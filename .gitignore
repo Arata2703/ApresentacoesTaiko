@@ -1,6 +1,31 @@
+# Dependências e builds gerados
 node_modules/
 dist/
-work/
-*.local
-.DS_Store
+*.tsbuildinfo
+
+# Relatórios e caches de testes
 coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Arquivos temporários de trabalho e caches locais
+work/
+.cache/
+*.log
+
+# Configurações locais e variáveis de ambiente
+*.local
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+
+# Arquivos auxiliares gerados pelo Husky (hooks compartilhados continuam no Git)
+.husky/_/
+
+# Metadados do sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini
