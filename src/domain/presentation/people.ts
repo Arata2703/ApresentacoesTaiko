@@ -44,13 +44,17 @@ export function setRosterMembership(
   }
 }
 
-export function removePerson(p: Presentation, id: string): Presentation {
-  byId(p.people, id)
-  const assigned =
+export function personIsAssigned(p: Presentation, id: string): boolean {
+  return (
     p.maps.some((map) =>
       map.instruments.some((item) => item.playerIds.includes(id)),
     ) || p.transitions.some((item) => item.participantIds.includes(id))
-  if (assigned)
+  )
+}
+
+export function removePerson(p: Presentation, id: string): Presentation {
+  byId(p.people, id)
+  if (personIsAssigned(p, id))
     throw new Error(
       'Pessoa em uso. Remova as atribuições ou apenas retire-a da lista de integrantes.',
     )

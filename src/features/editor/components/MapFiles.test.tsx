@@ -13,6 +13,7 @@ import { createPresentation } from '../../../domain/presentation/presentation'
 import { presentationFixture } from '../../../test/presentationFixture'
 import { projectMap, firstMapId } from '../editorProjection'
 import App from '../../../App'
+import { addPlayerToSelected } from '../../../test/addPlayer'
 
 vi.mock('../../../integrations/download', () => ({ download: vi.fn() }))
 vi.mock('../../../integrations/exportMap', () => ({ exportMap: vi.fn() }))
@@ -46,7 +47,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Adicionar Okedo' }))
-    await user.type(screen.getByLabelText('Nome do tocador'), 'Ana Silva')
+    await addPlayerToSelected('Ana Silva')
     fireEvent.change(screen.getByLabelText('Horizontal · m'), {
       target: { value: '3.25' },
     })
@@ -127,7 +128,12 @@ describe('arquivos e primeiro fluxo integrado', () => {
     await userEvent.click(
       screen.getByRole('button', { name: /Okedo, tocador Ana, João/ }),
     )
-    expect(screen.getByLabelText('Nome do tocador')).toHaveAttribute('readonly')
+    expect(
+      screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
+    ).toBeChecked()
+    expect(
+      screen.getByRole('checkbox', { name: 'João · pessoa 2' }),
+    ).toBeChecked()
     expect(screen.getByText('Okedo Eitetsu', { exact: true })).toBeVisible()
     fireEvent.change(screen.getByLabelText('Horizontal · m'), {
       target: { value: '7' },
@@ -166,7 +172,22 @@ describe('arquivos e primeiro fluxo integrado', () => {
     await userEvent.click(
       screen.getByRole('button', { name: /Shime, tocador João/ }),
     )
-    await userEvent.type(screen.getByLabelText('Nome do tocador'), ' Silva')
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Gerenciar integrantes' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Renomear João (pessoa 1)' }),
+    )
+    await userEvent.type(
+      screen.getByLabelText('Novo nome de João (pessoa 1)'),
+      ' Silva',
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Salvar nome de João (pessoa 1)' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Abrir mapa Ibuki' }),
+    )
     expect(
       screen.getByRole('button', { name: /Shime, tocador João Silva/ }),
     ).toBeVisible()

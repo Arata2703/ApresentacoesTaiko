@@ -1,19 +1,22 @@
-import {
-  getInstrumentType,
-  type InstrumentChanges,
-} from '../../../domain/stage'
+import { getInstrumentType } from '../../../domain/stage'
 import styles from '../editor.module.css'
-import type { EditorInstrument } from '../editorProjection'
+import type { EditorInstrument, InstrumentTransform } from '../editorProjection'
 import type { StageDimensions } from '../../../domain/presentation/model'
+import type { Person } from '../../../domain/presentation/model'
+import { PlayerAssignments } from '../../people/PlayerAssignments'
 
 interface Props {
+  people: readonly Person[]
+  onAssign: (ids: readonly string[]) => void
+  onManage: () => void
   selected?: EditorInstrument
   stage: StageDimensions
-  onChange: (changes: InstrumentChanges) => void
+  onChange: (changes: InstrumentTransform) => void
   onRemove: () => void
 }
 export function InstrumentProperties(props: Props) {
-  const { selected, onChange, onRemove, stage } = props
+  const { selected, onChange, onRemove, stage, people, onAssign, onManage } =
+    props
   const selectedType = selected && getInstrumentType(selected.kind)
   return (
     <aside className={styles.properties} aria-labelledby="properties-title">
@@ -22,21 +25,12 @@ export function InstrumentProperties(props: Props) {
         <>
           <h2 id="properties-title">{selectedType.name}</h2>
           <p className={styles.propertyCaption}>Instrumento selecionado</p>
-          <label className={styles.field}>
-            Nome do tocador
-            <input
-              placeholder="Ex.: Ana"
-              value={selected.player}
-              readOnly={selected.playerCount > 1}
-              onChange={(event) => onChange({ player: event.target.value })}
-              maxLength={80}
-            />
-          </label>
-          <p className={styles.propertyCaption}>
-            {selected.playerCount > 1
-              ? 'Vários tocadores preservados. A edição dessas atribuições chegará com o cadastro de integrantes.'
-              : 'Renomear um tocador atualiza seu nome onde ele estiver atribuído.'}
-          </p>
+          <PlayerAssignments
+            people={people}
+            selectedIds={selected.playerIds}
+            onAssign={onAssign}
+            onManage={onManage}
+          />
           <div className={styles.field}>
             Base
             <span className={styles.readOnly}>{selected.baseLabel}</span>

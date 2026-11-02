@@ -8,9 +8,14 @@ import { InstrumentProperties } from './components/InstrumentProperties'
 import { EditorFooter } from './components/EditorFooter'
 import { useStageEditor } from './useStageEditor'
 import styles from './editor.module.css'
+import { useState } from 'react'
+import { PeoplePage } from '../people/PeoplePage'
+import { peopleActions } from '../people/peopleActions'
 
 export function EditorPage() {
   const editor = useStageEditor()
+  const [peopleView, setPeopleView] = useState(false)
+  const people = peopleActions(editor.updatePresentation)
 
   return (
     <div className={styles.app}>
@@ -23,17 +28,27 @@ export function EditorPage() {
       />
       <div className={styles.layout}>
         <PresentationSidebar
+          peopleView={peopleView}
+          onPeople={() => setPeopleView(true)}
           presentation={editor.presentation}
           activeMapId={editor.activeMapId}
-          onSelect={editor.selectMap}
+          onSelect={(id) => {
+            editor.selectMap(id)
+            setPeopleView(false)
+          }}
         />
         <main className={styles.workspace} id="workspace">
           <MapFiles
             presentation={editor.presentation}
-            page={editor.page}
-            onOpen={editor.openPresentation}
+            page={peopleView ? null : editor.page}
+            onOpen={(presentation) => {
+              editor.openPresentation(presentation)
+              setPeopleView(false)
+            }}
           />
-          {editor.page ? (
+          {peopleView ? (
+            <PeoplePage presentation={editor.presentation} actions={people} />
+          ) : editor.page ? (
             <>
               <MapHeading song={editor.song} onSongChange={editor.setSong} />
               <div className={styles.editor}>
@@ -47,6 +62,9 @@ export function EditorPage() {
                   onMove={editor.moveInstrument}
                 />
                 <InstrumentProperties
+                  people={editor.presentation.people}
+                  onAssign={editor.assignPlayers}
+                  onManage={() => setPeopleView(true)}
                   stage={editor.page.stage}
                   selected={editor.selected}
                   onChange={editor.changeSelected}

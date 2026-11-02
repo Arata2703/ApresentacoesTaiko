@@ -1,16 +1,20 @@
 import type { Presentation } from '../../domain/presentation/model'
 import { bases } from '../../domain/presentation/catalog'
 import type { StageInstrument } from '../../domain/stage'
+export type InstrumentTransform = Partial<
+  Pick<StageInstrument, 'x' | 'y' | 'rotation'>
+>
 
 export interface EditorInstrument extends StageInstrument {
+  playerIds: readonly string[]
   baseLabel: string
-  playerCount: number
 }
 
 export function projectMap(presentation: Presentation, mapId: string | null) {
   const map = presentation.maps.find((item) => item.id === mapId)
   if (!map) return null
   const instruments: EditorInstrument[] = map.instruments.map((item) => ({
+    playerIds: item.playerIds,
     id: item.id,
     kind: item.kind,
     x: item.position.x,
@@ -19,7 +23,6 @@ export function projectMap(presentation: Presentation, mapId: string | null) {
     player: item.playerIds
       .map((id) => presentation.people.find((person) => person.id === id)!.name)
       .join(', '),
-    playerCount: item.playerIds.length,
     baseLabel:
       item.baseId === null
         ? 'Sem base definida'

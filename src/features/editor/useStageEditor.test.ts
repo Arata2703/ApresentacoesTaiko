@@ -4,6 +4,7 @@ import { useStageEditor } from './useStageEditor'
 import { createPresentation } from '../../domain/presentation/presentation'
 import { presentationFixture } from '../../test/presentationFixture'
 import { assignInstrumentPlayers } from '../../domain/presentation/maps'
+import { addPerson, renamePerson } from '../../domain/presentation/people'
 
 describe('estado do editor', () => {
   it('abre apresentação vazia sem inventar mapas e cria somente o primeiro sob ação explícita', () => {
@@ -32,12 +33,16 @@ describe('estado do editor', () => {
     const { result } = renderHook(useStageEditor)
     act(() => result.current.openPresentation(p))
     act(() => result.current.selectInstrument('flute'))
-    act(() => result.current.changeSelected({ player: 'Ana Silva' }))
+    act(() =>
+      result.current.updatePresentation((p) =>
+        renamePerson(p, 'ana', 'Ana Silva'),
+      ),
+    )
     expect(
       result.current.presentation.people.find((person) => person.id === 'ana')!
         .name,
     ).toBe('Ana Silva')
-    act(() => result.current.changeSelected({ player: '' }))
+    act(() => result.current.assignPlayers([]))
     expect(
       result.current.presentation.maps[1]!.instruments[0]!.playerIds,
     ).toEqual([])
@@ -53,7 +58,6 @@ describe('estado do editor', () => {
     act(() => result.current.selectInstrument('drum'))
     act(() =>
       result.current.changeSelected({
-        player: 'Não substituir',
         x: NaN,
         y: Infinity,
         rotation: NaN,
@@ -72,7 +76,8 @@ describe('estado do editor', () => {
   it('ignora edição e remoção sem seleção', () => {
     const { result } = renderHook(useStageEditor)
     act(() => {
-      result.current.changeSelected({ player: 'Ana' })
+      result.current.changeSelected({ x: 1 })
+      result.current.assignPlayers([])
       result.current.removeSelected()
     })
     expect(result.current.instruments).toEqual([])
@@ -81,14 +86,20 @@ describe('estado do editor', () => {
 
   it('mantém instrumentos independentes e altera apenas o selecionado', () => {
     const { result } = renderHook(useStageEditor)
+    act(() =>
+      result.current.updatePresentation((p) =>
+        addPerson(addPerson(p, 'ana', 'Ana'), 'bia', 'Bia'),
+      ),
+    )
     act(() => result.current.addInstrument('okedo'))
     const firstId = result.current.selectedId!
     act(() => result.current.addInstrument('shime'))
     const secondId = result.current.selectedId!
     expect(secondId).not.toBe(firstId)
-    act(() => result.current.changeSelected({ player: 'Bia' }))
+    act(() => result.current.assignPlayers(['bia']))
     act(() => result.current.selectInstrument(firstId))
-    act(() => result.current.changeSelected({ player: 'Ana', rotation: 90 }))
+    act(() => result.current.assignPlayers(['ana']))
+    act(() => result.current.changeSelected({ rotation: 90 }))
     expect(result.current.instruments.map((item) => item.player)).toEqual([
       'Ana',
       'Bia',

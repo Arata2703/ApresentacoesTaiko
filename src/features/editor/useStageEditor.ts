@@ -12,13 +12,12 @@ import {
   renameMap,
   updateMapInstrument,
 } from '../../domain/presentation/maps'
-import { addPerson, renamePerson } from '../../domain/presentation/people'
+import { getInstrumentType, type InstrumentKind } from '../../domain/stage'
 import {
-  getInstrumentType,
-  type InstrumentChanges,
-  type InstrumentKind,
-} from '../../domain/stage'
-import { firstMapId, projectMap } from './editorProjection'
+  firstMapId,
+  projectMap,
+  type InstrumentTransform,
+} from './editorProjection'
 
 function initialState() {
   const presentation = addMap(
@@ -33,7 +32,6 @@ function initialState() {
     selectedId: null as string | null,
     titleDraft: presentation.title,
     songDraft: 'Primeira música',
-    playerDraft: null as string | null,
   }
 }
 
@@ -44,11 +42,10 @@ export function useStageEditor() {
   )
   const page = projectMap(state.presentation, state.mapId)
   const instruments = page?.instruments ?? []
-  const item = instruments.find((entry) => entry.id === state.selectedId)
-  const selected = item && { ...item, player: state.playerDraft ?? item.player }
+  const selected = instruments.find((entry) => entry.id === state.selectedId)
 
   function selectInstrument(id: string) {
-    setState((s) => ({ ...s, selectedId: id, playerDraft: null }))
+    setState((s) => ({ ...s, selectedId: id }))
   }
 
   function addInstrument(kind: InstrumentKind) {
@@ -64,33 +61,19 @@ export function useStageEditor() {
           y: map.stage.depth * (1 / 3 + (Math.floor(count / 4) % 3) / 6),
         },
       })
-      return { ...s, presentation, selectedId: id, playerDraft: null }
+      return { ...s, presentation, selectedId: id }
     })
     setMessage(`${getInstrumentType(kind).name} adicionado ao palco.`)
   }
 
-  function changeSelected(changes: InstrumentChanges) {
-    const personId = crypto.randomUUID()
+  function changeSelected(changes: InstrumentTransform) {
     setState((s) => {
       const map = s.presentation.maps.find((entry) => entry.id === s.mapId)
       const instrument = map?.instruments.find(
         (entry) => entry.id === s.selectedId,
       )
       if (!map || !instrument) return s
-      let p = s.presentation
-      let playerDraft = s.playerDraft
-      if (changes.player !== undefined && instrument.playerIds.length <= 1) {
-        playerDraft = changes.player
-        const name = changes.player.trim()
-        if (!name) p = assignInstrumentPlayers(p, map.id, instrument.id, [])
-        else if (instrument.playerIds.length === 1)
-          p = renamePerson(p, instrument.playerIds[0]!, name)
-        else {
-          p = addPerson(p, personId, name, false)
-          p = assignInstrumentPlayers(p, map.id, instrument.id, [personId])
-        }
-      }
-      p = updateMapInstrument(p, map.id, instrument.id, {
+      const p = updateMapInstrument(s.presentation, map.id, instrument.id, {
         position: {
           x: Number.isFinite(changes.x) ? changes.x! : instrument.position.x,
           y: Number.isFinite(changes.y) ? changes.y! : instrument.position.y,
@@ -99,7 +82,7 @@ export function useStageEditor() {
           ? changes.rotation
           : instrument.rotation,
       })
-      return { ...s, presentation: p, playerDraft }
+      return { ...s, presentation: p }
     })
   }
 
@@ -113,7 +96,6 @@ export function useStageEditor() {
         selected.id,
       ),
       selectedId: null,
-      playerDraft: null,
     }))
     setMessage(`${getInstrumentType(selected.kind).name} removido.`)
   }
@@ -129,11 +111,26 @@ export function useStageEditor() {
           y: Number((instrument.position.y + dy).toFixed(3)),
         },
       })
-      return { ...s, presentation, selectedId: id, playerDraft: null }
+      return { ...s, presentation, selectedId: id }
     })
   }
 
   return {
+    updatePresentation: (change: (p: Presentation) => Presentation) =>
+      setState((s) => ({ ...s, presentation: change(s.presentation) })),
+    assignPlayers: (ids: readonly string[]) =>
+      setState((s) => {
+        if (s.mapId === null || s.selectedId === null) return s
+        return {
+          ...s,
+          presentation: assignInstrumentPlayers(
+            s.presentation,
+            s.mapId,
+            s.selectedId,
+            ids,
+          ),
+        }
+      }),
     presentation: state.presentation,
     page,
     instruments,
@@ -179,7 +176,6 @@ export function useStageEditor() {
               mapId: id,
               songDraft: map.title,
               selectedId: null,
-              playerDraft: null,
             }
           : s
       }),
@@ -191,7 +187,6 @@ export function useStageEditor() {
         selectedId: null,
         titleDraft: presentation.title,
         songDraft: projectMap(presentation, mapId)?.song ?? '',
-        playerDraft: null,
       })
       setMessage('Apresentação carregada do arquivo editável.')
     },

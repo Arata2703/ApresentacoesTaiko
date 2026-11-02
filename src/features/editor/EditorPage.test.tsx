@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from '../../App'
 import { catalog } from '../../domain/stage'
+import { addPlayerToSelected } from '../../test/addPlayer'
 
 describe('fluxos da primeira tela', () => {
   it('começa vazio e avisa que o trabalho ainda não é salvo', () => {
@@ -74,7 +75,7 @@ describe('fluxos da primeira tela', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: /Adicionar um okedo/ }))
-    await user.type(screen.getByLabelText('Nome do tocador'), 'Ana')
+    await addPlayerToSelected('Ana')
     fireEvent.change(screen.getByLabelText('Horizontal · m'), {
       target: { value: '4' },
     })
@@ -102,13 +103,17 @@ describe('fluxos da primeira tela', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Adicionar Okedo' }))
-    await user.type(screen.getByLabelText('Nome do tocador'), 'Ana')
+    await addPlayerToSelected('Ana')
     await user.click(screen.getByRole('button', { name: 'Adicionar Shime' }))
-    expect(screen.getByLabelText('Nome do tocador')).toHaveValue('')
+    expect(
+      screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
+    ).not.toBeChecked()
     const first = screen.getByRole('button', { name: /Okedo, tocador Ana/ })
     expect(first).toHaveAttribute('aria-pressed', 'false')
     await user.click(first)
-    expect(screen.getByLabelText('Nome do tocador')).toHaveValue('Ana')
+    expect(
+      screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
+    ).toBeChecked()
     await user.click(
       screen.getByRole('button', { name: 'Remover instrumento' }),
     )
