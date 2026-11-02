@@ -9,6 +9,7 @@ import {
 } from '../../integrations/presentationFile'
 import { presentationFixture } from '../../test/presentationFixture'
 import { assignInstrumentPlayers } from '../../domain/presentation/maps'
+import { createPresentation } from '../../domain/presentation/presentation'
 
 vi.mock('../../integrations/download', () => ({ download: vi.fn() }))
 afterEach(() => vi.clearAllMocks())
@@ -49,6 +50,24 @@ async function save() {
 }
 
 describe('integrantes pela interface', () => {
+  it('permite voltar à área de mapas quando o arquivo ainda não tem nenhum mapa', async () => {
+    render(<App />)
+    await open(serializePresentation(createPresentation('empty', 'Vazia')))
+    await people()
+    await add('Ana')
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Voltar aos mapas' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Criar primeiro mapa' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar Okedo' }),
+    )
+    expect(
+      screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
+    ).toBeVisible()
+  })
   it('cria homônimos distintos, valida nomes, cancela renomeação e exclui cadastro sem uso', async () => {
     render(<App />)
     await people()

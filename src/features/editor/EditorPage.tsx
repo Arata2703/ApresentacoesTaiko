@@ -47,7 +47,11 @@ export function EditorPage() {
             }}
           />
           {peopleView ? (
-            <PeoplePage presentation={editor.presentation} actions={people} />
+            <PeoplePage
+              presentation={editor.presentation}
+              actions={people}
+              onBack={() => setPeopleView(false)}
+            />
           ) : editor.page ? (
             <>
               <MapHeading song={editor.song} onSongChange={editor.setSong} />

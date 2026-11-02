@@ -1,6 +1,6 @@
 # Taiko / Palco
 
-Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. A M05 conecta o modelo completo da apresentação ao editor, ao arquivo versionado e ao PDF de um mapa.
+Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. Etapa atual: M06, com cadastro/lista de integrantes e seleção de vários tocadores por instrumento, integrados ao arquivo completo da apresentação.
 
 ## Executar
 
@@ -47,7 +47,9 @@ Leia [AGENTS.md](AGENTS.md) antes de modificar o projeto: funcionalidades novas 
 - Editor com catálogo lateral, mapa e painel de propriedades; navegação pelos mapas existentes no arquivo.
 - Instrumentos do catálogo inicial representados por símbolos ilustrativos.
 - Adição, seleção e remoção de instrumentos.
-- Nome do tocador, posição em metros e rotação; setas do teclado movem o instrumento selecionado.
+- Página de integrantes: cadastrar, renomear, incluir/retirar da lista e excluir cadastros sem uso.
+- Seleção de um ou vários tocadores por instrumento, por identidade, com preservação ao salvar/reabrir.
+- Posição em metros e rotação; setas do teclado movem o instrumento selecionado.
 - Títulos da apresentação e da música selecionada editáveis.
 - Arraste com mouse/toque, mantendo a alternativa de teclado e os limites do palco.
 - Download/abertura da apresentação completa, com validação e confirmação, incluindo conversão dos arquivos antigos da M02.
@@ -56,7 +58,9 @@ Leia [AGENTS.md](AGENTS.md) antes de modificar o projeto: funcionalidades novas 
 
 O navegador ainda não salva automaticamente: use **Baixar apresentação editável** antes de sair e **Abrir apresentação** para retomar. O PDF é para consulta/impressão de um mapa; o JSON guarda a apresentação inteira para continuar editando. Recarregar a página limpa a sessão. Os símbolos são ilustrativos; a base existente é exibida, e a escolha de base chegará na M07.
 
-Consulte [o que pode ser usado e os limites da M05](docs/m05-fluxo.md). Para testar a navegação entre mapas, abra [o exemplo](examples/presentation-v1.json) pela interface. Criar várias músicas e reordenar são entregas da M08.
+Cadastre as pessoas em **Integrantes**, na lateral; depois selecione um instrumento no mapa e marque seus tocadores. Renomeie pessoas no cadastro para atualizar todos os seus rótulos. Retirar da lista preserva atribuições; excluir um cadastro em uso fica bloqueado com explicação.
+
+Consulte [o que pode ser usado e os limites da M06](docs/m06-integrantes.md) e [o fluxo integrado da M05](docs/m05-fluxo.md). Para testar a navegação entre mapas, abra [o exemplo](examples/presentation-v1.json) pela interface. Criar várias músicas e reordenar são entregas da M08. O PDF de integrantes e os avisos automáticos de participação ainda não estão disponíveis.
 
 ## Núcleo lógico da M03
 
@@ -66,13 +70,13 @@ Consulte [o modelo, as operações e os limites da M03](docs/m03-modelo.md).
 
 ## Contrato de arquivo da M04
 
-O arquivo completo é JSON `taiko-presentation`, versão 1, com validação de estrutura e referências, diferenciação de erros/versões incompatíveis e conversão dos mapas da M02. A importação devolve um candidato validado que a interface aplica somente após confirmação. A suíte completa tem 229 testes.
+O arquivo completo é JSON `taiko-presentation`, versão 1, com validação de estrutura e referências, diferenciação de erros/versões incompatíveis e conversão dos mapas da M02. A importação devolve um candidato validado que a interface aplica somente após confirmação. A suíte completa tem 236 testes.
 
 Consulte [o contrato e a migração da M04](docs/m04-arquivo.md) e o [arquivo de exemplo](examples/presentation-v1.json). Os controles da página já usam esse formato.
 
 ## Próximas entregas
 
-Cadastro de integrantes e atribuições, editor completo, criação/ordenação de várias músicas, transições, materiais manuais, salvamento automático, PDF completo e deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
+Editor completo, criação/ordenação de várias músicas, transições, materiais manuais, salvamento automático, PDF completo e deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
 
 ## Organização
 
@@ -83,6 +87,7 @@ Cadastro de integrantes e atribuições, editor completo, criação/ordenação 
 - `src/features/editor/EditorPage.tsx`: composição da tela.
 - `src/features/editor/useStageEditor.ts`: estado e ações do editor, sem marcação visual.
 - `src/features/editor/editorProjection.ts`: conversão do mapa selecionado para os componentes/PDF, preservando o modelo completo como fonte dos dados.
+- `src/features/people/`: cadastro/lista de integrantes e atribuição de tocadores, com componentes, ações, estilos e testes próprios.
 - `src/features/editor/useInstrumentDrag.ts`: captura do ponteiro e conversão de deslocamento da tela para metros.
 - `src/integrations/mapFile.ts`: formato legado da prova M02, usado na conversão e testes de compatibilidade.
 - `src/integrations/presentationFile/`: contrato completo, validação, referências e migração do legado M02, integrado aos controles de arquivo.

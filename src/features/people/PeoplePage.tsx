@@ -8,14 +8,18 @@ import styles from './people.module.css'
 interface Props {
   presentation: Presentation
   actions: ReturnType<typeof peopleActions>
+  onBack: () => void
 }
 
-export function PeoplePage({ presentation, actions }: Props) {
+export function PeoplePage({ presentation, actions, onBack }: Props) {
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   return (
     <section className={styles.page} aria-labelledby="people-title">
-      <h1 id="people-title">Integrantes</h1>
+      <div className={styles.personHeading}>
+        <h1 id="people-title">Integrantes</h1>
+        <button onClick={onBack}>Voltar aos mapas</button>
+      </div>
       <p>
         Cadastre as pessoas e marque quem faz parte da lista desta apresentação.
         Os números distinguem pessoas com o mesmo nome.
