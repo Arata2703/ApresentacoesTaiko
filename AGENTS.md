@@ -29,6 +29,7 @@ Estas regras valem para qualquer chat ou agente que modificar o projeto.
 - Não publique, crie repositório remoto ou altere dados externos sem autorização aplicável.
 - Antes de editar, leia as instruções adicionais e confira alterações existentes. Não sobrescreva trabalho do usuário.
 - Ao entregar, informe mudanças, resultado das verificações, limitações e hash do commit quando houver.
+- Em cada etapa, explique o que foi feito, o que já pode ser usado na tela, como foi verificado e qual é a próxima etapa. Distinga lógica interna de funcionalidade disponível na interface; não apresente regras ainda desconectadas como recursos utilizáveis.
 
 ## Comandos
 
