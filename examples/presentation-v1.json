@@ -1,0 +1,115 @@
+{
+  "format": "taiko-presentation",
+  "version": 1,
+  "presentation": {
+    "id": "show",
+    "title": "Mostra Japão",
+    "people": [
+      {
+        "id": "ana",
+        "name": "Ana"
+      },
+      {
+        "id": "joao",
+        "name": "João"
+      }
+    ],
+    "rosterIds": ["ana"],
+    "maps": [
+      {
+        "id": "a",
+        "title": "Ibuki",
+        "stage": {
+          "width": 12,
+          "depth": 8
+        },
+        "instruments": [
+          {
+            "id": "drum",
+            "kind": "okedo",
+            "baseId": "okedo-eitetsu",
+            "playerIds": ["ana", "joao"],
+            "position": {
+              "x": 3.25,
+              "y": 1.5
+            },
+            "rotation": 315
+          }
+        ]
+      },
+      {
+        "id": "b",
+        "title": "Yatai",
+        "stage": {
+          "width": 10,
+          "depth": 6
+        },
+        "instruments": [
+          {
+            "id": "flute",
+            "kind": "fue",
+            "baseId": null,
+            "playerIds": [],
+            "position": {
+              "x": 5,
+              "y": 3
+            },
+            "rotation": 0
+          }
+        ]
+      }
+    ],
+    "transitions": [
+      {
+        "id": "entry",
+        "tsunagiName": "",
+        "instructions": "Entrada",
+        "participantIds": [],
+        "needsReview": true
+      },
+      {
+        "id": "middle",
+        "tsunagiName": "Ponte",
+        "instructions": "Mover okedo.\nLevar bases para o fundo.",
+        "participantIds": ["joao"],
+        "needsReview": true
+      },
+      {
+        "id": "exit",
+        "tsunagiName": "",
+        "instructions": "Saída",
+        "participantIds": [],
+        "needsReview": true
+      }
+    ],
+    "sequence": [
+      {
+        "kind": "transition",
+        "id": "entry"
+      },
+      {
+        "kind": "map",
+        "id": "b"
+      },
+      {
+        "kind": "transition",
+        "id": "middle"
+      },
+      {
+        "kind": "map",
+        "id": "a"
+      },
+      {
+        "kind": "transition",
+        "id": "exit"
+      }
+    ],
+    "materials": [
+      {
+        "id": "banner",
+        "name": "Banner",
+        "quantity": 1
+      }
+    ]
+  }
+}
