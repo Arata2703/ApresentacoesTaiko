@@ -21,8 +21,18 @@ export function MapFiles({ map, onOpen }: Props) {
   const [busy, setBusy] = useState(false)
 
   function save() {
+    const source = serializeMap(map)
+    try {
+      // Never offer a backup that this same version cannot reopen.
+      parseMap(source)
+    } catch {
+      setMessage(
+        'Não foi possível baixar o mapa. Esta demonstração aceita até 500 instrumentos e nomes de até 80 caracteres.',
+      )
+      return
+    }
     download(
-      new Blob([serializeMap(map)], { type: 'application/json' }),
+      new Blob([source], { type: 'application/json' }),
       'mapa-taiko.json',
     )
     setMessage('Arquivo editável baixado. Guarde-o para reabrir este mapa.')

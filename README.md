@@ -1,6 +1,6 @@
 # Taiko / Palco
 
-Primeira tela do planejador de apresentações de Taiko, com React, TypeScript, Vite e CSS Modules.
+Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. Etapa atual: prova técnica M02 de um mapa editável e exportação PDF.
 
 ## Executar
 
@@ -49,12 +49,17 @@ Leia [AGENTS.md](AGENTS.md) antes de modificar o projeto: funcionalidades novas 
 - Adição, seleção e remoção de instrumentos.
 - Nome do tocador, posição em metros e rotação; setas do teclado movem o instrumento selecionado.
 - Títulos da apresentação e da primeira música editáveis.
+- Arraste com mouse/toque, mantendo a alternativa de teclado e os limites do palco.
+- Download e abertura manual de um mapa JSON versão 1, com validação e confirmação antes de substituir o trabalho atual.
+- Exportação de uma página PDF A4 horizontal com posições, rotação indicada por traço e nomes em texto vetorial com fonte incorporada.
 
-Os nomes e posições existem apenas na memória da sessão. Recarregar a página limpa o mapa. O tamanho dos símbolos é ilustrativo; não representa medidas reais confirmadas dos instrumentos. A base padrão é informativa nesta etapa.
+O navegador ainda não salva automaticamente: baixe o mapa editável antes de sair e use **Abrir mapa** para retomá-lo. O PDF é para consulta/impressão; o JSON é para continuar editando. Recarregar a página limpa a sessão. O tamanho dos símbolos é ilustrativo; não representa medidas reais confirmadas dos instrumentos. A base padrão é informativa nesta etapa.
+
+Consulte [as decisões e limitações da M02](docs/m02-decisoes.md). O formato desta prova contém um único mapa; o arquivo de apresentação completo será tratado na M04.
 
 ## Ainda não implementado
 
-Arraste/canvas Konva, salvamento automático e arquivo de projeto, PDF, múltiplas músicas, transições, cadastro central de integrantes, troca de bases e deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
+Salvamento automático, arquivo de apresentação completo, múltiplas músicas, transições, cadastro central de integrantes, troca de bases e deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
 
 ## Organização
 
@@ -63,8 +68,12 @@ Arraste/canvas Konva, salvamento automático e arquivo de projeto, PDF, múltipl
 - `src/App.tsx`: entrada que seleciona a página do editor.
 - `src/features/editor/EditorPage.tsx`: composição da tela.
 - `src/features/editor/useStageEditor.ts`: estado e ações do editor, sem marcação visual.
+- `src/features/editor/useInstrumentDrag.ts`: captura do ponteiro e conversão de deslocamento da tela para metros.
+- `src/integrations/mapFile.ts`: formato versionado da prova e validação antes da abertura.
+- `src/integrations/mapPdf.ts`: composição vetorial do PDF, independente dos componentes React.
+- `src/integrations/exportMap.ts` e `download.ts`: carregamento sob demanda do gerador/fonte e download no navegador.
 - `src/features/editor/components/`: cabeçalho, navegação, catálogo, palco, propriedades e outros componentes visuais, conectados por propriedades e callbacks.
 - `src/features/editor/editor.module.css`: estilos compartilhados e restritos à funcionalidade do editor.
 - `src/styles.css`: estilos globais e foco.
 
-Os demais adaptadores e camadas serão adicionados quando houver funcionalidade correspondente. A prova técnica de palco/PDF ainda não foi encerrada. Nenhum repositório remoto ou publicação foi criado.
+Os demais adaptadores e camadas serão adicionados quando houver funcionalidade correspondente. Nenhum repositório remoto ou publicação foi criado.

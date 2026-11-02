@@ -19,6 +19,16 @@ function upload(source: string, size = source.length) {
 }
 
 describe('arquivos pela interface', () => {
+  it('não oferece backup que a própria demonstração não conseguiria reabrir', async () => {
+    render(
+      <MapFiles map={{ ...map, title: 'a'.repeat(81) }} onOpen={vi.fn()} />,
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Baixar mapa editável' }),
+    )
+    expect(screen.getByText(/Não foi possível baixar o mapa/)).toBeVisible()
+    expect(download).not.toHaveBeenCalled()
+  })
   it('baixa arquivo editável com o estado atual e orienta o usuário', async () => {
     render(<MapFiles map={map} onOpen={vi.fn()} />)
     await userEvent.click(
