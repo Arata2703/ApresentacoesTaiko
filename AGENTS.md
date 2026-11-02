@@ -24,7 +24,9 @@ Estas regras valem para qualquer chat ou agente que modificar o projeto.
 
 ## Commits e escopo
 
-- Faça commits graduais, com uma etapa coerente por commit, incluindo os testes correspondentes.
+- Primeiro implemente a etapa, acrescente os testes e execute as verificações. Apresente o resultado utilizável e explique como validá-lo, deixando as alterações sem commit para a validação do usuário.
+- Aguarde a aprovação explícita do usuário antes de fazer commits. Solicitações de implementar ou continuar uma etapa não autorizam commits automaticamente. Incorpore os ajustes pedidos e apresente novamente o resultado até a aprovação.
+- Após a aprovação, faça commits graduais, com uma parte coerente por commit e os testes correspondentes. Execute as verificações obrigatórias em cada commit; não inclua alterações fora do escopo aprovado. Se o usuário pedir novos ajustes antes de terminar os commits, conclua os ajustes e aguarde sua validação antes de commitar essa parte.
 - Respeite o MVP e o roadmap. Não implemente funcionalidades futuras sem solicitação.
 - Não publique, crie repositório remoto ou altere dados externos sem autorização aplicável.
 - Antes de editar, leia as instruções adicionais e confira alterações existentes. Não sobrescreva trabalho do usuário.
