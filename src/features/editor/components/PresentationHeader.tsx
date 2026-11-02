@@ -30,7 +30,7 @@ export function PresentationHeader(props: Props) {
           <span /> Sessão local · salvamento manual em arquivo
         </span>
       </div>
-      <span className={styles.version}>INTEGRANTES · M06</span>
+      <span className={styles.version}>EDITOR · M07</span>
     </header>
   )
 }

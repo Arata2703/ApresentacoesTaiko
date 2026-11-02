@@ -13,21 +13,21 @@
   height: 26px;
   min-width: 0;
   padding: 4px 7px;
-  border: 1px solid #bcc8ae;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
   box-shadow: 0 2px 5px #00000009;
-  background: #fffefa;
+  background: var(--surface);
   text-align: center;
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
-  color: #354e3b;
+  color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .nameField.editing {
-  background: #edf2e6;
+  background: var(--soft);
   outline: none;
 }
 .options {
@@ -42,8 +42,8 @@
   padding: 3px;
   max-height: 160px;
   overflow-y: auto;
-  background: #fffefa;
-  border: 1px solid #bdcbb3;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
   border-radius: 8px;
   box-shadow: 0 4px 12px #29372e1a;
   text-align: left;
@@ -55,16 +55,16 @@
 }
 .options [aria-selected='true'],
 .options [role='option']:hover {
-  background: #edf1e7;
+  background: var(--soft);
 }
 .empty {
   padding: 6px;
-  color: #68765c;
+  color: var(--ink-muted);
 }
 .error {
   padding: 5px;
   margin: 3px 0 0;
   border: 1px solid #d1a59a;
   color: #8b3927;
-  background: #fffefa;
+  background: var(--surface);
 }
