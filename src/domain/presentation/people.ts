@@ -64,3 +64,28 @@ export function removePerson(p: Presentation, id: string): Presentation {
     rosterIds: p.rosterIds.filter((personId) => personId !== id),
   }
 }
+
+/** Explicit removal from the presentation also detaches all uses of this identity. */
+export function removePresentationPerson(
+  p: Presentation,
+  id: string,
+): Presentation {
+  byId(p.people, id)
+  return {
+    ...p,
+    people: p.people.filter((person) => person.id !== id),
+    rosterIds: p.rosterIds.filter((personId) => personId !== id),
+    maps: p.maps.map((map) => ({
+      ...map,
+      instruments: map.instruments.map((item) => ({
+        ...item,
+        playerIds: item.playerIds.filter((personId) => personId !== id),
+      })),
+    })),
+    transitions: p.transitions.map((item) => ({
+      ...item,
+      participantIds: item.participantIds.filter((personId) => personId !== id),
+      needsReview: item.participantIds.includes(id) ? true : item.needsReview,
+    })),
+  }
+}

@@ -175,16 +175,14 @@ describe('arquivos e primeiro fluxo integrado', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Gerenciar integrantes' }),
     )
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Renomear João (pessoa 1)' }),
+    await userEvent.dblClick(
+      screen.getByRole('button', { name: 'Editar nome de João (pessoa 1)' }),
     )
     await userEvent.type(
       screen.getByLabelText('Novo nome de João (pessoa 1)'),
       ' Silva',
     )
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Salvar nome de João (pessoa 1)' }),
-    )
+    await userEvent.keyboard('{Enter}')
     await userEvent.click(
       screen.getByRole('button', { name: 'Abrir mapa Ibuki' }),
     )

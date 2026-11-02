@@ -1,36 +1,38 @@
 .page {
-  padding: 24px;
+  padding: 16px;
   background: #fffefa;
   border: 1px solid #e1e4da;
   border-radius: 8px;
 }
 .page h1 {
-  margin-top: 0;
+  margin: 0;
+  font-size: 24px;
 }
 .page p {
-  line-height: 1.7;
+  line-height: 1.5;
+  margin: 8px 0;
 }
 .addForm,
 .actions {
   display: flex;
   align-items: end;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 .page label {
   display: grid;
-  gap: 8px;
+  gap: 4px;
 }
 .page input:not([type='checkbox']) {
   border: 1px solid #a7b99a;
-  padding: 9px 12px;
+  padding: 6px 8px;
   border-radius: 4px;
   width: min(100%, 320px);
 }
 .page button {
   border: 1px solid #a7b99a;
   background: #f1f5eb;
-  padding: 9px 12px;
+  padding: 6px 10px;
   border-radius: 4px;
   color: #35452a;
 }
@@ -38,41 +40,15 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
-.list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 18px;
-  margin-top: 24px;
-}
-.card {
-  border: 1px solid #d5ddc9;
-  border-radius: 8px;
-  padding: 18px;
-  overflow-wrap: anywhere;
-}
 .personHeading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
-.personHeading h2 {
-  font-size: 19px;
-}
-.personHeading span,
 .hint {
   color: #68765c;
   font-size: 12px;
-}
-.page .check {
-  display: flex;
-  align-items: center;
-  margin: 8px 0 18px;
-  font-size: 13px;
-}
-.card form {
-  display: grid;
-  gap: 12px;
 }
 .assignment {
   display: flex;
@@ -105,4 +81,77 @@
   color: #35452a;
   border-radius: 4px;
   padding: 8px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  text-align: left;
+}
+.table th {
+  font-size: 12px;
+  color: #68765c;
+  background: #f4f6ef;
+}
+.table th,
+.table td {
+  padding: 6px 8px;
+  border: 1px solid #e1e4da;
+  vertical-align: middle;
+}
+.table td:first-child {
+  width: 50%;
+  overflow-wrap: anywhere;
+}
+.table form {
+  display: grid;
+  gap: 8px;
+}
+.editableName {
+  cursor: text;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  padding: 0;
+  box-sizing: border-box;
+}
+.nameCell {
+  cursor: text;
+}
+.nameCell:hover,
+.nameCell:focus-within {
+  background: #f4f6ef;
+}
+.page .table .nameInput {
+  width: 100%;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  box-sizing: border-box;
+}
+.table th:last-child,
+.table td:nth-child(2) {
+  width: 50%;
+}
+.page .iconButton {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  background: transparent;
+  border-color: #d5ddc9;
+}
+.page .iconButton:hover {
+  background: #fff1eb;
+  color: #9b3c2c;
 }

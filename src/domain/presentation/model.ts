@@ -54,7 +54,7 @@ export interface Presentation {
   readonly id: string
   readonly title: string
   readonly people: readonly Person[]
-  /** Membership is separate from identity, so removing a roster entry keeps assignments. */
+  /** Legacy v1 field; the current editor includes every person in the presentation list. */
   readonly rosterIds: readonly string[]
   readonly maps: readonly MusicMap[]
   readonly transitions: readonly TextTransition[]

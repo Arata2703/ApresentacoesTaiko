@@ -20,13 +20,10 @@ export function PeoplePage({ presentation, actions, onBack }: Props) {
         <h1 id="people-title">Integrantes</h1>
         <button onClick={onBack}>Voltar aos mapas</button>
       </div>
+      <p>Duplo clique no nome para editar. Enter salva; Esc cancela.</p>
       <p>
-        Cadastre as pessoas e marque quem faz parte da lista desta apresentação.
-        Os números distinguem pessoas com o mesmo nome.
-      </p>
-      <p>
-        {presentation.rosterIds.length} na lista · {presentation.people.length}{' '}
-        no cadastro
+        {presentation.people.length}{' '}
+        {presentation.people.length === 1 ? 'integrante' : 'integrantes'}
       </p>
       <form
         className={styles.addForm}
@@ -53,21 +50,29 @@ export function PeoplePage({ presentation, actions, onBack }: Props) {
       </form>
       {error && <p role="alert">{error}</p>}
       {!presentation.people.length && (
-        <p>Nenhuma pessoa cadastrada. Adicione o primeiro integrante acima.</p>
+        <p>Nenhum integrante. Adicione o primeiro integrante acima.</p>
       )}
-      <div className={styles.list}>
-        {presentation.people.map((person, index) => (
-          <PersonRow
-            key={person.id}
-            person={person}
-            number={index + 1}
-            included={presentation.rosterIds.includes(person.id)}
-            assigned={personIsAssigned(presentation, person.id)}
-            onRename={actions.rename}
-            onMembership={actions.membership}
-            onRemove={actions.remove}
-          />
-        ))}
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th scope="col">Nome do integrante</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {presentation.people.map((person, index) => (
+              <PersonRow
+                key={person.id}
+                person={person}
+                number={index + 1}
+                assigned={personIsAssigned(presentation, person.id)}
+                onRename={actions.rename}
+                onRemove={actions.remove}
+              />
+            ))}
+          </tbody>
+        </table>
       </div>
       <p className={styles.hint}>
         Guarde as alterações em Baixar apresentação editável. O PDF da lista de

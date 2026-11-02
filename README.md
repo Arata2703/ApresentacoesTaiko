@@ -47,7 +47,7 @@ Leia [AGENTS.md](AGENTS.md) antes de modificar o projeto: funcionalidades novas 
 - Editor com catálogo lateral, mapa e painel de propriedades; navegação pelos mapas existentes no arquivo.
 - Instrumentos do catálogo inicial representados por símbolos ilustrativos.
 - Adição, seleção e remoção de instrumentos.
-- Página de integrantes: cadastrar, renomear, incluir/retirar da lista e excluir cadastros sem uso.
+- Tabela compacta de integrantes: célula inteira do nome editável por duplo clique e lixeira para remoção.
 - Seleção de um ou vários tocadores por instrumento, por identidade, com preservação ao salvar/reabrir.
 - Posição em metros e rotação; setas do teclado movem o instrumento selecionado.
 - Títulos da apresentação e da música selecionada editáveis.
@@ -58,7 +58,7 @@ Leia [AGENTS.md](AGENTS.md) antes de modificar o projeto: funcionalidades novas 
 
 O navegador ainda não salva automaticamente: use **Baixar apresentação editável** antes de sair e **Abrir apresentação** para retomar. O PDF é para consulta/impressão de um mapa; o JSON guarda a apresentação inteira para continuar editando. Recarregar a página limpa a sessão. Os símbolos são ilustrativos; a base existente é exibida, e a escolha de base chegará na M07.
 
-Cadastre as pessoas em **Integrantes**, na lateral; depois selecione um instrumento no mapa e marque seus tocadores. Renomeie pessoas no cadastro para atualizar todos os seus rótulos. Retirar da lista preserva atribuições; excluir um cadastro em uso fica bloqueado com explicação.
+Adicione as pessoas em **Integrantes**, na lateral; todos os nomes adicionados pertencem à apresentação. Dê duplo clique no nome para editar: Enter ou sair do campo salva, Esc cancela. Depois selecione um instrumento no mapa e marque seus tocadores. A remoção de alguém em uso pede confirmação e retira suas atribuições, preservando os instrumentos e textos.
 
 Consulte [o que pode ser usado e os limites da M06](docs/m06-integrantes.md) e [o fluxo integrado da M05](docs/m05-fluxo.md). Para testar a navegação entre mapas, abra [o exemplo](examples/presentation-v1.json) pela interface. Criar várias músicas e reordenar são entregas da M08. O PDF de integrantes e os avisos automáticos de participação ainda não estão disponíveis.
 
@@ -70,7 +70,7 @@ Consulte [o modelo, as operações e os limites da M03](docs/m03-modelo.md).
 
 ## Contrato de arquivo da M04
 
-O arquivo completo é JSON `taiko-presentation`, versão 1, com validação de estrutura e referências, diferenciação de erros/versões incompatíveis e conversão dos mapas da M02. A importação devolve um candidato validado que a interface aplica somente após confirmação. A suíte completa tem 236 testes.
+O arquivo completo é JSON `taiko-presentation`, versão 1, com validação de estrutura e referências, diferenciação de erros/versões incompatíveis e conversão dos mapas da M02. A importação devolve um candidato validado que a interface aplica somente após confirmação. A suíte completa tem 239 testes.
 
 Consulte [o contrato e a migração da M04](docs/m04-arquivo.md) e o [arquivo de exemplo](examples/presentation-v1.json). Os controles da página já usam esse formato.
 

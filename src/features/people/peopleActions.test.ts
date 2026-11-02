@@ -22,15 +22,12 @@ describe('ações do cadastro', () => {
     expect(p.people[1]!.id).not.toBe(id)
     expect(() => actions.rename(id, '')).toThrow('1 a 80')
     actions.rename(id, 'Ana Silva')
-    actions.membership(id, false)
-    expect(p.rosterIds).not.toContain(id)
-    actions.membership(id, true)
     expect(p.rosterIds).toContain(id)
     expect(p.people[0]).toEqual({ id, name: 'Ana Silva' })
     actions.remove(p.people[1]!.id)
     expect(p.people).toHaveLength(1)
   })
-  it('não remove um cadastro atribuído mesmo se a ação for chamada diretamente', () => {
+  it('remove a pessoa e retira as atribuições preservando os instrumentos', () => {
     let p = addMap(createPresentation('show', 'Show'), 'map', 'Música', {
       width: 10,
       depth: 6,
@@ -46,8 +43,9 @@ describe('ações do cadastro', () => {
       'drum',
       [id],
     )
-    const assigned = p
     actions.remove(id)
-    expect(p).toBe(assigned)
+    expect(p.people).toEqual([])
+    expect(p.rosterIds).toEqual([])
+    expect(p.maps[0]!.instruments[0]!.playerIds).toEqual([])
   })
 })

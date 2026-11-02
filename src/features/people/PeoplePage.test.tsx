@@ -50,6 +50,67 @@ async function save() {
 }
 
 describe('integrantes pela interface', () => {
+  it('permite editar pela célula inteira sem reiniciar um rascunho já em edição', async () => {
+    render(<App />)
+    await people()
+    await add('Ana')
+    const cell = within(
+      screen.getByRole('row', { name: 'Pessoa 1: Ana' }),
+    ).getAllByRole('cell')[0]!
+    await userEvent.dblClick(cell)
+    const input = screen.getByLabelText('Novo nome de Ana (pessoa 1)')
+    await userEvent.clear(input)
+    await userEvent.type(input, 'Ana Silva')
+    await userEvent.dblClick(input)
+    expect(input).toHaveValue('Ana Silva')
+    await userEvent.keyboard('{Enter}')
+    expect(
+      screen.getByRole('row', { name: 'Pessoa 1: Ana Silva' }),
+    ).toBeVisible()
+  })
+  it('edita pelo teclado, salva ao sair do campo e cancela um nome alterado com Esc', async () => {
+    render(<App />)
+    await people()
+    await add('Ana')
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Editar nome de Ana (pessoa 1)' }),
+    )
+    await userEvent.keyboard('x')
+    expect(
+      screen.queryByLabelText('Novo nome de Ana (pessoa 1)'),
+    ).not.toBeInTheDocument()
+    await userEvent.keyboard('{F2}')
+    await userEvent.type(
+      screen.getByLabelText('Novo nome de Ana (pessoa 1)'),
+      ' Silva',
+    )
+    await userEvent.click(screen.getByLabelText('Nome do novo integrante'))
+    expect(
+      screen.getByRole('button', {
+        name: 'Editar nome de Ana Silva (pessoa 1)',
+      }),
+    ).toHaveTextContent('Ana Silva')
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'Editar nome de Ana Silva (pessoa 1)',
+      }),
+    )
+    await userEvent.keyboard('{Enter}')
+    await userEvent.clear(
+      screen.getByLabelText('Novo nome de Ana Silva (pessoa 1)'),
+    )
+    await userEvent.type(
+      screen.getByLabelText('Novo nome de Ana Silva (pessoa 1)'),
+      'Outro nome',
+    )
+    await userEvent.keyboard('{Escape}')
+    expect(
+      screen.getByRole('button', {
+        name: 'Editar nome de Ana Silva (pessoa 1)',
+      }),
+    ).toHaveTextContent('Ana Silva')
+    expect((await save()).p.people[0]!.name).toBe('Ana Silva')
+  })
   it('permite voltar à área de mapas quando o arquivo ainda não tem nenhum mapa', async () => {
     render(<App />)
     await open(serializePresentation(createPresentation('empty', 'Vazia')))
@@ -71,7 +132,7 @@ describe('integrantes pela interface', () => {
   it('cria homônimos distintos, valida nomes, cancela renomeação e exclui cadastro sem uso', async () => {
     render(<App />)
     await people()
-    expect(screen.getByText(/Nenhuma pessoa cadastrada/)).toBeVisible()
+    expect(screen.getByText(/Nenhum integrante/)).toBeVisible()
     expect(
       screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
     ).toBeDisabled()
@@ -81,30 +142,24 @@ describe('integrantes pela interface', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('1 a 80')
     await add('Ana')
     await add('Ana')
-    expect(screen.getByText('2 na lista · 2 no cadastro')).toBeVisible()
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Renomear Ana (pessoa 1)' }),
+    expect(screen.getByText('2 integrantes')).toBeVisible()
+    await userEvent.dblClick(
+      screen.getByRole('button', { name: 'Editar nome de Ana (pessoa 1)' }),
     )
     const input = screen.getByLabelText('Novo nome de Ana (pessoa 1)')
     await userEvent.clear(input)
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Salvar nome de Ana (pessoa 1)' }),
-    )
+    await userEvent.keyboard('{Enter}')
     expect(screen.getByRole('alert')).toHaveTextContent('1 a 80')
-    await userEvent.click(
-      screen.getByRole('button', {
-        name: 'Cancelar renomeação de Ana (pessoa 1)',
-      }),
-    )
+    await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     const before = await save()
     expect(before.p.people[0]!.id).not.toBe(before.p.people[1]!.id)
     await userEvent.click(
       screen.getByRole('button', {
-        name: 'Excluir cadastro de Ana (pessoa 2)',
+        name: 'Remover Ana (pessoa 2)',
       }),
     )
-    expect(screen.getByText('1 na lista · 1 no cadastro')).toBeVisible()
+    expect(screen.getByText('1 integrante')).toBeVisible()
     expect((await save()).p.people).toEqual([before.p.people[0]])
   })
   it('atribui várias pessoas por identidade e reabre sem perder as escolhas', async () => {
@@ -172,15 +227,13 @@ describe('integrantes pela interface', () => {
     ])
     await open(serializePresentation(p))
     await people()
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Renomear Ana (pessoa 1)' }),
+    await userEvent.dblClick(
+      screen.getByRole('button', { name: 'Editar nome de Ana (pessoa 1)' }),
     )
     const input = screen.getByLabelText('Novo nome de Ana (pessoa 1)')
     await userEvent.clear(input)
     await userEvent.type(input, 'Ana Silva')
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Salvar nome de Ana (pessoa 1)' }),
-    )
+    await userEvent.keyboard('{Enter}')
     const saved = await save()
     expect(saved.p.people).toEqual([
       { id: 'ana', name: 'Ana Silva' },
@@ -201,38 +254,47 @@ describe('integrantes pela interface', () => {
       screen.getByRole('button', { name: /Okedo, tocador Ana Silva, João/ }),
     ).toBeVisible()
   })
-  it('retira da lista sem apagar atribuições e protege exclusão de uso em mapa ou somente transição', async () => {
+  it('inclui todos os cadastrados e confirma remoção de pessoa atribuída', async () => {
     render(<App />)
     const p = assignInstrumentPlayers(presentationFixture(), 'a', 'drum', [
       'ana',
     ])
     await open(serializePresentation(p))
     await people()
-    const ana = screen.getByRole('article', { name: 'Pessoa 1: Ana' })
-    const joao = screen.getByRole('article', { name: 'Pessoa 2: João' })
-    expect(
-      within(ana).getByRole('button', { name: /Excluir cadastro/ }),
-    ).toBeDisabled()
-    expect(
-      within(joao).getByRole('button', { name: /Excluir cadastro/ }),
-    ).toBeDisabled()
-    expect(
-      within(joao).getByText(/Pessoa atribuída a instrumento ou transição/),
-    ).toBeVisible()
-    await userEvent.click(within(ana).getByRole('checkbox'))
-    await userEvent.click(within(joao).getByRole('checkbox'))
+    expect(screen.getByRole('table')).toBeVisible()
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    expect((await save()).p.rosterIds).toEqual(['ana', 'joao'])
+    const joao = screen.getByRole('row', { name: 'Pessoa 2: João' })
+    await userEvent.click(
+      within(joao).getByRole('button', { name: 'Remover João (pessoa 2)' }),
+    )
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(
+      'retira suas atribuições',
+    )
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'Cancelar remoção de João (pessoa 2)',
+      }),
+    )
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    await userEvent.click(
+      within(joao).getByRole('button', { name: 'Remover João (pessoa 2)' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'Confirmar remoção de João (pessoa 2)',
+      }),
+    )
     const saved = await save()
-    expect(saved.p.rosterIds).toEqual(['joao'])
-    expect(saved.p.people).toEqual(p.people)
+    expect(saved.p.rosterIds).toEqual(['ana'])
+    expect(saved.p.people).toEqual([p.people[0]])
     expect(saved.p.maps).toEqual(p.maps)
-    expect(saved.p.transitions).toEqual(p.transitions)
+    expect(
+      saved.p.transitions.find((item) => item.id === 'middle')!.participantIds,
+    ).toEqual([])
     await open(saved.source)
     await people()
-    expect(
-      screen.getByRole('checkbox', { name: /Na lista de integrantes · João/ }),
-    ).toBeChecked()
-    expect(
-      screen.getByRole('checkbox', { name: /Na lista de integrantes · Ana/ }),
-    ).not.toBeChecked()
+    expect(screen.getByRole('row', { name: 'Pessoa 1: Ana' })).toBeVisible()
+    expect(screen.queryByRole('row', { name: /João/ })).not.toBeInTheDocument()
   })
 })

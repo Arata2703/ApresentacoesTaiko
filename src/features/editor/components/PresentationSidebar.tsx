@@ -25,7 +25,7 @@ export function PresentationSidebar({
         aria-pressed={peopleView}
         onClick={onPeople}
       >
-        Integrantes ({presentation.rosterIds.length})
+        Integrantes ({presentation.people.length})
       </button>
       <div className={styles.sidebarHeading}>
         <span className={styles.eyebrow}>MAPAS</span>

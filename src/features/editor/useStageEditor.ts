@@ -19,6 +19,13 @@ import {
   type InstrumentTransform,
 } from './editorProjection'
 
+function includeAllPeople(p: Presentation): Presentation {
+  return p.rosterIds.length === p.people.length &&
+    p.people.every((person) => p.rosterIds.includes(person.id))
+    ? p
+    : { ...p, rosterIds: p.people.map((person) => person.id) }
+}
+
 function initialState() {
   const presentation = addMap(
     createPresentation(crypto.randomUUID(), 'Minha apresentação'),
@@ -131,7 +138,7 @@ export function useStageEditor() {
           ),
         }
       }),
-    presentation: state.presentation,
+    presentation: includeAllPeople(state.presentation),
     page,
     instruments,
     selected,
@@ -180,6 +187,7 @@ export function useStageEditor() {
           : s
       }),
     openPresentation: (presentation: Presentation) => {
+      presentation = includeAllPeople(presentation)
       const mapId = firstMapId(presentation)
       setState({
         presentation,
