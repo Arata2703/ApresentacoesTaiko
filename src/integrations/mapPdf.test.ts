@@ -4,6 +4,9 @@ import { PDFDocument } from 'pdf-lib'
 import { describe, expect, it } from 'vitest'
 import { createMapPdf } from './mapPdf'
 import { createInstrument } from '../domain/stage'
+import { presentationFixture } from '../test/presentationFixture'
+import { projectMap } from '../features/editor/editorProjection'
+import { importPresentation, serializePresentation } from './presentationFile'
 
 const font = new Uint8Array(
   await readFile(
@@ -11,6 +14,23 @@ const font = new Uint8Array(
   ),
 )
 describe('PDF vetorial real', () => {
+  it('gera a página do mesmo mapa validado e reaberto que alimenta o editor', async () => {
+    const loaded = importPresentation(
+      serializePresentation(presentationFixture()),
+    )
+    if (loaded.status !== 'valid') throw new Error('Arquivo deveria ser válido')
+    const page = projectMap(loaded.presentation, 'a')!
+    expect(page.stage).toEqual({ width: 12, depth: 8 })
+    expect(page.instruments[0]).toMatchObject({
+      x: 3.25,
+      y: 1.5,
+      rotation: 315,
+      player: 'Ana, João',
+    })
+    const pdf = await PDFDocument.load(await createMapPdf(page, font))
+    expect(pdf.getPageCount()).toBe(1)
+    expect(pdf.getTitle()).toBe('Mostra Japão - Ibuki')
+  })
   it('gera uma página A4 horizontal com fonte incorporada e acentos', async () => {
     const bytes = await createMapPdf(
       {

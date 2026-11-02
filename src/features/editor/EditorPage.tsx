@@ -22,25 +22,47 @@ export function EditorPage() {
         onTitleChange={editor.setTitle}
       />
       <div className={styles.layout}>
-        <PresentationSidebar song={editor.song} />
+        <PresentationSidebar
+          presentation={editor.presentation}
+          activeMapId={editor.activeMapId}
+          onSelect={editor.selectMap}
+        />
         <main className={styles.workspace} id="workspace">
-          <MapFiles map={editor} onOpen={editor.openMap} />
-          <MapHeading song={editor.song} onSongChange={editor.setSong} />
-          <div className={styles.editor}>
-            <InstrumentCatalog onAdd={editor.addInstrument} />
-            <StageMap
-              instruments={editor.instruments}
-              selectedId={editor.selectedId}
-              onSelect={editor.selectInstrument}
-              onAdd={editor.addInstrument}
-              onMove={editor.moveInstrument}
-            />
-            <InstrumentProperties
-              selected={editor.selected}
-              onChange={editor.changeSelected}
-              onRemove={editor.removeSelected}
-            />
-          </div>
+          <MapFiles
+            presentation={editor.presentation}
+            page={editor.page}
+            onOpen={editor.openPresentation}
+          />
+          {editor.page ? (
+            <>
+              <MapHeading song={editor.song} onSongChange={editor.setSong} />
+              <div className={styles.editor}>
+                <InstrumentCatalog onAdd={editor.addInstrument} />
+                <StageMap
+                  stage={editor.page.stage}
+                  instruments={editor.instruments}
+                  selectedId={editor.selectedId}
+                  onSelect={editor.selectInstrument}
+                  onAdd={editor.addInstrument}
+                  onMove={editor.moveInstrument}
+                />
+                <InstrumentProperties
+                  stage={editor.page.stage}
+                  selected={editor.selected}
+                  onChange={editor.changeSelected}
+                  onRemove={editor.removeSelected}
+                />
+              </div>
+            </>
+          ) : (
+            <section>
+              <h1>Apresentação sem mapas</h1>
+              <p>Crie o primeiro mapa para começar a formação.</p>
+              <button onClick={editor.createFirstMap}>
+                Criar primeiro mapa
+              </button>
+            </section>
+          )}
           <EditorFooter message={editor.message} />
         </main>
       </div>

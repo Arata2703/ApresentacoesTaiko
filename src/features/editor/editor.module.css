@@ -792,3 +792,14 @@
 .fileButtons input {
   max-width: 230px;
 }
+
+.pageItem {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 12px;
+  background: #fffefa;
+}
+.pageItem[aria-pressed='true'] {
+  background: #edf1e7;
+  outline: 1px solid #6c8b54;
+}

@@ -1,8 +1,74 @@
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { useStageEditor } from './useStageEditor'
+import { createPresentation } from '../../domain/presentation/presentation'
+import { presentationFixture } from '../../test/presentationFixture'
+import { assignInstrumentPlayers } from '../../domain/presentation/maps'
 
 describe('estado do editor', () => {
+  it('abre apresentação vazia sem inventar mapas e cria somente o primeiro sob ação explícita', () => {
+    const { result } = renderHook(useStageEditor)
+    act(() =>
+      result.current.openPresentation(createPresentation('empty', 'Vazia')),
+    )
+    expect(result.current.page).toBeNull()
+    act(() => {
+      result.current.setSong('Ignorado')
+      result.current.changeSelected({ x: 1 })
+      result.current.moveInstrument('missing', 1, 1)
+      result.current.selectMap('missing')
+      result.current.removeSelected()
+    })
+    expect(result.current.presentation.maps).toEqual([])
+    act(() => result.current.createFirstMap())
+    act(() => result.current.createFirstMap())
+    expect(result.current.presentation.maps).toHaveLength(1)
+    expect(result.current.page?.song).toBe('Primeira música')
+  })
+  it('renomeia a identidade compartilhada e limpar um campo retira somente aquela atribuição', () => {
+    let p = presentationFixture()
+    p = assignInstrumentPlayers(p, 'a', 'drum', ['ana'])
+    p = assignInstrumentPlayers(p, 'b', 'flute', ['ana'])
+    const { result } = renderHook(useStageEditor)
+    act(() => result.current.openPresentation(p))
+    act(() => result.current.selectInstrument('flute'))
+    act(() => result.current.changeSelected({ player: 'Ana Silva' }))
+    expect(
+      result.current.presentation.people.find((person) => person.id === 'ana')!
+        .name,
+    ).toBe('Ana Silva')
+    act(() => result.current.changeSelected({ player: '' }))
+    expect(
+      result.current.presentation.maps[1]!.instruments[0]!.playerIds,
+    ).toEqual([])
+    expect(
+      result.current.presentation.maps[0]!.instruments[0]!.playerIds,
+    ).toEqual(['ana'])
+    expect(result.current.presentation.people).toHaveLength(2)
+  })
+  it('protege atribuições múltiplas e ignora campos numéricos não finitos', () => {
+    const { result } = renderHook(useStageEditor)
+    act(() => result.current.openPresentation(presentationFixture()))
+    act(() => result.current.selectMap('a'))
+    act(() => result.current.selectInstrument('drum'))
+    act(() =>
+      result.current.changeSelected({
+        player: 'Não substituir',
+        x: NaN,
+        y: Infinity,
+        rotation: NaN,
+      }),
+    )
+    expect(result.current.selected).toMatchObject({
+      player: 'Ana, João',
+      x: 3.25,
+      y: 1.5,
+      rotation: 315,
+    })
+    expect(
+      result.current.presentation.maps[0]!.instruments[0]!.playerIds,
+    ).toEqual(['ana', 'joao'])
+  })
   it('ignora edição e remoção sem seleção', () => {
     const { result } = renderHook(useStageEditor)
     act(() => {
@@ -51,9 +117,9 @@ describe('estado do editor', () => {
   it('não perde instrumentos ao receber movimento de identificador ausente', () => {
     const { result } = renderHook(useStageEditor)
     act(() => result.current.addInstrument('okedo'))
-    const before = result.current.instruments
+    const before = result.current.presentation
     act(() => result.current.moveInstrument('removido', 1, 1))
-    expect(result.current.instruments).toBe(before)
-    expect(result.current.selected).toBeUndefined()
+    expect(result.current.presentation).toBe(before)
+    expect(result.current.selected?.id).toBe(before.maps[0]!.instruments[0]!.id)
   })
 })

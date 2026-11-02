@@ -1,15 +1,16 @@
 import type { CSSProperties, KeyboardEvent } from 'react'
 import {
-  stageSize,
   getInstrumentType,
   type InstrumentKind,
   type StageInstrument,
 } from '../../../domain/stage'
 import { InstrumentSymbol } from './InstrumentSymbol'
+import type { StageDimensions } from '../../../domain/presentation/model'
 import { useInstrumentDrag } from '../useInstrumentDrag'
 import styles from '../editor.module.css'
 
 interface Props {
+  stage: StageDimensions
   instruments: StageInstrument[]
   selectedId: string | null
   onSelect: (id: string) => void
@@ -17,8 +18,8 @@ interface Props {
   onMove: (id: string, dx: number, dy: number) => void
 }
 export function StageMap(props: Props) {
-  const { instruments, selectedId, onSelect, onAdd, onMove } = props
-  const drag = useInstrumentDrag(onMove)
+  const { instruments, selectedId, onSelect, onAdd, onMove, stage } = props
+  const drag = useInstrumentDrag(onMove, stage)
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, id: string) {
     const moves: Record<string, [number, number]> = {
       ArrowLeft: [-0.1, 0],
@@ -32,11 +33,14 @@ export function StageMap(props: Props) {
     onMove(id, ...move)
   }
   return (
-    <section className={styles.stageArea} aria-label="Palco de 10 por 6 metros">
+    <section
+      className={styles.stageArea}
+      aria-label={`Palco de ${stage.width} por ${stage.depth} metros`}
+    >
       <div className={styles.stageToolbar}>
         <span>VISTA SUPERIOR</span>
         <span>
-          {stageSize.width} × {stageSize.depth} m
+          {stage.width} × {stage.depth} m
         </span>
       </div>
       <div className={styles.audience}>
@@ -44,7 +48,10 @@ export function StageMap(props: Props) {
         PLATEIA
         <span />
       </div>
-      <div className={styles.stage}>
+      <div
+        className={styles.stage}
+        style={{ aspectRatio: `${stage.width} / ${stage.depth}` }}
+      >
         <div className={styles.stageBoundary} />
         {instruments.length === 0 && (
           <div className={styles.emptyStage}>
@@ -69,8 +76,8 @@ export function StageMap(props: Props) {
               className={`${styles.stageInstrument} ${selectedId === item.id ? styles.selected : ''}`}
               style={
                 {
-                  '--x': `${(item.x / stageSize.width) * 100}%`,
-                  '--y': `${(item.y / stageSize.depth) * 100}%`,
+                  '--x': `${(item.x / stage.width) * 100}%`,
+                  '--y': `${(item.y / stage.depth) * 100}%`,
                   '--rotation': `${item.rotation}deg`,
                 } as CSSProperties
               }
@@ -96,7 +103,7 @@ export function StageMap(props: Props) {
       </div>
       <div className={styles.stageBottom}>
         <span>FUNDO DO PALCO</span>
-        <span>10 m</span>
+        <span>{stage.width} m</span>
       </div>
       <p className={styles.stageHint}>
         {instruments.length

@@ -2,6 +2,9 @@ import { PDFDocument, rgb, type PDFFont } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import { getInstrumentType, stageSize } from '../domain/stage'
 import type { MapDraft } from './mapFile'
+import type { StageDimensions } from '../domain/presentation/model'
+
+export type MapPdfInput = MapDraft & { stage?: StageDimensions }
 
 function fittedSize(font: PDFFont, text: string, width: number, size: number) {
   const supported = new Set(font.getCharacterSet())
@@ -23,7 +26,7 @@ function fittedSize(font: PDFFont, text: string, width: number, size: number) {
 
 /** Vector output: stage geometry and labels remain sharp when printed. */
 export async function createMapPdf(
-  map: MapDraft,
+  map: MapPdfInput,
   fontBytes: Uint8Array,
 ): Promise<Uint8Array<ArrayBuffer>> {
   const pdf = await PDFDocument.create()
@@ -48,32 +51,34 @@ export async function createMapPdf(
     size: fittedSize(font, song, 770, 14),
     color: ink,
   })
-  const x = 95,
-    y = 62,
-    width = 650,
-    height = 390
+  const stage = map.stage ?? stageSize
+  const scale = Math.min(650 / stage.width, 390 / stage.depth)
+  const width = stage.width * scale,
+    height = stage.depth * scale
+  const x = (841.89 - width) / 2,
+    y = 62 + (390 - height) / 2
   page.drawText('PLATEIA', { x: 392, y: 470, font, size: 11, color: ink })
   page.drawRectangle({ x, y, width, height, borderColor: ink, borderWidth: 1 })
   for (let column = 1; column < 10; column++) {
     page.drawLine({
-      start: { x: x + column * 65, y },
-      end: { x: x + column * 65, y: y + height },
+      start: { x: x + (column * width) / 10, y },
+      end: { x: x + (column * width) / 10, y: y + height },
       color: rgb(0.88, 0.91, 0.86),
       thickness: 0.5,
     })
   }
   for (let row = 1; row < 6; row++) {
     page.drawLine({
-      start: { x, y: y + row * 65 },
-      end: { x: x + width, y: y + row * 65 },
+      start: { x, y: y + (row * height) / 6 },
+      end: { x: x + width, y: y + (row * height) / 6 },
       color: rgb(0.88, 0.91, 0.86),
       thickness: 0.5,
     })
   }
   for (const item of map.instruments) {
     const type = getInstrumentType(item.kind)
-    const cx = x + (item.x / stageSize.width) * width
-    const cy = y + height - (item.y / stageSize.depth) * height
+    const cx = x + (item.x / stage.width) * width
+    const cy = y + height - (item.y / stage.depth) * height
     const radians = (item.rotation * Math.PI) / 180
     page.drawEllipse({
       x: cx,
@@ -103,12 +108,15 @@ export async function createMapPdf(
     })
     page.drawText(label, { x: labelX, y: cy - 26, font, size, color: ink })
   }
-  page.drawText('FUNDO DO PALCO | 10 x 6 m | Ícones ilustrativos', {
-    x: 275,
-    y: 36,
-    font,
-    size: 9,
-    color: ink,
-  })
+  page.drawText(
+    `FUNDO DO PALCO | ${stage.width} x ${stage.depth} m | Ícones ilustrativos`,
+    {
+      x: 275,
+      y: 36,
+      font,
+      size: 9,
+      color: ink,
+    },
+  )
   return new Uint8Array(await pdf.save())
 }

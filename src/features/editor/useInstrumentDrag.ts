@@ -1,9 +1,11 @@
 import { useRef, type PointerEvent } from 'react'
 import { stageSize } from '../../domain/stage'
+import type { StageDimensions } from '../../domain/presentation/model'
 
 /** Pointer capture keeps a drag active even when the cursor leaves the icon. */
 export function useInstrumentDrag(
   onMove: (id: string, dx: number, dy: number) => void,
+  stage: StageDimensions = stageSize,
 ) {
   const drag = useRef<{
     id: string
@@ -34,8 +36,8 @@ export function useInstrumentDrag(
     if (!current || current.pointer !== event.pointerId) return
     onMove(
       current.id,
-      ((event.clientX - current.x) / current.width) * stageSize.width,
-      ((event.clientY - current.y) / current.height) * stageSize.depth,
+      ((event.clientX - current.x) / current.width) * stage.width,
+      ((event.clientY - current.y) / current.height) * stage.depth,
     )
     current.x = event.clientX
     current.y = event.clientY

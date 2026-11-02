@@ -1,8 +1,8 @@
 import fontUrl from '@fontsource/noto-sans/files/noto-sans-latin-400-normal.woff?url'
-import type { MapDraft } from './mapFile'
+import type { MapPdfInput } from './mapPdf'
 import { download } from './download'
 
-export async function exportMap(map: MapDraft) {
+export async function exportMap(map: MapPdfInput) {
   const [response, { createMapPdf }] = await Promise.all([
     fetch(fontUrl),
     import('./mapPdf'),

@@ -1,17 +1,19 @@
 import {
   getInstrumentType,
-  type StageInstrument,
   type InstrumentChanges,
 } from '../../../domain/stage'
 import styles from '../editor.module.css'
+import type { EditorInstrument } from '../editorProjection'
+import type { StageDimensions } from '../../../domain/presentation/model'
 
 interface Props {
-  selected?: StageInstrument
+  selected?: EditorInstrument
+  stage: StageDimensions
   onChange: (changes: InstrumentChanges) => void
   onRemove: () => void
 }
 export function InstrumentProperties(props: Props) {
-  const { selected, onChange, onRemove } = props
+  const { selected, onChange, onRemove, stage } = props
   const selectedType = selected && getInstrumentType(selected.kind)
   return (
     <aside className={styles.properties} aria-labelledby="properties-title">
@@ -25,23 +27,29 @@ export function InstrumentProperties(props: Props) {
             <input
               placeholder="Ex.: Ana"
               value={selected.player}
+              readOnly={selected.playerCount > 1}
               onChange={(event) => onChange({ player: event.target.value })}
-              maxLength={60}
+              maxLength={80}
             />
           </label>
+          <p className={styles.propertyCaption}>
+            {selected.playerCount > 1
+              ? 'Vários tocadores preservados. A edição dessas atribuições chegará com o cadastro de integrantes.'
+              : 'Renomear um tocador atualiza seu nome onde ele estiver atribuído.'}
+          </p>
           <div className={styles.field}>
-            Base padrão
-            <span className={styles.readOnly}>{selectedType.base}</span>
+            Base
+            <span className={styles.readOnly}>{selected.baseLabel}</span>
           </div>
           <div className={styles.positionFields}>
             <label className={styles.field}>
               Horizontal · m
               <input
                 type="number"
-                min="0.5"
-                max="9.5"
+                min="0"
+                max={stage.width}
                 step="0.1"
-                value={Number(selected.x.toFixed(1))}
+                value={selected.x}
                 onChange={(event) =>
                   onChange({ x: event.target.valueAsNumber })
                 }
@@ -51,10 +59,10 @@ export function InstrumentProperties(props: Props) {
               Profundidade · m
               <input
                 type="number"
-                min="0.6"
-                max="5.4"
+                min="0"
+                max={stage.depth}
                 step="0.1"
-                value={Number(selected.y.toFixed(1))}
+                value={selected.y}
                 onChange={(event) =>
                   onChange({ y: event.target.valueAsNumber })
                 }
@@ -67,8 +75,8 @@ export function InstrumentProperties(props: Props) {
               aria-label="Rotação"
               type="range"
               min="0"
-              max="345"
-              step="15"
+              max="359"
+              step="1"
               value={selected.rotation}
               onChange={(event) =>
                 onChange({ rotation: event.target.valueAsNumber })

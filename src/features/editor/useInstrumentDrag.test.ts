@@ -19,6 +19,15 @@ function pointer(x = 100, y = 100, id = 1, button = 0, width = 500) {
 }
 
 describe('arraste em metros', () => {
+  it('usa as dimensões do mapa ativo ao converter o arraste', () => {
+    const onMove = vi.fn()
+    const { result } = renderHook(() =>
+      useInstrumentDrag(onMove, { width: 12, depth: 8 }),
+    )
+    act(() => result.current.start(pointer(), 'a'))
+    act(() => result.current.move(pointer(350, 250)))
+    expect(onMove).toHaveBeenCalledWith('a', 6, 4)
+  })
   it('converte deslocamento, preserva captura e encerra ao soltar', () => {
     const onMove = vi.fn()
     const { result } = renderHook(() => useInstrumentDrag(onMove))

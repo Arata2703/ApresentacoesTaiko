@@ -1,41 +1,45 @@
 import { useState, type ChangeEvent } from 'react'
+import type { Presentation } from '../../../domain/presentation/model'
 import {
-  parseMap,
-  serializeMap,
-  type MapDraft,
-} from '../../../integrations/mapFile'
+  importPresentation,
+  serializePresentation,
+  maxProjectBytes,
+  type ImportResult,
+} from '../../../integrations/presentationFile'
+import type { MapPdfInput } from '../../../integrations/mapPdf'
 import { download } from '../../../integrations/download'
 import { exportMap } from '../../../integrations/exportMap'
 import styles from '../editor.module.css'
 
 interface Props {
-  map: MapDraft
-  onOpen: (map: MapDraft) => void
+  presentation: Presentation
+  page: MapPdfInput | null
+  onOpen: (presentation: Presentation) => void
 }
+type Candidate = Extract<ImportResult, { status: 'valid' }>
 
-export function MapFiles({ map, onOpen }: Props) {
-  const [pending, setPending] = useState<MapDraft | null>(null)
+export function MapFiles({ presentation, page, onOpen }: Props) {
+  const [pending, setPending] = useState<Candidate | null>(null)
   const [message, setMessage] = useState(
-    'Baixe o mapa para guardar seu trabalho. O navegador ainda não salva automaticamente.',
+    'Baixe a apresentação para guardar seu trabalho. O navegador ainda não salva automaticamente.',
   )
   const [busy, setBusy] = useState(false)
 
   function save() {
-    const source = serializeMap(map)
     try {
-      // Never offer a backup that this same version cannot reopen.
-      parseMap(source)
+      const source = serializePresentation(presentation)
+      download(
+        new Blob([source], { type: 'application/json' }),
+        'apresentacao-taiko.json',
+      )
+      setMessage(
+        'Apresentação editável baixada, com todos os mapas e demais dados.',
+      )
     } catch {
       setMessage(
-        'Não foi possível baixar o mapa. Esta demonstração aceita até 500 instrumentos e nomes de até 80 caracteres.',
+        'Não foi possível baixar a apresentação. Revise os dados e o limite de 5 MB. Seu trabalho foi preservado.',
       )
-      return
     }
-    download(
-      new Blob([source], { type: 'application/json' }),
-      'mapa-taiko.json',
-    )
-    setMessage('Arquivo editável baixado. Guarde-o para reabrir este mapa.')
   }
 
   async function open(event: ChangeEvent<HTMLInputElement>) {
@@ -45,12 +49,15 @@ export function MapFiles({ map, onOpen }: Props) {
     setBusy(true)
     setPending(null)
     try {
-      if (file.size > 1_000_000)
-        throw new Error('Arquivo muito grande para esta demonstração.')
-      setPending(parseMap(await file.text()))
+      if (file.size > maxProjectBytes)
+        throw new Error('O arquivo ultrapassa o limite de 5 MB.')
+      const result = importPresentation(await file.text())
+      if (result.status === 'valid') setPending(result)
+      else
+        setMessage(`${result.message} Sua apresentação atual foi preservada.`)
     } catch {
       setMessage(
-        'Não foi possível abrir este arquivo. Escolha um mapa JSON válido da versão 1. Seu mapa atual foi preservado.',
+        'Não foi possível ler o arquivo. Confira o formato JSON e o limite de 5 MB. Sua apresentação atual foi preservada.',
       )
     } finally {
       setBusy(false)
@@ -58,11 +65,12 @@ export function MapFiles({ map, onOpen }: Props) {
   }
 
   async function pdf() {
+    if (!page) return
     setBusy(true)
     try {
-      await exportMap(map)
+      await exportMap(page)
       setMessage(
-        'PDF A4 horizontal baixado. Baixe também o mapa editável para continuar depois.',
+        'PDF A4 horizontal do mapa selecionado baixado. Baixe também a apresentação editável para continuar depois.',
       )
     } catch (error) {
       setMessage(
@@ -76,42 +84,48 @@ export function MapFiles({ map, onOpen }: Props) {
   }
 
   return (
-    <section className={styles.fileActions} aria-label="Arquivos do mapa">
+    <section
+      className={styles.fileActions}
+      aria-label="Arquivos da apresentação"
+    >
       <div className={styles.fileButtons}>
         <button onClick={save} disabled={busy}>
-          Baixar mapa editável
+          Baixar apresentação editável
         </button>
         <label>
-          Abrir mapa
+          Abrir apresentação
           <input
-            aria-label="Abrir mapa"
+            aria-label="Abrir apresentação"
             type="file"
             accept=".json,application/json"
             disabled={busy}
             onChange={(event) => void open(event)}
           />
         </label>
-        <button onClick={() => void pdf()} disabled={busy}>
-          {busy ? 'Processando…' : 'Exportar PDF'}
+        <button onClick={() => void pdf()} disabled={busy || page === null}>
+          {busy ? 'Processando…' : 'Exportar PDF deste mapa'}
         </button>
       </div>
       <p aria-live="polite">{message}</p>
       {pending && (
         <div
           role="alertdialog"
-          aria-label="Substituir mapa atual"
-          aria-describedby="replace-map-description"
+          aria-label="Substituir apresentação atual"
+          aria-describedby="replace-project-description"
         >
-          <p id="replace-map-description">
-            Abrir “{pending.title}” substituirá o mapa atual. Baixe seu trabalho
-            antes de continuar.
+          <p id="replace-project-description">
+            Abrir “{pending.presentation.title}” substituirá a apresentação
+            atual. Baixe seu trabalho antes de continuar.
           </p>
+          {pending.warnings.map((warning) => (
+            <p key={warning}>{warning}</p>
+          ))}
           <button
             onClick={() => {
-              onOpen(pending)
+              onOpen(pending.presentation)
               setPending(null)
               setMessage(
-                'Mapa reaberto. Continue editando e baixe uma nova cópia ao terminar.',
+                'Apresentação reaberta. Todos os dados foram preservados; o PDF exporta somente o mapa selecionado.',
               )
             }}
           >

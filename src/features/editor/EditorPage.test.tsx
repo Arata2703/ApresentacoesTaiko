@@ -56,7 +56,11 @@ describe('fluxos da primeira tela', () => {
         }),
       ).toHaveAttribute('aria-pressed', 'true')
       expect(screen.getByRole('heading', { name })).toBeVisible()
-      expect(screen.getByText(base, { exact: true })).toBeVisible()
+      const baseName =
+        base === 'Suwaridai'
+          ? `${name.startsWith('Nagado') ? 'Nagado' : name} suwaridai`
+          : base
+      expect(screen.getByText(baseName, { exact: true })).toBeVisible()
       expect(screen.getByRole('status')).toHaveTextContent(
         `${name} adicionado ao palco.`,
       )

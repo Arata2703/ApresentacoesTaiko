@@ -1,40 +1,42 @@
+import type { Presentation } from '../../../domain/presentation/model'
 import styles from '../editor.module.css'
 
 interface Props {
-  song: string
+  presentation: Presentation
+  activeMapId: string | null
+  onSelect: (id: string) => void
 }
-export function PresentationSidebar(props: Props) {
-  const { song } = props
+export function PresentationSidebar({
+  presentation,
+  activeMapId,
+  onSelect,
+}: Props) {
+  const maps = presentation.sequence
+    .filter((item) => item.kind === 'map')
+    .map((item) => presentation.maps.find((map) => map.id === item.id)!)
   return (
     <aside className={styles.sidebar} aria-label="Páginas da apresentação">
       <div className={styles.sidebarHeading}>
-        <span className={styles.eyebrow}>APRESENTAÇÃO</span>
-        <span className={styles.pageCount}>01</span>
+        <span className={styles.eyebrow}>MAPAS</span>
+        <span className={styles.pageCount}>{maps.length}</span>
       </div>
-      <div className={styles.pageItem} aria-current="page">
-        <div className={styles.miniMap} aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
-        </div>
-        <div>
-          <span className={styles.pageNumber}>01 · MAPA DE PALCO</span>
-          <strong>{song || 'Música sem título'}</strong>
-        </div>
-      </div>
-      <div className={styles.sidebarNote}>
-        <span className={styles.noteIcon} aria-hidden="true">
-          ↗
-        </span>
-        <p>
-          Um bom espetáculo
-          <br />
-          começa no planejamento.
-        </p>
-      </div>
+      {maps.map((map, index) => (
+        <button
+          key={map.id}
+          className={styles.pageItem}
+          onClick={() => onSelect(map.id)}
+          aria-pressed={activeMapId === map.id}
+          aria-label={`Abrir mapa ${map.title}`}
+        >
+          <span className={styles.pageNumber}>{index + 1} · MAPA DE PALCO</span>
+          <strong>{map.title}</strong>
+        </button>
+      ))}
+      {!maps.length && <p>Nenhum mapa nesta apresentação.</p>}
       <div className={styles.scopeNote}>
-        Novas músicas e transições chegam nas próximas etapas.
+        A apresentação editável guarda todos os dados. O PDF contém somente o
+        mapa selecionado. Criação de várias músicas e edição de transições
+        chegam nas próximas etapas.
       </div>
     </aside>
   )
