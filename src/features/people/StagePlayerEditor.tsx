@@ -58,6 +58,7 @@ export function StagePlayerEditor({
   return (
     <div className={styles.editor}>
       <input
+        className={`${styles.nameField} ${styles.editing}`}
         autoFocus
         id={id}
         role="combobox"

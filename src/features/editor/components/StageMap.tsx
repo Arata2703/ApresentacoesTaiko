@@ -10,6 +10,7 @@ import { StagePlayerEditor } from '../../people/StagePlayerEditor'
 import type { PlayerReference } from '../../people/playerDraft'
 import { useInstrumentDrag } from '../useInstrumentDrag'
 import styles from '../editor.module.css'
+import playerStyles from '../../people/stagePlayerEditor.module.css'
 
 interface Props {
   stage: StageDimensions
@@ -142,7 +143,7 @@ export function StageMap({
                   tabIndex={0}
                   aria-label={`Editar tocadores de ${type.name}${item.player ? `: ${item.player}` : ''}`}
                   title="Duplo clique para editar os tocadores"
-                  className={styles.instrumentLabel}
+                  className={`${styles.instrumentLabel} ${playerStyles.nameField}`}
                   onClick={() => onSelect(item.id)}
                   onDoubleClick={() => edit(item.id)}
                   onKeyDown={(event) => {

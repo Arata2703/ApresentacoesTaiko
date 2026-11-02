@@ -5,8 +5,12 @@
   max-width: 70vw;
   font-size: 12px;
 }
-.editor input {
-  width: 100%;
+.nameField {
+  display: block;
+  box-sizing: border-box;
+  width: 146px;
+  max-width: 70vw;
+  height: 26px;
   min-width: 0;
   padding: 4px 7px;
   border: 1px solid #bcc8ae;
@@ -15,10 +19,16 @@
   background: #fffefa;
   text-align: center;
   font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: #354e3b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.editor input:focus-visible {
-  outline: 1px solid #7b9563;
-  outline-offset: 2px;
+.nameField.editing {
+  background: #edf2e6;
+  outline: none;
 }
 .options {
   position: absolute;

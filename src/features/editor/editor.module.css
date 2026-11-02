@@ -452,10 +452,6 @@
 .selected {
   z-index: 5;
 }
-.selected .instrumentLabel {
-  color: #354e3b;
-  font-weight: 600;
-}
 .selected .rotating {
   filter: drop-shadow(0 2px 3px #354e3b30);
 }
@@ -464,16 +460,7 @@
   display: block;
 }
 .instrumentLabel {
-  font-size: 10px;
-  width: max-content;
-  max-width: 146px;
   flex-shrink: 0;
-  text-align: center;
-  background: #fffef8e8;
-  border-radius: 2px;
-  padding: 2px 4px;
-  overflow-wrap: anywhere;
-  line-height: 1.3;
 }
 .properties {
   padding: 25px 20px;

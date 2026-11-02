@@ -32,7 +32,7 @@ O leitor genérico de arquivos continua capaz de validar e preservar os registro
 
 O duplo clique no rótulo abaixo do instrumento abre um campo compacto no próprio lugar. Enter/F2 no rótulo também inicia a edição. Enter ou sair do campo salva; Esc cancela. Os nomes usam `/` como separador, inclusive no PDF do mapa. O autocomplete busca integrantes sem distinguir acentos/maiúsculas e identifica homônimos pela posição na lista. Nomes novos entram na lista única apenas ao salvar; apagar o campo limpa a atribuição sem apagar as pessoas.
 
-A opção visual aprovada é o campo compacto com cantos suaves, sem caixa de seleção ao redor do instrumento. A seleção usa sombra discreta e ênfase no nome; o foco por teclado destaca o desenho. As sugestões aparecem abaixo do campo durante a digitação.
+A opção visual aprovada é uma caixa permanente ao redor do nome, com cantos suaves e tamanho idêntico durante a edição. Ao editar, apenas o fundo fica levemente verde, sem contorno adicional. Não há caixa de seleção ao redor do instrumento: a seleção usa sombra discreta, e o foco por teclado destaca o desenho. As sugestões aparecem abaixo do campo durante a digitação.
 
 `StagePlayerEditor`, `playerSuggestions` e `playerDraft` separam interação, busca e resolução das identidades. A movimentação continua ligada ao palco, mesmo com o rótulo editável separado do botão do instrumento. A revisão passou em 248 testes, com 100% de linhas/funções e limites de cobertura preservados.
 
