@@ -25,6 +25,9 @@ export interface StageInstrument {
   y: number
   rotation: number
 }
+export type InstrumentChanges = Partial<
+  Pick<StageInstrument, 'player' | 'x' | 'y' | 'rotation'>
+>
 export const stageSize = { width: 10, depth: 6 }
 export const catalog: InstrumentType[] = [
   { kind: 'okedo', name: 'Okedo', appearance: 'drum', base: 'Suwaridai' },
@@ -76,7 +79,7 @@ export function getInstrumentType(kind: InstrumentKind): InstrumentType {
 export function updateInstrument(
   instruments: StageInstrument[],
   id: string,
-  changes: Partial<Pick<StageInstrument, 'player' | 'x' | 'y' | 'rotation'>>,
+  changes: InstrumentChanges,
 ): StageInstrument[] {
   return instruments.map((item) => {
     if (item.id !== id) return item

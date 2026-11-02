@@ -40,8 +40,11 @@ Arraste/canvas Konva, salvamento automático e arquivo de projeto, PDF, múltipl
 
 - `src/domain/stage.ts`: tipos e operações de posição/rotação, sem dependência de React.
 - `src/domain/stage.test.ts`: testes das regras de limites, normalização e imutabilidade.
-- `src/App.tsx`: composição e estado da primeira tela.
-- `src/App.module.css`: estilos da tela.
+- `src/App.tsx`: entrada que seleciona a página do editor.
+- `src/features/editor/EditorPage.tsx`: composição da tela.
+- `src/features/editor/useStageEditor.ts`: estado e ações do editor, sem marcação visual.
+- `src/features/editor/components/`: cabeçalho, navegação, catálogo, palco, propriedades e outros componentes visuais, conectados por propriedades e callbacks.
+- `src/features/editor/editor.module.css`: estilos compartilhados e restritos à funcionalidade do editor.
 - `src/styles.css`: estilos globais e foco.
 
 Os demais adaptadores e camadas serão adicionados quando houver funcionalidade correspondente. A prova técnica de palco/PDF ainda não foi encerrada. Nenhum repositório remoto ou publicação foi criado.
