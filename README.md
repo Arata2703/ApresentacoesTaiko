@@ -1,6 +1,6 @@
 # Taiko / Palco
 
-Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. A tela oferece a prova M02 de um mapa editável e PDF; a M03 acrescenta o núcleo de dados e operações do MVP, ainda sem integração visual.
+Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. A tela oferece a prova M02 de um mapa editável e PDF; M03 e M04 acrescentam o núcleo de dados e o contrato de arquivo completo, com integração visual a partir da M05.
 
 ## Executar
 
@@ -61,11 +61,17 @@ Consulte [as decisões e limitações da M02](docs/m02-decisoes.md). O formato d
 
 O modelo e as operações da apresentação estão em `src/domain/presentation/`: pessoas com IDs estáveis, lista de integrantes, catálogo/bases, mapas em metros, múltiplos tocadores, sequência, transições textuais e materiais manuais. As regras são independentes da interface e preservam a integridade das referências.
 
-Consulte [o modelo, as operações e os limites da M03](docs/m03-modelo.md). O formato de arquivo completo será definido na M04; sua integração com a tela começa na M05. A suíte completa tem 150 testes.
+Consulte [o modelo, as operações e os limites da M03](docs/m03-modelo.md).
+
+## Contrato de arquivo da M04
+
+O arquivo completo é JSON `taiko-presentation`, versão 1, com validação de estrutura e referências, diferenciação de erros/versões incompatíveis e conversão dos mapas da M02. A importação devolve um candidato validado; sua aplicação na tela depende da M05. A suíte completa tem 220 testes.
+
+Consulte [o contrato e a migração da M04](docs/m04-arquivo.md) e o [arquivo de exemplo](examples/presentation-v1.json). Para usar o novo formato pelos controles da página, falta a integração da M05.
 
 ## Próximas entregas
 
-Salvamento automático, arquivo de apresentação completo e telas para múltiplas músicas, transições, cadastro central de integrantes e troca de bases, além do deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
+Integração visual do novo arquivo, salvamento automático e telas para múltiplas músicas, transições, cadastro central de integrantes e troca de bases, além do deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
 
 ## Organização
 
@@ -77,6 +83,7 @@ Salvamento automático, arquivo de apresentação completo e telas para múltipl
 - `src/features/editor/useStageEditor.ts`: estado e ações do editor, sem marcação visual.
 - `src/features/editor/useInstrumentDrag.ts`: captura do ponteiro e conversão de deslocamento da tela para metros.
 - `src/integrations/mapFile.ts`: formato versionado da prova e validação antes da abertura.
+- `src/integrations/presentationFile/`: contrato completo, validação, referências e migração do legado M02, preparado para integração na M05.
 - `src/integrations/mapPdf.ts`: composição vetorial do PDF, independente dos componentes React.
 - `src/integrations/exportMap.ts` e `download.ts`: carregamento sob demanda do gerador/fonte e download no navegador.
 - `src/features/editor/components/`: cabeçalho, navegação, catálogo, palco, propriedades e outros componentes visuais, conectados por propriedades e callbacks.
