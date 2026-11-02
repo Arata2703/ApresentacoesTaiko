@@ -186,12 +186,12 @@ describe('integrantes pela interface', () => {
       screen.getByRole('checkbox', { name: 'Ana · pessoa 2' }),
     )
     expect(
-      screen.getByRole('button', { name: /Okedo, tocador Ana, Ana/ }),
+      screen.getByRole('button', { name: /Okedo, tocador Ana\/Ana/ }),
     ).toBeVisible()
     const multiple = await save()
     await open(multiple.source)
     await userEvent.click(
-      screen.getByRole('button', { name: /Okedo, tocador Ana, Ana/ }),
+      screen.getByRole('button', { name: /Okedo, tocador Ana\/Ana/ }),
     )
     expect(
       screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
@@ -251,7 +251,7 @@ describe('integrantes pela interface', () => {
       screen.getByRole('button', { name: 'Abrir mapa Ibuki' }),
     )
     expect(
-      screen.getByRole('button', { name: /Okedo, tocador Ana Silva, João/ }),
+      screen.getByRole('button', { name: /Okedo, tocador Ana Silva\/João/ }),
     ).toBeVisible()
   })
   it('inclui todos os cadastrados e confirma remoção de pessoa atribuída', async () => {

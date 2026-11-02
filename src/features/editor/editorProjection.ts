@@ -22,7 +22,7 @@ export function projectMap(presentation: Presentation, mapId: string | null) {
     rotation: item.rotation,
     player: item.playerIds
       .map((id) => presentation.people.find((person) => person.id === id)!.name)
-      .join(', '),
+      .join('/'),
     baseLabel:
       item.baseId === null
         ? 'Sem base definida'

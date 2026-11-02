@@ -64,7 +64,7 @@ describe('estado do editor', () => {
       }),
     )
     expect(result.current.selected).toMatchObject({
-      player: 'Ana, João',
+      player: 'Ana/João',
       x: 3.25,
       y: 1.5,
       rotation: 315,

@@ -25,7 +25,7 @@ describe('PDF vetorial real', () => {
       x: 3.25,
       y: 1.5,
       rotation: 315,
-      player: 'Ana, João',
+      player: 'Ana/João',
     })
     const pdf = await PDFDocument.load(await createMapPdf(page, font))
     expect(pdf.getPageCount()).toBe(1)

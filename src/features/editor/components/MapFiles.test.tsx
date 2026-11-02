@@ -126,7 +126,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
     )
     expect(screen.getByLabelText('Palco de 12 por 8 metros')).toBeVisible()
     await userEvent.click(
-      screen.getByRole('button', { name: /Okedo, tocador Ana, João/ }),
+      screen.getByRole('button', { name: /Okedo, tocador Ana\/João/ }),
     )
     expect(
       screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
