@@ -1,6 +1,6 @@
 # Taiko / Palco
 
-Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. Etapa atual: prova técnica M02 de um mapa editável e exportação PDF.
+Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. A tela oferece a prova M02 de um mapa editável e PDF; a M03 acrescenta o núcleo de dados e operações do MVP, ainda sem integração visual.
 
 ## Executar
 
@@ -57,14 +57,21 @@ O navegador ainda não salva automaticamente: baixe o mapa editável antes de sa
 
 Consulte [as decisões e limitações da M02](docs/m02-decisoes.md). O formato desta prova contém um único mapa; o arquivo de apresentação completo será tratado na M04.
 
-## Ainda não implementado
+## Núcleo lógico da M03
 
-Salvamento automático, arquivo de apresentação completo, múltiplas músicas, transições, cadastro central de integrantes, troca de bases e deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
+O modelo e as operações da apresentação estão em `src/domain/presentation/`: pessoas com IDs estáveis, lista de integrantes, catálogo/bases, mapas em metros, múltiplos tocadores, sequência, transições textuais e materiais manuais. As regras são independentes da interface e preservam a integridade das referências.
+
+Consulte [o modelo, as operações e os limites da M03](docs/m03-modelo.md). O formato de arquivo completo será definido na M04; sua integração com a tela começa na M05. A suíte completa tem 150 testes.
+
+## Próximas entregas
+
+Salvamento automático, arquivo de apresentação completo e telas para múltiplas músicas, transições, cadastro central de integrantes e troca de bases, além do deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
 
 ## Organização
 
 - `src/domain/stage.ts`: tipos e operações de posição/rotação, sem dependência de React.
 - `src/domain/stage.test.ts`: testes das regras de limites, normalização e imutabilidade.
+- `src/domain/presentation/`: modelo completo do MVP e operações separadas por apresentação, pessoas, mapas, catálogo, sequência e materiais, com testes do núcleo.
 - `src/App.tsx`: entrada que seleciona a página do editor.
 - `src/features/editor/EditorPage.tsx`: composição da tela.
 - `src/features/editor/useStageEditor.ts`: estado e ações do editor, sem marcação visual.
