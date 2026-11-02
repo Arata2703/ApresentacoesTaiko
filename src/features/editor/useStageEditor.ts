@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { MapDraft } from '../../integrations/mapFile'
 import {
   createInstrument,
   getInstrumentType,
@@ -52,6 +53,13 @@ export function useStageEditor() {
   }
 
   return {
+    openMap: (map: MapDraft) => {
+      setTitle(map.title)
+      setSong(map.song)
+      setInstruments(map.instruments)
+      setSelectedId(null)
+      setMessage('Mapa carregado do arquivo editável.')
+    },
     title,
     song,
     instruments,

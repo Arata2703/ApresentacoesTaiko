@@ -11,7 +11,7 @@ export function EditorFooter(props: Props) {
         {message}
       </span>
       <span>
-        Alterações apenas nesta sessão. Recarregar a página limpa o mapa.
+        Baixe o mapa editável antes de sair. Recarregar a página limpa a sessão.
       </span>
     </footer>
   )

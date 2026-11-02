@@ -6,6 +6,7 @@ import {
   type StageInstrument,
 } from '../../../domain/stage'
 import { InstrumentSymbol } from './InstrumentSymbol'
+import { useInstrumentDrag } from '../useInstrumentDrag'
 import styles from '../editor.module.css'
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
 }
 export function StageMap(props: Props) {
   const { instruments, selectedId, onSelect, onAdd, onMove } = props
+  const drag = useInstrumentDrag(onMove)
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, id: string) {
     const moves: Record<string, [number, number]> = {
       ArrowLeft: [-0.1, 0],
@@ -73,6 +75,11 @@ export function StageMap(props: Props) {
                 } as CSSProperties
               }
               onClick={() => onSelect(item.id)}
+              onPointerDown={(event) => drag.start(event, item.id)}
+              onPointerMove={drag.move}
+              onPointerUp={drag.end}
+              onPointerCancel={drag.end}
+              onLostPointerCapture={drag.end}
               onKeyDown={(event) => handleKeyDown(event, item.id)}
               aria-pressed={selectedId === item.id}
               aria-label={`${type.name}${item.player ? `, tocador ${item.player}` : ', sem tocador'}. Use as setas para mover.`}
@@ -93,7 +100,7 @@ export function StageMap(props: Props) {
       </div>
       <p className={styles.stageHint}>
         {instruments.length
-          ? 'Selecione um instrumento para editar. Use as setas do teclado para mover.'
+          ? 'Arraste ou use as setas para mover. Ajuste a rotação no painel lateral.'
           : 'A grade é uma referência de posição. As dimensões dos ícones são ilustrativas.'}
       </p>
     </section>

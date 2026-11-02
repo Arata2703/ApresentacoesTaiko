@@ -34,7 +34,7 @@ export function PresentationSidebar(props: Props) {
         </p>
       </div>
       <div className={styles.scopeNote}>
-        Novas músicas, transições e exportação chegam nas próximas etapas.
+        Novas músicas e transições chegam nas próximas etapas.
       </div>
     </aside>
   )
