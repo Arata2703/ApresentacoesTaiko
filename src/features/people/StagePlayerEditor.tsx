@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
 import type { Person } from '../../domain/presentation/model'
 import { playerSuggestions, type PlayerSuggestion } from './playerSuggestions'
 import { resolvePlayerDraft, type PlayerReference } from './playerDraft'
@@ -9,6 +9,7 @@ interface Props {
   selectedIds: readonly string[]
   onCommit: (players: readonly PlayerReference[]) => void
   onCancel: () => void
+  initialCaret?: number
 }
 
 export function StagePlayerEditor({
@@ -16,7 +17,13 @@ export function StagePlayerEditor({
   selectedIds,
   onCommit,
   onCancel,
+  initialCaret,
 }: Props) {
+  const input = useRef<HTMLInputElement>(null)
+  useLayoutEffect(() => {
+    if (initialCaret !== undefined)
+      input.current!.setSelectionRange(initialCaret, initialCaret)
+  }, [initialCaret])
   const id = useId()
   const [text, setText] = useState(
     selectedIds
@@ -58,6 +65,7 @@ export function StagePlayerEditor({
   return (
     <div className={styles.editor}>
       <input
+        ref={input}
         className={`${styles.nameField} ${styles.editing}`}
         autoFocus
         id={id}

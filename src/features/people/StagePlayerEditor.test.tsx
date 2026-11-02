@@ -22,6 +22,44 @@ async function loadExample() {
 }
 
 describe('edição direta do rótulo no palco', () => {
+  it('posiciona o cursor junto ao duplo clique e insere no meio do nome', async () => {
+    render(<App />)
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar Okedo' }),
+    )
+    await userEvent.dblClick(
+      screen.getByRole('button', { name: 'Editar tocadores de Okedo' }),
+    )
+    await userEvent.type(screen.getByRole('combobox'), 'Rafael')
+    await userEvent.keyboard('{Enter}')
+    const label = screen.getByRole('button', {
+      name: 'Editar tocadores de Okedo: Rafael',
+    })
+    Object.defineProperty(document, 'caretPositionFromPoint', {
+      configurable: true,
+      value: () => ({ offsetNode: label.firstChild!, offset: 3 }),
+    })
+    try {
+      fireEvent.doubleClick(label, { clientX: 120, clientY: 80 })
+      const input = screen.getByRole('combobox') as HTMLInputElement
+      expect(input.selectionStart).toBe(3)
+      expect(input.selectionEnd).toBe(3)
+      await userEvent.keyboard('X')
+      expect(input).toHaveValue('RafXael')
+      await userEvent.keyboard('{Escape}')
+      expect(label).not.toBeInTheDocument()
+      expect(
+        screen.getByRole('button', {
+          name: 'Editar tocadores de Okedo: Rafael',
+        }),
+      ).toBeVisible()
+    } finally {
+      Object.defineProperty(document, 'caretPositionFromPoint', {
+        configurable: true,
+        value: undefined,
+      })
+    }
+  })
   it('edita no próprio texto, cria integrantes e usa A/B sem abrir um painel', async () => {
     render(<App />)
     await userEvent.click(

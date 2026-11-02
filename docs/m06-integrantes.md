@@ -34,6 +34,8 @@ O duplo clique no rótulo abaixo do instrumento abre um campo compacto no própr
 
 A opção visual aprovada é uma caixa permanente ao redor do nome, com cantos suaves e tamanho idêntico durante a edição. Ao editar, apenas o fundo fica levemente verde, sem contorno adicional. Não há caixa de seleção ao redor do instrumento: a seleção usa sombra discreta, e o foco por teclado destaca o desenho. As sugestões aparecem abaixo do campo durante a digitação.
 
+O duplo clique posiciona o cursor junto ao ponto clicado no texto, usando a posição de inserção retornada pelo navegador. A entrada por teclado mantém o comportamento padrão. A correção tem teste de inserção no meio do nome e cobertura da API alternativa de posicionamento; a suíte completa passou com 250 testes.
+
 `StagePlayerEditor`, `playerSuggestions` e `playerDraft` separam interação, busca e resolução das identidades. A movimentação continua ligada ao palco, mesmo com o rótulo editável separado do botão do instrumento. A revisão passou em 248 testes, com 100% de linhas/funções e limites de cobertura preservados.
 
 - `PeoplePage.tsx`: tabela, formulário de adição e retorno aos mapas, inclusive em apresentações vazias.

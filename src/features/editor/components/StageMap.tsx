@@ -11,6 +11,7 @@ import type { PlayerReference } from '../../people/playerDraft'
 import { useInstrumentDrag } from '../useInstrumentDrag'
 import styles from '../editor.module.css'
 import playerStyles from '../../people/stagePlayerEditor.module.css'
+import { caretOffsetAtPoint } from '../../people/caretOffset'
 
 interface Props {
   stage: StageDimensions
@@ -37,6 +38,9 @@ export function StageMap({
 }: Props) {
   const surface = useRef<HTMLDivElement>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [initialCaret, setInitialCaret] = useState<number | undefined>(
+    undefined,
+  )
   const drag = useInstrumentDrag(onMove, stage)
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, id: string) {
     const moves: Record<string, [number, number]> = {
@@ -50,7 +54,8 @@ export function StageMap({
     event.preventDefault()
     onMove(id, ...move)
   }
-  function edit(id: string) {
+  function edit(id: string, caret?: number) {
+    setInitialCaret(caret)
     onSelect(id)
     setEditingId(id)
   }
@@ -131,6 +136,7 @@ export function StageMap({
                   key={item.id}
                   people={people}
                   selectedIds={item.playerIds}
+                  initialCaret={initialCaret}
                   onCommit={(players) => {
                     onCommitPlayers(item.id, players)
                     setEditingId(null)
@@ -145,7 +151,16 @@ export function StageMap({
                   title="Duplo clique para editar os tocadores"
                   className={`${styles.instrumentLabel} ${playerStyles.nameField}`}
                   onClick={() => onSelect(item.id)}
-                  onDoubleClick={() => edit(item.id)}
+                  onDoubleClick={(event) =>
+                    edit(
+                      item.id,
+                      caretOffsetAtPoint(
+                        event.currentTarget,
+                        event.clientX,
+                        event.clientY,
+                      ),
+                    )
+                  }
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === 'F2') {
                       event.preventDefault()
