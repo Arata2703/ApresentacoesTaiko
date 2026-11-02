@@ -22,7 +22,7 @@ interface Props {
     players: readonly PlayerReference[],
   ) => void
   selectedId: string | null
-  onSelect: (id: string) => void
+  onSelect: (id: string | null) => void
   onAdd: (kind: InstrumentKind) => void
   onMove: (id: string, dx: number, dy: number) => void
 }
@@ -63,6 +63,14 @@ export function StageMap({
     <section
       className={styles.stageArea}
       aria-label={`Palco de ${stage.width} por ${stage.depth} metros`}
+      onClick={(event) => {
+        if (
+          !(event.target as Element).closest('[data-stage-instrument], button')
+        ) {
+          setEditingId(null)
+          onSelect(null)
+        }
+      }}
     >
       <div className={styles.stageToolbar}>
         <span>VISTA SUPERIOR</span>
@@ -101,6 +109,7 @@ export function StageMap({
           return (
             <div
               key={item.id}
+              data-stage-instrument
               className={`${styles.stageInstrument} ${selectedId === item.id ? styles.selected : ''}`}
               style={
                 {

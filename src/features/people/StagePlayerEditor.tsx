@@ -78,7 +78,7 @@ export function StagePlayerEditor({
         aria-activedescendant={
           open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined
         }
-        placeholder="Nome ou A/B"
+        placeholder="Nome"
         value={text}
         onChange={(event) => {
           setText(event.target.value)

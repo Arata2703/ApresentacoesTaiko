@@ -11,6 +11,7 @@ import styles from './editor.module.css'
 import { useState } from 'react'
 import { PeoplePage } from '../people/PeoplePage'
 import { peopleActions } from '../people/peopleActions'
+import { StageSettings } from './components/StageSettings'
 
 export function EditorPage() {
   const editor = useStageEditor()
@@ -55,6 +56,11 @@ export function EditorPage() {
           ) : editor.page ? (
             <>
               <MapHeading song={editor.song} onSongChange={editor.setSong} />
+              <StageSettings
+                key={`${editor.activeMapId}:${editor.page.stage.width}:${editor.page.stage.depth}`}
+                stage={editor.page.stage}
+                onApply={editor.resizeStage}
+              />
               <div className={styles.editor}>
                 <InstrumentCatalog onAdd={editor.addInstrument} />
                 <StageMap
@@ -68,6 +74,7 @@ export function EditorPage() {
                   onMove={editor.moveInstrument}
                 />
                 <InstrumentProperties
+                  onBaseChange={editor.changeBase}
                   people={editor.presentation.people}
                   onAssign={editor.assignPlayers}
                   onManage={() => setPeopleView(true)}

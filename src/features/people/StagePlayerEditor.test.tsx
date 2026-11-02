@@ -30,7 +30,10 @@ describe('edição direta do rótulo no palco', () => {
     await userEvent.dblClick(
       screen.getByRole('button', { name: 'Editar tocadores de Okedo' }),
     )
-    await userEvent.type(screen.getByRole('combobox'), 'Rafael')
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'Rafael',
+    )
     await userEvent.keyboard('{Enter}')
     const label = screen.getByRole('button', {
       name: 'Editar tocadores de Okedo: Rafael',
@@ -41,7 +44,9 @@ describe('edição direta do rótulo no palco', () => {
     })
     try {
       fireEvent.doubleClick(label, { clientX: 120, clientY: 80 })
-      const input = screen.getByRole('combobox') as HTMLInputElement
+      const input = screen.getByRole('combobox', {
+        name: 'Tocadores no instrumento',
+      }) as HTMLInputElement
       expect(input.selectionStart).toBe(3)
       expect(input.selectionEnd).toBe(3)
       await userEvent.keyboard('X')
@@ -65,13 +70,21 @@ describe('edição direta do rótulo no palco', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Adicionar Okedo' }),
     )
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', { name: 'Tocadores no instrumento' }),
+    ).not.toBeInTheDocument()
     await userEvent.dblClick(
       screen.getByRole('button', { name: 'Editar tocadores de Okedo' }),
     )
-    await userEvent.type(screen.getByRole('combobox'), 'Kaory/Rafael')
+    expect(screen.getByPlaceholderText('Nome')).toHaveFocus()
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'Kaory/Rafael',
+    )
     await userEvent.keyboard('{Enter}')
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', { name: 'Tocadores no instrumento' }),
+    ).not.toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /Okedo, tocador Kaory\/Rafael/ }),
     ).toBeVisible()
@@ -89,7 +102,9 @@ describe('edição direta do rótulo no palco', () => {
         name: 'Editar tocadores de Okedo: Kaory/Rafael',
       }),
     )
-    await userEvent.clear(screen.getByRole('combobox'))
+    await userEvent.clear(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+    )
     await userEvent.keyboard('{Enter}')
     expect(
       screen.getByRole('button', { name: /Okedo, sem tocador/ }),
@@ -104,7 +119,10 @@ describe('edição direta do rótulo no palco', () => {
     await userEvent.dblClick(
       screen.getByRole('button', { name: 'Editar tocadores de Fue' }),
     )
-    await userEvent.type(screen.getByRole('combobox'), 'an')
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'an',
+    )
     expect(screen.getByRole('option', { name: 'Ana · pessoa 1' })).toBeVisible()
     await userEvent.click(
       screen.getByRole('option', { name: 'Ana · pessoa 3' }),
@@ -141,8 +159,13 @@ describe('edição direta do rótulo no palco', () => {
       screen.getByRole('button', { name: 'Editar tocadores de Fue: Ana' }),
     )
     await userEvent.keyboard('{Enter}')
-    await userEvent.clear(screen.getByRole('combobox'))
-    await userEvent.type(screen.getByRole('combobox'), 'joa')
+    await userEvent.clear(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+    )
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'joa',
+    )
     await userEvent.keyboard('{Escape}')
     expect(
       screen.getByRole('button', { name: /Fue, tocador Ana/ }),
@@ -150,8 +173,13 @@ describe('edição direta do rótulo no palco', () => {
     await userEvent.dblClick(
       screen.getByRole('button', { name: 'Editar tocadores de Fue: Ana' }),
     )
-    await userEvent.clear(screen.getByRole('combobox'))
-    await userEvent.type(screen.getByRole('combobox'), 'João')
+    await userEvent.clear(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+    )
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'João',
+    )
     await userEvent.click(screen.getByLabelText('Nome da música'))
     expect(
       screen.getByRole('button', { name: /Fue, tocador João/ }),
@@ -174,17 +202,30 @@ describe('edição direta do rótulo no palco', () => {
         <button>Sair</button>
       </>,
     )
-    await userEvent.type(screen.getByRole('combobox'), 'Ana')
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'Ana',
+    )
     await userEvent.click(screen.getByRole('button', { name: 'Sair' }))
     expect(screen.getByRole('alert')).toHaveTextContent('mesmo nome')
     expect(onCommit).not.toHaveBeenCalled()
-    await userEvent.clear(screen.getByRole('combobox'))
-    await userEvent.type(screen.getByRole('combobox'), 'X'.repeat(81))
+    await userEvent.clear(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+    )
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'X'.repeat(81),
+    )
     await userEvent.keyboard('{ArrowDown}{ArrowUp}{Enter}')
     expect(screen.getByRole('alert')).toHaveTextContent('1 a 80')
     expect(screen.getByText('Nenhum integrante encontrado.')).toBeVisible()
-    await userEvent.clear(screen.getByRole('combobox'))
-    await userEvent.type(screen.getByRole('combobox'), 'Bia')
+    await userEvent.clear(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+    )
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'Bia',
+    )
     await userEvent.click(
       screen.getByRole('option', { name: 'Adicionar “Bia” aos integrantes' }),
     )

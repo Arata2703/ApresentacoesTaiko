@@ -4,6 +4,8 @@ import type { EditorInstrument, InstrumentTransform } from '../editorProjection'
 import type { StageDimensions } from '../../../domain/presentation/model'
 import type { Person } from '../../../domain/presentation/model'
 import { PlayerAssignments } from '../../people/PlayerAssignments'
+import { bases } from '../../../domain/presentation/catalog'
+import type { BaseId } from '../../../domain/presentation/model'
 
 interface Props {
   people: readonly Person[]
@@ -13,6 +15,7 @@ interface Props {
   stage: StageDimensions
   onChange: (changes: InstrumentTransform) => void
   onRemove: () => void
+  onBaseChange: (id: BaseId | null) => void
 }
 export function InstrumentProperties(props: Props) {
   const { selected, onChange, onRemove, stage, people, onAssign, onManage } =
@@ -31,10 +34,30 @@ export function InstrumentProperties(props: Props) {
             onAssign={onAssign}
             onManage={onManage}
           />
-          <div className={styles.field}>
+          <label className={styles.field}>
             Base
-            <span className={styles.readOnly}>{selected.baseLabel}</span>
-          </div>
+            <select
+              value={selected.baseId ?? ''}
+              onChange={(event) =>
+                props.onBaseChange(
+                  (event.target.value || null) as BaseId | null,
+                )
+              }
+            >
+              <option value="">Sem base definida</option>
+              {bases
+                .filter((base) => base.kinds.includes(selected.kind))
+                .map((base) => (
+                  <option key={base.id} value={base.id}>
+                    {base.name}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <p className={styles.dimensionNote}>
+            Tamanho do desenho ilustrativo. As dimensões reais dos instrumentos
+            ainda não foram informadas.
+          </p>
           <div className={styles.positionFields}>
             <label className={styles.field}>
               Horizontal · m

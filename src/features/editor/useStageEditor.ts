@@ -1,5 +1,9 @@
 import { useState } from 'react'
-import type { Presentation } from '../../domain/presentation/model'
+import type {
+  BaseId,
+  Presentation,
+  StageDimensions,
+} from '../../domain/presentation/model'
 import {
   createPresentation,
   renamePresentation,
@@ -11,6 +15,8 @@ import {
   removeMapInstrument,
   renameMap,
   updateMapInstrument,
+  setInstrumentBase,
+  resizeStage,
 } from '../../domain/presentation/maps'
 import { getInstrumentType, type InstrumentKind } from '../../domain/stage'
 import { addPerson } from '../../domain/presentation/people'
@@ -54,7 +60,7 @@ export function useStageEditor() {
   const instruments = page?.instruments ?? []
   const selected = instruments.find((entry) => entry.id === state.selectedId)
 
-  function selectInstrument(id: string) {
+  function selectInstrument(id: string | null) {
     setState((s) => ({ ...s, selectedId: id }))
   }
 
@@ -126,6 +132,29 @@ export function useStageEditor() {
   }
 
   return {
+    changeBase: (baseId: BaseId | null) =>
+      setState((s) =>
+        s.mapId === null || s.selectedId === null
+          ? s
+          : {
+              ...s,
+              presentation: setInstrumentBase(
+                s.presentation,
+                s.mapId,
+                s.selectedId,
+                baseId,
+              ),
+            },
+      ),
+    resizeStage: (stage: StageDimensions) =>
+      setState((s) =>
+        s.mapId === null
+          ? s
+          : {
+              ...s,
+              presentation: resizeStage(s.presentation, s.mapId, stage),
+            },
+      ),
     commitPlayers: (
       instrumentId: string,
       players: readonly PlayerReference[],

@@ -1,4 +1,4 @@
-import type { Presentation } from '../../domain/presentation/model'
+import type { BaseId, Presentation } from '../../domain/presentation/model'
 import { bases } from '../../domain/presentation/catalog'
 import type { StageInstrument } from '../../domain/stage'
 export type InstrumentTransform = Partial<
@@ -8,12 +8,14 @@ export type InstrumentTransform = Partial<
 export interface EditorInstrument extends StageInstrument {
   playerIds: readonly string[]
   baseLabel: string
+  baseId: BaseId | null
 }
 
 export function projectMap(presentation: Presentation, mapId: string | null) {
   const map = presentation.maps.find((item) => item.id === mapId)
   if (!map) return null
   const instruments: EditorInstrument[] = map.instruments.map((item) => ({
+    baseId: item.baseId,
     playerIds: item.playerIds,
     id: item.id,
     kind: item.kind,
