@@ -82,8 +82,7 @@ export function InstrumentProperties(props: Props) {
       ) : (
         <>
           <h2 id="properties-title">
-            Cada detalhe
-            <br />
+            Cada detalhe <br />
             no seu lugar.
           </h2>
           <div className={styles.selectionSketch} aria-hidden="true">
