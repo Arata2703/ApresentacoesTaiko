@@ -7,6 +7,26 @@ import { assignInstrumentPlayers } from '../../domain/presentation/maps'
 import { addPerson, renamePerson } from '../../domain/presentation/people'
 
 describe('estado do editor', () => {
+  it('confirma nomes diretamente em um instrumento sem duplicar novas identidades repetidas', () => {
+    const { result } = renderHook(useStageEditor)
+    act(() => result.current.commitPlayers('missing', [{ name: 'Ignorar' }]))
+    expect(result.current.presentation.people).toEqual([])
+    act(() => result.current.addInstrument('okedo'))
+    const id = result.current.selectedId!
+    act(() =>
+      result.current.commitPlayers(id, [{ name: 'Ana' }, { name: 'Ana' }]),
+    )
+    expect(result.current.presentation.people).toHaveLength(1)
+    const personId = result.current.presentation.people[0]!.id
+    act(() =>
+      result.current.commitPlayers(id, [{ id: personId }, { name: 'Bia' }]),
+    )
+    expect(result.current.selected!.player).toBe('Ana/Bia')
+    expect(result.current.presentation.rosterIds).toHaveLength(2)
+    expect(() => result.current.commitPlayers(id, [{ name: ' ' }])).toThrow(
+      '1 a 80',
+    )
+  })
   it('abre apresentação vazia sem inventar mapas e cria somente o primeiro sob ação explícita', () => {
     const { result } = renderHook(useStageEditor)
     act(() =>

@@ -58,6 +58,8 @@ export function EditorPage() {
               <div className={styles.editor}>
                 <InstrumentCatalog onAdd={editor.addInstrument} />
                 <StageMap
+                  people={editor.presentation.people}
+                  onCommitPlayers={editor.commitPlayers}
                   stage={editor.page.stage}
                   instruments={editor.instruments}
                   selectedId={editor.selectedId}

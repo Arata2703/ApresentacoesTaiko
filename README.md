@@ -76,6 +76,8 @@ Consulte [o contrato e a migração da M04](docs/m04-arquivo.md) e o [arquivo de
 
 ## Próximas entregas
 
+Os tocadores aparecem como `A/B`. No palco, dê duplo clique no nome abaixo do instrumento para editar em um campo compacto com autocomplete. Enter ou sair do campo salva; Esc cancela. Nomes novos são incluídos na lista de integrantes. O instrumento selecionado não recebe uma moldura ao redor.
+
 Editor completo, criação/ordenação de várias músicas, transições, materiais manuais, salvamento automático, PDF completo e deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
 
 ## Organização

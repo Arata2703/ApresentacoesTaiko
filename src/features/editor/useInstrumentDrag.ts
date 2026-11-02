@@ -16,9 +16,13 @@ export function useInstrumentDrag(
     height: number
   } | null>(null)
 
-  function start(event: PointerEvent<HTMLButtonElement>, id: string) {
+  function start(
+    event: PointerEvent<HTMLButtonElement>,
+    id: string,
+    surface = event.currentTarget.parentElement!,
+  ) {
     if (event.button !== 0 || drag.current) return
-    const bounds = event.currentTarget.parentElement!.getBoundingClientRect()
+    const bounds = surface.getBoundingClientRect()
     if (bounds.width <= 0 || bounds.height <= 0) return
     event.currentTarget.setPointerCapture(event.pointerId)
     drag.current = {

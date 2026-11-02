@@ -13,6 +13,9 @@ import {
   updateMapInstrument,
 } from '../../domain/presentation/maps'
 import { getInstrumentType, type InstrumentKind } from '../../domain/stage'
+import { addPerson } from '../../domain/presentation/people'
+import { named } from '../../domain/presentation/rules'
+import type { PlayerReference } from '../people/playerDraft'
 import {
   firstMapId,
   projectMap,
@@ -123,6 +126,32 @@ export function useStageEditor() {
   }
 
   return {
+    commitPlayers: (
+      instrumentId: string,
+      players: readonly PlayerReference[],
+    ) => {
+      const additions = new Map<string, { id: string; name: string }>()
+      const ids = players.map((player) => {
+        if ('id' in player) return player.id
+        const name = named(player.name)
+        if (!additions.has(name))
+          additions.set(name, { id: crypto.randomUUID(), name })
+        return additions.get(name)!.id
+      })
+      setState((s) => {
+        const map = s.presentation.maps.find((item) =>
+          item.instruments.some((instrument) => instrument.id === instrumentId),
+        )
+        if (!map) return s
+        let p = s.presentation
+        for (const person of additions.values())
+          p = addPerson(p, person.id, person.name)
+        return {
+          ...s,
+          presentation: assignInstrumentPlayers(p, map.id, instrumentId, ids),
+        }
+      })
+    },
     updatePresentation: (change: (p: Presentation) => Presentation) =>
       setState((s) => ({ ...s, presentation: change(s.presentation) })),
     assignPlayers: (ids: readonly string[]) =>

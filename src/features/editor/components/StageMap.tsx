@@ -1,24 +1,41 @@
-import type { CSSProperties, KeyboardEvent } from 'react'
-import {
-  getInstrumentType,
-  type InstrumentKind,
-  type StageInstrument,
-} from '../../../domain/stage'
+import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
+import { getInstrumentType, type InstrumentKind } from '../../../domain/stage'
 import { InstrumentSymbol } from './InstrumentSymbol'
-import type { StageDimensions } from '../../../domain/presentation/model'
+import type {
+  StageDimensions,
+  Person,
+} from '../../../domain/presentation/model'
+import type { EditorInstrument } from '../editorProjection'
+import { StagePlayerEditor } from '../../people/StagePlayerEditor'
+import type { PlayerReference } from '../../people/playerDraft'
 import { useInstrumentDrag } from '../useInstrumentDrag'
 import styles from '../editor.module.css'
 
 interface Props {
   stage: StageDimensions
-  instruments: StageInstrument[]
+  instruments: EditorInstrument[]
+  people: readonly Person[]
+  onCommitPlayers: (
+    instrumentId: string,
+    players: readonly PlayerReference[],
+  ) => void
   selectedId: string | null
   onSelect: (id: string) => void
   onAdd: (kind: InstrumentKind) => void
   onMove: (id: string, dx: number, dy: number) => void
 }
-export function StageMap(props: Props) {
-  const { instruments, selectedId, onSelect, onAdd, onMove, stage } = props
+export function StageMap({
+  instruments,
+  selectedId,
+  onSelect,
+  onAdd,
+  onMove,
+  stage,
+  people,
+  onCommitPlayers,
+}: Props) {
+  const surface = useRef<HTMLDivElement>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const drag = useInstrumentDrag(onMove, stage)
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, id: string) {
     const moves: Record<string, [number, number]> = {
@@ -31,6 +48,10 @@ export function StageMap(props: Props) {
     if (!move) return
     event.preventDefault()
     onMove(id, ...move)
+  }
+  function edit(id: string) {
+    onSelect(id)
+    setEditingId(id)
   }
   return (
     <section
@@ -49,6 +70,7 @@ export function StageMap(props: Props) {
         <span />
       </div>
       <div
+        ref={surface}
         className={styles.stage}
         style={{ aspectRatio: `${stage.width} / ${stage.depth}` }}
       >
@@ -71,7 +93,7 @@ export function StageMap(props: Props) {
         {instruments.map((item) => {
           const type = getInstrumentType(item.kind)
           return (
-            <button
+            <div
               key={item.id}
               className={`${styles.stageInstrument} ${selectedId === item.id ? styles.selected : ''}`}
               style={
@@ -81,23 +103,59 @@ export function StageMap(props: Props) {
                   '--rotation': `${item.rotation}deg`,
                 } as CSSProperties
               }
-              onClick={() => onSelect(item.id)}
-              onPointerDown={(event) => drag.start(event, item.id)}
-              onPointerMove={drag.move}
-              onPointerUp={drag.end}
-              onPointerCancel={drag.end}
-              onLostPointerCapture={drag.end}
-              onKeyDown={(event) => handleKeyDown(event, item.id)}
-              aria-pressed={selectedId === item.id}
-              aria-label={`${type.name}${item.player ? `, tocador ${item.player}` : ', sem tocador'}. Use as setas para mover.`}
             >
-              <span className={styles.rotating}>
-                <InstrumentSymbol kind={item.kind} />
-              </span>
-              <span className={styles.instrumentLabel}>
-                {item.player || type.name}
-              </span>
-            </button>
+              <button
+                className={styles.instrumentButton}
+                onClick={() => {
+                  setEditingId(null)
+                  onSelect(item.id)
+                }}
+                onPointerDown={(event) =>
+                  drag.start(event, item.id, surface.current!)
+                }
+                onPointerMove={drag.move}
+                onPointerUp={drag.end}
+                onPointerCancel={drag.end}
+                onLostPointerCapture={drag.end}
+                onKeyDown={(event) => handleKeyDown(event, item.id)}
+                aria-pressed={selectedId === item.id}
+                aria-label={`${type.name}${item.player ? `, tocador ${item.player}` : ', sem tocador'}. Use as setas para mover.`}
+              >
+                <span className={styles.rotating}>
+                  <InstrumentSymbol kind={item.kind} />
+                </span>
+              </button>
+              {editingId === item.id && selectedId === item.id ? (
+                <StagePlayerEditor
+                  key={item.id}
+                  people={people}
+                  selectedIds={item.playerIds}
+                  onCommit={(players) => {
+                    onCommitPlayers(item.id, players)
+                    setEditingId(null)
+                  }}
+                  onCancel={() => setEditingId(null)}
+                />
+              ) : (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Editar tocadores de ${type.name}${item.player ? `: ${item.player}` : ''}`}
+                  title="Duplo clique para editar os tocadores"
+                  className={styles.instrumentLabel}
+                  onClick={() => onSelect(item.id)}
+                  onDoubleClick={() => edit(item.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === 'F2') {
+                      event.preventDefault()
+                      edit(item.id)
+                    }
+                  }}
+                >
+                  {item.player || type.name}
+                </span>
+              )}
+            </div>
           )
         })}
       </div>
@@ -107,7 +165,7 @@ export function StageMap(props: Props) {
       </div>
       <p className={styles.stageHint}>
         {instruments.length
-          ? 'Arraste ou use as setas para mover. Ajuste a rotação no painel lateral.'
+          ? 'Arraste ou use as setas para mover. Duplo clique no nome para editar os tocadores.'
           : 'A grade é uma referência de posição. As dimensões dos ícones são ilustrativas.'}
       </p>
     </section>

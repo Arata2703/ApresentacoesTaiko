@@ -1,0 +1,60 @@
+.editor {
+  position: relative;
+  z-index: 6;
+  width: 146px;
+  max-width: 70vw;
+  font-size: 12px;
+}
+.editor input {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 7px;
+  border: 1px solid #bcc8ae;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px #00000009;
+  background: #fffefa;
+  text-align: center;
+  font-size: 12px;
+}
+.editor input:focus-visible {
+  outline: 1px solid #7b9563;
+  outline-offset: 2px;
+}
+.options {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 190px;
+  max-width: 70vw;
+  list-style: none;
+  margin: 3px 0 0;
+  padding: 3px;
+  max-height: 160px;
+  overflow-y: auto;
+  background: #fffefa;
+  border: 1px solid #bdcbb3;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px #29372e1a;
+  text-align: left;
+}
+.options [role='option'] {
+  padding: 6px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.options [aria-selected='true'],
+.options [role='option']:hover {
+  background: #edf1e7;
+}
+.empty {
+  padding: 6px;
+  color: #68765c;
+}
+.error {
+  padding: 5px;
+  margin: 3px 0 0;
+  border: 1px solid #d1a59a;
+  color: #8b3927;
+  background: #fffefa;
+}

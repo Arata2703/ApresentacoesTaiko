@@ -447,12 +447,17 @@
   border-radius: 5px;
 }
 .stageInstrument:hover {
-  background: #e7eddd88;
+  background: transparent;
 }
 .selected {
-  outline: 1px solid #6c8b54;
-  outline-offset: 4px;
-  background: #eaf0e155;
+  z-index: 5;
+}
+.selected .instrumentLabel {
+  color: #354e3b;
+  font-weight: 600;
+}
+.selected .rotating {
+  filter: drop-shadow(0 2px 3px #354e3b30);
 }
 .rotating {
   transform: rotate(var(--rotation));
@@ -460,7 +465,10 @@
 }
 .instrumentLabel {
   font-size: 10px;
-  max-width: 90px;
+  width: max-content;
+  max-width: 146px;
+  flex-shrink: 0;
+  text-align: center;
   background: #fffef8e8;
   border-radius: 2px;
   padding: 2px 4px;
@@ -802,4 +810,25 @@
 .pageItem[aria-pressed='true'] {
   background: #edf1e7;
   outline: 1px solid #6c8b54;
+}
+
+.instrumentButton {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  background: transparent;
+  padding: 0;
+  border: 0;
+}
+.instrumentButton:focus-visible {
+  outline: none;
+}
+.instrumentButton:focus-visible .rotating {
+  filter: drop-shadow(0 0 3px #497951);
+}
+.instrumentLabel[role='button'] {
+  cursor: text;
+}
+.stageInstrument:focus-within {
+  z-index: 6;
 }
