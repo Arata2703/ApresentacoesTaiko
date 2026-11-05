@@ -12,6 +12,8 @@ import { useState } from 'react'
 import { PeoplePage } from '../people/PeoplePage'
 import { peopleActions } from '../people/peopleActions'
 import { StageSettings } from './components/StageSettings'
+import { MusicActions } from './components/MusicActions'
+import { ShowOrder } from './components/ShowOrder'
 
 export function EditorPage() {
   const editor = useStageEditor()
@@ -29,6 +31,12 @@ export function EditorPage() {
       />
       <div className={styles.layout}>
         <PresentationSidebar
+          onAdd={() => {
+            editor.addMusic()
+            setPeopleView(false)
+          }}
+          onMove={editor.moveMusic}
+          onReorder={editor.reorderMusic}
           peopleView={peopleView}
           onPeople={() => setPeopleView(true)}
           presentation={editor.presentation}
@@ -47,6 +55,15 @@ export function EditorPage() {
               setPeopleView(false)
             }}
           />
+          <div className={styles.fileActions} aria-live="polite">
+            <p>{editor.cache.message}</p>
+            {editor.cache.blocked && (
+              <button onClick={editor.cache.enable}>
+                Substituir cópia local pelos dados atuais
+              </button>
+            )}
+          </div>
+          {!peopleView && <ShowOrder presentation={editor.presentation} />}
           {peopleView ? (
             <PeoplePage
               presentation={editor.presentation}
@@ -56,6 +73,12 @@ export function EditorPage() {
           ) : editor.page ? (
             <>
               <MapHeading song={editor.song} onSongChange={editor.setSong} />
+              <MusicActions
+                key={editor.activeMapId}
+                song={editor.song}
+                onDuplicate={editor.duplicateMusic}
+                onRemove={editor.removeMusic}
+              />
               <StageSettings
                 key={`${editor.activeMapId}:${editor.page.stage.width}:${editor.page.stage.depth}`}
                 stage={editor.page.stage}

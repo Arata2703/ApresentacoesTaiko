@@ -21,7 +21,7 @@ type Candidate = Extract<ImportResult, { status: 'valid' }>
 export function MapFiles({ presentation, page, onOpen }: Props) {
   const [pending, setPending] = useState<Candidate | null>(null)
   const [message, setMessage] = useState(
-    'Baixe a apresentação para guardar seu trabalho. O navegador ainda não salva automaticamente.',
+    'Baixe a apresentação editável para guardar uma cópia de segurança ou transferir para outro dispositivo.',
   )
   const [busy, setBusy] = useState(false)
 

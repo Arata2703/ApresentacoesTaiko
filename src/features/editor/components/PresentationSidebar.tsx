@@ -1,5 +1,8 @@
 import type { Presentation } from '../../../domain/presentation/model'
 import styles from '../editor.module.css'
+import sequenceStyles from './musicSequence.module.css'
+import { MapSlides } from './MapSlides'
+import type { DropSide } from '../slideDropTarget'
 
 interface Props {
   peopleView: boolean
@@ -7,6 +10,9 @@ interface Props {
   presentation: Presentation
   activeMapId: string | null
   onSelect: (id: string) => void
+  onAdd: () => void
+  onMove: (id: string, direction: -1 | 1) => void
+  onReorder: (id: string, targetId: string, side: DropSide) => void
 }
 export function PresentationSidebar({
   presentation,
@@ -14,12 +20,19 @@ export function PresentationSidebar({
   onSelect,
   peopleView,
   onPeople,
+  onAdd,
+  onMove,
+  onReorder,
 }: Props) {
   const maps = presentation.sequence
     .filter((item) => item.kind === 'map')
     .map((item) => presentation.maps.find((map) => map.id === item.id)!)
   return (
-    <aside className={styles.sidebar} aria-label="Páginas da apresentação">
+    <aside
+      data-map-list
+      className={styles.sidebar}
+      aria-label="Páginas da apresentação"
+    >
       <button
         className={styles.pageItem}
         aria-pressed={peopleView}
@@ -31,23 +44,20 @@ export function PresentationSidebar({
         <span className={styles.eyebrow}>MAPAS</span>
         <span className={styles.pageCount}>{maps.length}</span>
       </div>
-      {maps.map((map, index) => (
-        <button
-          key={map.id}
-          className={styles.pageItem}
-          onClick={() => onSelect(map.id)}
-          aria-pressed={!peopleView && activeMapId === map.id}
-          aria-label={`Abrir mapa ${map.title}`}
-        >
-          <span className={styles.pageNumber}>{index + 1} · MAPA DE PALCO</span>
-          <strong>{map.title}</strong>
-        </button>
-      ))}
+      <MapSlides
+        maps={maps}
+        selectedId={peopleView ? null : activeMapId}
+        onSelect={onSelect}
+        onMove={onMove}
+        onReorder={onReorder}
+      />
+      <button className={sequenceStyles.add} onClick={onAdd}>
+        + Adicionar música
+      </button>
       {!maps.length && <p>Nenhum mapa nesta apresentação.</p>}
       <div className={styles.scopeNote}>
         A apresentação editável guarda todos os dados. O PDF contém somente o
-        mapa selecionado. Criação de várias músicas e edição de transições
-        chegam nas próximas etapas.
+        mapa selecionado. A edição de transições chega na próxima etapa.
       </div>
     </aside>
   )

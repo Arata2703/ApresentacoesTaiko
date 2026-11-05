@@ -11,8 +11,8 @@ export function EditorFooter(props: Props) {
         {message}
       </span>
       <span>
-        Baixe a apresentação editável antes de sair. Recarregar a página limpa a
-        sessão.
+        A cópia local fica neste navegador. Baixe o arquivo editável como
+        backup.
       </span>
     </footer>
   )

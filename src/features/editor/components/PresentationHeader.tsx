@@ -27,10 +27,10 @@ export function PresentationHeader(props: Props) {
           maxLength={80}
         />
         <span className={styles.localLabel}>
-          <span /> Sessão local · salvamento manual em arquivo
+          <span /> Sessão local · salvamento automático no navegador
         </span>
       </div>
-      <span className={styles.version}>EDITOR · M07</span>
+      <span className={styles.version}>MÚSICAS · M08</span>
     </header>
   )
 }

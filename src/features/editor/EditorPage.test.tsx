@@ -15,7 +15,7 @@ describe('fluxos da primeira tela', () => {
       screen.getByRole('heading', { name: 'Cada detalhe no seu lugar.' }),
     ).toBeVisible()
     expect(
-      screen.getByText(/Sessão local · salvamento manual em arquivo/),
+      screen.getByText(/Sessão local · salvamento automático no navegador/),
     ).toBeVisible()
     expect(screen.getByRole('status')).toHaveTextContent(
       'Escolha um instrumento',

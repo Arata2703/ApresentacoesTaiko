@@ -27,6 +27,12 @@ import {
   projectMap,
   type InstrumentTransform,
 } from './editorProjection'
+import { mapActions, type EditorState } from './mapActions'
+import {
+  readPresentationCache,
+  type CachedPresentation,
+} from '../../integrations/presentationCache'
+import { usePresentationCache } from './usePresentationCache'
 
 function includeAllPeople(p: Presentation): Presentation {
   return p.rosterIds.length === p.people.length &&
@@ -35,7 +41,20 @@ function includeAllPeople(p: Presentation): Presentation {
     : { ...p, rosterIds: p.people.map((person) => person.id) }
 }
 
-function initialState() {
+function initialState(cached: CachedPresentation) {
+  if (cached) {
+    const presentation = includeAllPeople(cached.presentation)
+    const mapId = presentation.maps.some((map) => map.id === cached.mapId)
+      ? cached.mapId
+      : firstMapId(presentation)
+    return {
+      presentation,
+      mapId,
+      selectedId: null,
+      titleDraft: presentation.title,
+      songDraft: projectMap(presentation, mapId)?.song ?? '',
+    }
+  }
   const presentation = addMap(
     createPresentation(crypto.randomUUID(), 'Minha apresentação'),
     crypto.randomUUID(),
@@ -52,7 +71,15 @@ function initialState() {
 }
 
 export function useStageEditor() {
-  const [state, setState] = useState(initialState)
+  const [cached] = useState(readPresentationCache)
+  const [state, setState] = useState<EditorState>(() =>
+    initialState(cached.data),
+  )
+  const cache = usePresentationCache(
+    state.presentation,
+    state.mapId,
+    cached.error,
+  )
   const [message, setMessage] = useState(
     'Escolha um instrumento no catálogo para começar.',
   )
@@ -155,6 +182,8 @@ export function useStageEditor() {
               presentation: resizeStage(s.presentation, s.mapId, stage),
             },
       ),
+    ...mapActions(state, setState),
+    cache,
     commitPlayers: (
       instrumentId: string,
       players: readonly PlayerReference[],
@@ -245,6 +274,7 @@ export function useStageEditor() {
           : s
       }),
     openPresentation: (presentation: Presentation) => {
+      cache.enable()
       presentation = includeAllPeople(presentation)
       const mapId = firstMapId(presentation)
       setState({

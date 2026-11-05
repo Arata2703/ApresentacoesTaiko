@@ -1,6 +1,6 @@
 # Taiko / Palco
 
-Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. Etapa atual: M06, com cadastro/lista de integrantes e seleção de vários tocadores por instrumento, integrados ao arquivo completo da apresentação.
+Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. Etapa atual: M08, com criação, duplicação, remoção e ordenação de mapas disponíveis para validação, integradas ao arquivo completo da apresentação.
 
 ## Executar
 
@@ -44,7 +44,7 @@ Leia [AGENTS.md](AGENTS.md) antes de modificar o projeto: funcionalidades novas 
 
 ## O que está implementado
 
-- Editor com catálogo lateral, mapa e painel de propriedades; navegação pelos mapas existentes no arquivo.
+- Editor com catálogo lateral, mapa e painel de propriedades; criação, duplicação, remoção e ordenação de mapas.
 - Instrumentos do catálogo inicial representados por símbolos ilustrativos.
 - Adição, seleção e remoção de instrumentos.
 - Tabela compacta de integrantes: célula inteira do nome editável por duplo clique e lixeira para remoção.
@@ -56,11 +56,11 @@ Leia [AGENTS.md](AGENTS.md) antes de modificar o projeto: funcionalidades novas 
 - Criação do primeiro mapa quando a apresentação aberta não tiver mapas.
 - Exportação de uma página PDF A4 horizontal do mapa selecionado, com medidas, posições, rotação indicada por traço e nomes em texto vetorial com fonte incorporada.
 
-O navegador ainda não salva automaticamente: use **Baixar apresentação editável** antes de sair e **Abrir apresentação** para retomar. O PDF é para consulta/impressão de um mapa; o JSON guarda a apresentação inteira para continuar editando. Recarregar a página limpa a sessão. Os símbolos são ilustrativos; a base existente é exibida, e a escolha de base chegará na M07.
+A apresentação atual é salva automaticamente neste navegador e restaurada ao atualizar a página. Use **Baixar apresentação editável** como backup e **Abrir apresentação** para transferir ou retomar um arquivo. O PDF é para consulta/impressão de um mapa; o JSON guarda a apresentação inteira para continuar editando. Confira o aviso de salvamento e [os limites da cópia local](docs/salvamento-local.md). Os símbolos são ilustrativos; bases compatíveis podem ser escolhidas no painel e as medidas do palco são editáveis em metros.
 
 Adicione as pessoas em **Integrantes**, na lateral; todos os nomes adicionados pertencem à apresentação. Dê duplo clique no nome para editar: Enter ou sair do campo salva, Esc cancela. Depois selecione um instrumento no mapa e marque seus tocadores. A remoção de alguém em uso pede confirmação e retira suas atribuições, preservando os instrumentos e textos.
 
-Consulte [o que pode ser usado e os limites da M06](docs/m06-integrantes.md) e [o fluxo integrado da M05](docs/m05-fluxo.md). Para testar a navegação entre mapas, abra [o exemplo](examples/presentation-v1.json) pela interface. Criar várias músicas e reordenar são entregas da M08. O PDF de integrantes e os avisos automáticos de participação ainda não estão disponíveis.
+Consulte [o que pode ser usado e os limites da M06](docs/m06-integrantes.md) e [a gestão de mapas da M08](docs/m08-musicas.md). Para testar uma sequência com transições importadas, abra [o exemplo](examples/presentation-v1.json) pela interface. A criação/edição dessas transições será entregue na M09. O PDF de integrantes e os avisos automáticos de participação ainda não estão disponíveis.
 
 ## Núcleo lógico da M03
 
@@ -76,11 +76,11 @@ Consulte [o contrato e a migração da M04](docs/m04-arquivo.md) e o [arquivo de
 
 ## Próximas entregas
 
-A M07 está disponível para validação: troca de bases compatíveis, medidas editáveis do palco e aviso de desenhos ilustrativos. O editor usa a paleta azul-marinho/branco/dourado do uniforme e um halo azul identifica imediatamente o instrumento selecionado. Consulte [os critérios e o roteiro de validação](docs/m07-editor.md). A próxima etapa é M08, criação e ordenação de mapas.
+A M07 foi validada: troca de bases compatíveis, medidas editáveis do palco e aviso de desenhos ilustrativos. O editor usa a paleta azul-marinho/branco/dourado do uniforme e um halo azul identifica imediatamente o instrumento selecionado. A M08 aguarda validação; consulte [o roteiro de músicas e sequência](docs/m08-musicas.md). A próxima etapa é M09, transições textuais com mapas automáticos.
 
 Os tocadores aparecem como `A/B`. No palco, dê duplo clique no nome abaixo do instrumento para editar em um campo compacto com autocomplete. Enter ou sair do campo salva; Esc cancela. Nomes novos são incluídos na lista de integrantes. O instrumento selecionado não recebe uma moldura ao redor.
 
-Editor completo, criação/ordenação de várias músicas, transições, materiais manuais, salvamento automático, PDF completo e deploy. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
+Transições, materiais manuais, PDF completo e deploy. O salvamento automático da apresentação atual foi antecipado durante a validação da M08. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
 
 ## Organização
 
