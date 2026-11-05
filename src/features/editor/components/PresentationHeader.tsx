@@ -30,7 +30,7 @@ export function PresentationHeader(props: Props) {
           <span /> Sessão local · salvamento automático no navegador
         </span>
       </div>
-      <span className={styles.version}>MÚSICAS · M08</span>
+      <span className={styles.version}>TRANSIÇÕES · M09</span>
     </header>
   )
 }

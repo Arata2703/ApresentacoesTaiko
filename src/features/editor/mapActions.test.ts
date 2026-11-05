@@ -13,24 +13,24 @@ describe('gerenciamento de músicas', () => {
     const { result } = renderHook(useStageEditor)
     act(() => result.current.openPresentation(presentationFixture()))
     act(() => {
-      result.current.reorderMusic('missing', 'a')
-      result.current.reorderMusic('a', 'missing')
-      result.current.reorderMusic('a', 'a')
+      result.current.reorderSlide('missing', 'a')
+      result.current.reorderSlide('a', 'missing')
+      result.current.reorderSlide('a', 'a')
     })
     expect(result.current.presentation.sequence.map((item) => item.id)).toEqual(
       ['entry', 'b', 'middle', 'a', 'exit'],
     )
-    act(() => result.current.reorderMusic('b', 'a'))
+    act(() => result.current.reorderSlide('b', 'a'))
     expect(result.current.presentation.sequence.map((item) => item.id)).toEqual(
-      ['entry', 'a', 'middle', 'b', 'exit'],
+      ['entry', 'middle', 'a', 'b', 'exit'],
     )
     expect(
       result.current.presentation.transitions.find((t) => t.id === 'middle')!
         .needsReview,
     ).toBe(true)
-    act(() => result.current.reorderMusic('b', 'a', 'before'))
+    act(() => result.current.reorderSlide('b', 'a', 'before'))
     expect(result.current.presentation.sequence.map((item) => item.id)).toEqual(
-      ['entry', 'b', 'middle', 'a', 'exit'],
+      ['entry', 'middle', 'b', 'a', 'exit'],
     )
   })
   it('adiciona, duplica, reordena, remove e reabre mantendo identidades e dados', () => {
@@ -51,11 +51,11 @@ describe('gerenciamento de músicas', () => {
     )
     act(() => result.current.addMusic())
     const added = result.current.activeMapId!
-    act(() => result.current.moveMusic(added, -1))
+    act(() => result.current.moveSlide(added, -1))
     expect(result.current.presentation.sequence.map((item) => item.id)).toEqual(
       [original, added, copy],
     )
-    act(() => result.current.moveMusic(added, 1))
+    act(() => result.current.moveSlide(added, 1))
     act(() => result.current.removeMusic())
     expect(result.current.activeMapId).toBe(copy)
     act(() => result.current.selectMap(original))
@@ -72,7 +72,7 @@ describe('gerenciamento de músicas', () => {
     act(() => {
       result.current.removeMusic()
       result.current.duplicateMusic()
-      result.current.moveMusic('missing', 1)
+      result.current.moveSlide('missing', 1)
     })
     act(() => result.current.addMusic())
     expect(result.current.page?.song).toBe('Música 1')
@@ -81,16 +81,16 @@ describe('gerenciamento de músicas', () => {
     const { result } = renderHook(useStageEditor)
     act(() => result.current.openPresentation(presentationFixture()))
     act(() => {
-      result.current.moveMusic('b', -1)
-      result.current.moveMusic('a', 1)
-      result.current.moveMusic('missing', -1)
+      result.current.moveSlide('entry', -1)
+      result.current.moveSlide('exit', 1)
+      result.current.moveSlide('missing', -1)
     })
     expect(result.current.presentation.sequence.map((item) => item.id)).toEqual(
       ['entry', 'b', 'middle', 'a', 'exit'],
     )
-    act(() => result.current.moveMusic('b', 1))
+    act(() => result.current.moveSlide('middle', 1))
     expect(result.current.presentation.sequence.map((item) => item.id)).toEqual(
-      ['entry', 'a', 'middle', 'b', 'exit'],
+      ['entry', 'b', 'a', 'middle', 'exit'],
     )
     expect(
       result.current.presentation.transitions.find((t) => t.id === 'middle'),

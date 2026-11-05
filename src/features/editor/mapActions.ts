@@ -30,24 +30,18 @@ export function mapActions(
   update: Dispatch<SetStateAction<EditorState>>,
 ) {
   return {
-    reorderMusic: (id: string, targetId: string, side: DropSide = 'after') =>
+    reorderSlide: (id: string, targetId: string, side: DropSide = 'after') =>
       update((s) => {
-        const maps = s.presentation.sequence
-          .filter((item) => item.kind === 'map')
-          .map((item) => item.id)
-        const source = maps.indexOf(id)
-        const target = maps.indexOf(targetId)
+        const ids = s.presentation.sequence.map((item) => item.id)
+        const source = ids.indexOf(id)
+        const target = ids.indexOf(targetId)
         if (source < 0 || target < 0 || source === target) return s
-        maps.splice(source, 1)
-        const insertion = maps.indexOf(targetId) + (side === 'after' ? 1 : 0)
-        maps.splice(insertion, 0, id)
-        let index = 0
-        const ids = s.presentation.sequence.map((item) =>
-          item.kind === 'map' ? maps[index++]! : item.id,
-        )
+        ids.splice(source, 1)
+        const insertion = ids.indexOf(targetId) + (side === 'after' ? 1 : 0)
+        ids.splice(insertion, 0, id)
         return { ...s, presentation: reorderSequence(s.presentation, ids) }
       }),
-    addMusic: () => {
+    addMusic: (afterSlideId?: string) => {
       const id = crypto.randomUUID()
       update((s) =>
         activate(
@@ -57,6 +51,7 @@ export function mapActions(
             id,
             `Música ${s.presentation.maps.length + 1}`,
             { width: 10, depth: 6 },
+            afterSlideId,
           ),
           id,
         ),
@@ -84,17 +79,11 @@ export function mapActions(
         return activate(s, removeMap(s.presentation, state.mapId!), nextId)
       })
     },
-    moveMusic: (id: string, direction: -1 | 1) =>
+    moveSlide: (id: string, direction: -1 | 1) =>
       update((s) => {
         const sequence = s.presentation.sequence
         const index = sequence.findIndex((item) => item.id === id)
-        let target = index + direction
-        while (
-          target >= 0 &&
-          target < sequence.length &&
-          sequence[target]!.kind !== 'map'
-        )
-          target += direction
+        const target = index + direction
         if (index < 0 || target < 0 || target >= sequence.length) return s
         const ids = sequence.map((item) => item.id)
         ;[ids[index], ids[target]] = [ids[target]!, ids[index]!]

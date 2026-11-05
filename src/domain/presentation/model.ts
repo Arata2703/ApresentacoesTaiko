@@ -39,6 +39,7 @@ export interface TextTransition {
   readonly id: string
   readonly tsunagiName: string
   readonly instructions: string
+  readonly instructionsFormat?: 'html'
   readonly participantIds: readonly string[]
   readonly needsReview: boolean
 }

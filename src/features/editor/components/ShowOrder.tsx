@@ -2,7 +2,13 @@ import type { Presentation } from '../../../domain/presentation/model'
 import styles from './musicSequence.module.css'
 import { useState } from 'react'
 
-export function ShowOrder({ presentation: p }: { presentation: Presentation }) {
+export function ShowOrder({
+  presentation: p,
+  onAddEntry,
+}: {
+  presentation: Presentation
+  onAddEntry: () => void
+}) {
   const [open, setOpen] = useState(false)
   return (
     <details
@@ -10,6 +16,11 @@ export function ShowOrder({ presentation: p }: { presentation: Presentation }) {
       onToggle={(event) => setOpen(event.currentTarget.open)}
     >
       <summary>Ordem da apresentação · {p.sequence.length} itens</summary>
+      {open && p.maps.length > 0 && (
+        <button type="button" onClick={onAddEntry}>
+          Adicionar transição de entrada
+        </button>
+      )}
       {open && (
         <ol>
           {p.sequence.map((item) => (

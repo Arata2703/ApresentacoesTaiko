@@ -33,9 +33,18 @@ describe('sequência de músicas na interface', () => {
       screen.getByRole('button', { name: /Okedo, sem tocador/ }),
     ).toBeVisible()
     await userEvent.click(
-      screen.getByRole('button', { name: '+ Adicionar música' }),
+      screen.getByRole('button', { name: 'Adicionar mapa' }),
     )
     expect(screen.getByLabelText('Nome da música')).toHaveValue('Música 3')
+    expect(
+      screen
+        .getAllByRole('button', { name: /Abrir mapa/ })
+        .map((button) => button.getAttribute('aria-label')),
+    ).toEqual([
+      'Abrir mapa Primeira música',
+      'Abrir mapa Música 3',
+      'Abrir mapa Yatai',
+    ])
     await userEvent.click(
       screen.getByRole('button', { name: 'Abrir mapa Música 3' }),
     )
@@ -63,6 +72,7 @@ describe('sequência de músicas na interface', () => {
     const p = presentationFixture()
     const { unmount } = render(
       <ShowOrder
+        onAddEntry={() => {}}
         presentation={{
           ...p,
           transitions: p.transitions.map((t) => ({ ...t, needsReview: true })),
@@ -74,7 +84,12 @@ describe('sequência de músicas na interface', () => {
     expect(screen.getAllByText(/Tsunagi: Sem nome/)).toHaveLength(2)
     expect(screen.getAllByText(/Revisar transição/)).toHaveLength(3)
     unmount()
-    render(<ShowOrder presentation={createPresentation('empty', 'Vazia')} />)
+    render(
+      <ShowOrder
+        onAddEntry={() => {}}
+        presentation={createPresentation('empty', 'Vazia')}
+      />,
+    )
     await userEvent.click(screen.getByText(/Ordem da apresentação/))
     expect(screen.getByText(/Nenhuma música ou transição/)).toBeVisible()
   })

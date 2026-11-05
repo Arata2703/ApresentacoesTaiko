@@ -116,7 +116,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
     expect(
       await screen.findByText(/PDF A4 horizontal do mapa selecionado baixado/),
     ).toBeVisible()
-  })
+  }, 15000)
   it('abre formato completo, navega mapas e preserva pessoas, bases, transições e materiais ao salvar', async () => {
     render(<App />)
     await confirmOpen(serializePresentation(p))

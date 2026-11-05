@@ -4,8 +4,7 @@
   gap: 8px;
   margin: -12px 0 20px;
 }
-.actions button,
-.add {
+.actions button {
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--line-strong);
@@ -13,13 +12,37 @@
   padding: 7px 10px;
   font-size: 12px;
 }
-.actions button:hover,
-.add:hover {
+.actions button:hover {
   background: var(--soft);
 }
-.add {
-  width: 100%;
-  margin-bottom: 16px;
+.insert {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.insert button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--navy);
+}
+.insert button:hover {
+  background: var(--soft);
+  border-color: var(--line-strong);
+}
+.insert svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .slide {
   position: relative;
@@ -30,8 +53,37 @@
 .slide:active {
   cursor: grabbing;
 }
-.dragging {
-  opacity: 0.45;
+.card {
+  position: relative;
+  margin-bottom: 12px;
+}
+.card .slide {
+  margin-bottom: 0;
+}
+.card:has(.reviewAction) .slide {
+  padding-bottom: 44px;
+}
+.reviewAction {
+  position: absolute;
+  bottom: 9px;
+  left: 12px;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  font-size: 11px;
+  color: #76511e;
+}
+.reviewAction:hover {
+  background: var(--soft);
+}
+.movingCard {
+  position: fixed;
+  z-index: 100;
+}
+.movingCard .slide {
+  border-color: var(--navy);
+  box-shadow: 0 5px 16px #10164135;
 }
 .dropMarker {
   position: absolute;
@@ -52,12 +104,6 @@
   float: right;
   font-size: 15px;
   color: var(--ink-muted);
-}
-.dragHint {
-  font-size: 11px;
-  line-height: 1.6;
-  color: var(--ink-muted);
-  margin: -12px 0 14px;
 }
 .confirm {
   flex-basis: 100%;

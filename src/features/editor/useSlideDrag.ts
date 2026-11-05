@@ -13,12 +13,20 @@ export function useSlideDrag(
     moved: boolean
     targetId: string | null
     side: DropSide
+    offsetX: number
+    offsetY: number
+    width: number
+    height: number
   } | null>(null)
   const skipClick = useRef(false)
   const [active, setActive] = useState<{
     id: string
     targetId: string | null
     side: DropSide
+    left: number
+    top: number
+    width: number
+    height: number
   } | null>(null)
   function cancel() {
     pointer.current = null
@@ -29,6 +37,7 @@ export function useSlideDrag(
     start: (event: PointerEvent<HTMLButtonElement>, id: string) => {
       if (event.button !== 0 || pointer.current) return
       skipClick.current = false
+      const rect = event.currentTarget.getBoundingClientRect()
       pointer.current = {
         id,
         pointerId: event.pointerId,
@@ -37,6 +46,10 @@ export function useSlideDrag(
         moved: false,
         targetId: null,
         side: 'after',
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top,
+        width: rect.width,
+        height: rect.height,
       }
       event.currentTarget.setPointerCapture?.(event.pointerId)
     },
@@ -62,6 +75,10 @@ export function useSlideDrag(
         id: current.id,
         targetId: current.targetId,
         side: current.side,
+        left: event.clientX - current.offsetX,
+        top: event.clientY - current.offsetY,
+        width: current.width,
+        height: current.height,
       })
     },
     end: (event: PointerEvent<HTMLButtonElement>) => {

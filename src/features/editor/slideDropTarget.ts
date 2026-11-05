@@ -6,8 +6,8 @@ export function slideDropTarget(
   y: number,
 ): { id: string; side: DropSide } | null {
   const slides = element
-    .closest('[data-map-list]')!
-    .querySelectorAll<HTMLElement>('[data-map-slide]')
+    .closest('[data-slide-list]')!
+    .querySelectorAll<HTMLElement>('[data-slide-id]')
   let nearest: { id: string; side: DropSide } | null = null
   let distance = Infinity
   for (const slide of slides) {
@@ -18,7 +18,7 @@ export function slideDropTarget(
     if (delta < distance) {
       distance = delta
       nearest = {
-        id: slide.dataset.mapSlide!,
+        id: slide.dataset.slideId!,
         side: y < middle ? 'before' : 'after',
       }
     }

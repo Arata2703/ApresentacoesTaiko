@@ -113,14 +113,40 @@ function map(value: unknown): MusicMap {
   }
 }
 
+function legacyActions(value: unknown): string[] {
+  const data = record(value)
+  if (typeof data.enabled !== 'boolean')
+    throw new Error('Modo de etapas inválido.')
+  const steps = array(data.steps).map((step) => {
+    const actions = array(step).map(string)
+    if (actions.length === 0)
+      throw new Error('Uma etapa deve conter ao menos uma ação.')
+    return actions
+  })
+  return steps.flat()
+}
+
 function transition(value: unknown): TextTransition {
   const data = record(value)
+  if (
+    data.instructionsFormat !== undefined &&
+    data.instructionsFormat !== 'html'
+  )
+    throw new Error('Formato das instruções desconhecido.')
   if (typeof data.needsReview !== 'boolean')
     throw new Error('O indicador de revisão deve ser verdadeiro ou falso.')
   return {
     id: id(data.id),
     tsunagiName: name(data.tsunagiName, true),
-    instructions: string(data.instructions),
+    instructions:
+      data.actionPlan === undefined
+        ? string(data.instructions)
+        : [string(data.instructions), ...legacyActions(data.actionPlan)]
+            .filter(Boolean)
+            .join('\n'),
+    ...(data.instructionsFormat === undefined
+      ? {}
+      : { instructionsFormat: 'html' as const }),
     participantIds: references(data.participantIds),
     needsReview: data.needsReview,
   }

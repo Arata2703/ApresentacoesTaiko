@@ -14,11 +14,25 @@ import { peopleActions } from '../people/peopleActions'
 import { StageSettings } from './components/StageSettings'
 import { MusicActions } from './components/MusicActions'
 import { ShowOrder } from './components/ShowOrder'
+import { useTransitions } from '../transitions/useTransitions'
+import { TransitionEditor } from '../transitions/TransitionEditor'
 
 export function EditorPage() {
   const editor = useStageEditor()
   const [peopleView, setPeopleView] = useState(false)
   const people = peopleActions(editor.updatePresentation)
+  const transitions = useTransitions(
+    editor.presentation,
+    editor.updatePresentation,
+  )
+  const selectedSlideId = peopleView
+    ? undefined
+    : (transitions.selected?.id ?? editor.activeMapId ?? undefined)
+  function openMap(id: string) {
+    transitions.close()
+    editor.selectMap(id)
+    setPeopleView(false)
+  }
 
   return (
     <div className={styles.app}>
@@ -32,26 +46,37 @@ export function EditorPage() {
       <div className={styles.layout}>
         <PresentationSidebar
           onAdd={() => {
-            editor.addMusic()
+            transitions.close()
+            editor.addMusic(selectedSlideId)
             setPeopleView(false)
           }}
-          onMove={editor.moveMusic}
-          onReorder={editor.reorderMusic}
+          onAddTransition={() => {
+            transitions.create(selectedSlideId)
+            setPeopleView(false)
+          }}
+          onMove={editor.moveSlide}
+          onReorder={editor.reorderSlide}
+          onReview={transitions.review}
+          activeTransitionId={transitions.selected?.id ?? null}
+          onTransition={(id) => {
+            transitions.open(id)
+            setPeopleView(false)
+          }}
           peopleView={peopleView}
           onPeople={() => setPeopleView(true)}
           presentation={editor.presentation}
           activeMapId={editor.activeMapId}
           onSelect={(id) => {
-            editor.selectMap(id)
-            setPeopleView(false)
+            openMap(id)
           }}
         />
         <main className={styles.workspace} id="workspace">
           <MapFiles
             presentation={editor.presentation}
-            page={peopleView ? null : editor.page}
+            page={peopleView || transitions.selected ? null : editor.page}
             onOpen={(presentation) => {
               editor.openPresentation(presentation)
+              transitions.close()
               setPeopleView(false)
             }}
           />
@@ -63,12 +88,27 @@ export function EditorPage() {
               </button>
             )}
           </div>
-          {!peopleView && <ShowOrder presentation={editor.presentation} />}
+          {!peopleView && (
+            <ShowOrder
+              presentation={editor.presentation}
+              onAddEntry={() => transitions.create(null)}
+            />
+          )}
           {peopleView ? (
             <PeoplePage
               presentation={editor.presentation}
               actions={people}
               onBack={() => setPeopleView(false)}
+            />
+          ) : transitions.selected ? (
+            <TransitionEditor
+              key={transitions.selected.id}
+              presentation={editor.presentation}
+              transition={transitions.selected}
+              onChange={transitions.change}
+              onReview={transitions.review}
+              onRemove={transitions.remove}
+              onOpenMap={openMap}
             />
           ) : editor.page ? (
             <>

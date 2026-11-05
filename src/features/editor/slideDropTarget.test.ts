@@ -4,10 +4,10 @@ import { slideDropTarget } from './slideDropTarget'
 describe('espaço de inserção dos slides', () => {
   it('usa metades e o espaço mais próximo entre slides', () => {
     const list = document.createElement('aside')
-    list.dataset.mapList = ''
+    list.dataset.slideList = ''
     const slides = ['5', '6', '7'].map((id, index) => {
       const el = document.createElement('button')
-      el.dataset.mapSlide = id
+      el.dataset.slideId = id
       list.append(el)
       vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
         top: 100 + 100 * index,

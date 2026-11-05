@@ -1,4 +1,4 @@
-import { act, render, renderHook, screen } from '@testing-library/react'
+import { act, render, renderHook, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from '../../../App'
@@ -88,7 +88,11 @@ describe('editor individual M07', () => {
     )
     await userEvent.click(screen.getByRole('button', { name: 'Adicionar Fue' }))
     expect(screen.getByRole('combobox', { name: 'Base' })).toHaveValue('')
-    expect(screen.getAllByRole('option')).toHaveLength(1)
+    expect(
+      within(screen.getByRole('combobox', { name: 'Base' })).getAllByRole(
+        'option',
+      ),
+    ).toHaveLength(1)
   })
   it('valida medidas antes de aplicar e reposiciona instrumentos ao reduzir o palco', async () => {
     render(<App />)

@@ -16,20 +16,25 @@ function send(element: HTMLElement, type: string, y: number) {
 describe('arrastar slides', () => {
   it('mantém o mesmo indicador entre slides ao passar da base de um para o topo do próximo', async () => {
     render(<App />)
-    const add = screen.getByRole('button', { name: '+ Adicionar música' })
-    await userEvent.click(add)
-    await userEvent.click(add)
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar mapa' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar mapa' }),
+    )
     const side = screen.getByRole('complementary', {
       name: 'Páginas da apresentação',
     })
     const slides = within(side).getAllByRole('button', { name: /Abrir mapa/ })
     slides.forEach((button, index) =>
-      vi.spyOn(button, 'getBoundingClientRect').mockReturnValue({
-        left: 0,
-        right: 200,
-        top: 100 + 100 * index,
-        height: 80,
-      } as DOMRect),
+      vi
+        .spyOn(button.closest('[data-slide-id]')!, 'getBoundingClientRect')
+        .mockReturnValue({
+          left: 0,
+          right: 200,
+          top: 100 + 100 * index,
+          height: 80,
+        } as DOMRect),
     )
     try {
       send(slides[0]!, 'pointerdown', 110)
@@ -37,13 +42,18 @@ describe('arrastar slides', () => {
       const indicator = screen.getByRole('separator', {
         name: 'Posição de inserção',
       })
-      expect(slides[2]).toContainElement(indicator)
+      expect(slides[2]!.closest('[data-slide-id]')).toContainElement(indicator)
       send(slides[0]!, 'pointermove', 305)
       expect(
         screen.getByRole('separator', { name: 'Posição de inserção' }),
       ).toBe(indicator)
-      expect(slides[2]).toContainElement(indicator)
+      expect(slides[2]!.closest('[data-slide-id]')).toContainElement(indicator)
+      expect(
+        screen.getAllByRole('button', { name: 'Abrir mapa Primeira música' }),
+      ).toEqual([slides[0]])
+      expect(slides[0]!.parentElement).toHaveStyle({ top: '195px' })
       send(slides[0]!, 'pointercancel', 305)
+      expect(slides[0]!.parentElement?.style.top).toBe('')
       expect(screen.queryByRole('separator')).not.toBeInTheDocument()
     } finally {
       vi.restoreAllMocks()
@@ -51,9 +61,12 @@ describe('arrastar slides', () => {
   })
   it('insere em outra posição sem mudar o selecionado, cancela e mantém alternativa por teclado', async () => {
     render(<App />)
-    const add = screen.getByRole('button', { name: '+ Adicionar música' })
-    await userEvent.click(add)
-    await userEvent.click(add)
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar mapa' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar mapa' }),
+    )
     const side = screen.getByRole('complementary', {
       name: 'Páginas da apresentação',
     })
@@ -67,7 +80,10 @@ describe('arrastar slides', () => {
     within(side)
       .getAllByRole('button', { name: /Abrir mapa/ })
       .forEach((button, index) => {
-        vi.spyOn(button, 'getBoundingClientRect').mockReturnValue({
+        vi.spyOn(
+          button.closest('[data-slide-id]')!,
+          'getBoundingClientRect',
+        ).mockReturnValue({
           left: 0,
           right: 200,
           top: 100 + index * 100,

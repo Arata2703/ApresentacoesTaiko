@@ -27,15 +27,24 @@ export function addMap(
   id: string,
   title: string,
   stage: StageDimensions,
+  afterSlideId?: string,
 ): Presentation {
   assertNewId(p, id)
+  const anchor =
+    afterSlideId === undefined ? null : byId(p.sequence, afterSlideId)
+  const index =
+    anchor === null ? p.sequence.length : p.sequence.indexOf(anchor) + 1
   return reconcileSequence(p, {
     ...p,
     maps: [
       ...p.maps,
       { id, title: named(title), stage: dimensions(stage), instruments: [] },
     ],
-    sequence: [...p.sequence, { kind: 'map', id }],
+    sequence: [
+      ...p.sequence.slice(0, index),
+      { kind: 'map', id },
+      ...p.sequence.slice(index),
+    ],
   })
 }
 

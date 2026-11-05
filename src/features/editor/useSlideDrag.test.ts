@@ -11,6 +11,12 @@ function event(y = 0, id = 1, button = 0, target: HTMLElement | null = null) {
     button,
     preventDefault: vi.fn(),
     currentTarget: {
+      getBoundingClientRect: () => ({
+        left: 80,
+        top: 0,
+        width: 200,
+        height: 80,
+      }),
       setPointerCapture: vi.fn(),
       closest: () => ({ querySelectorAll: () => (target ? [target] : []) }),
     },
@@ -22,7 +28,7 @@ describe('controle do arraste de slides', () => {
       select = vi.fn()
     const { result } = renderHook(() => useSlideDrag(reorder, select))
     const target = document.createElement('button')
-    target.dataset.mapSlide = 'b'
+    target.dataset.slideId = 'b'
     vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
       left: 0,
       right: 200,
@@ -47,6 +53,10 @@ describe('controle do arraste de slides', () => {
       id: 'a',
       targetId: 'b',
       side: 'after',
+      left: 80,
+      top: 100,
+      width: 200,
+      height: 80,
     })
     act(() => result.current.end(event(100)))
     expect(reorder).toHaveBeenCalledExactlyOnceWith('a', 'b', 'after')
@@ -64,7 +74,7 @@ describe('controle do arraste de slides', () => {
       result.current.end(event(100))
     })
     expect(reorder).toHaveBeenCalledTimes(1)
-    target.dataset.mapSlide = 'a'
+    target.dataset.slideId = 'a'
     act(() => {
       result.current.start(event(), 'a')
       result.current.move(event(100, 1, 0, target))

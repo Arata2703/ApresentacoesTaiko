@@ -1,0 +1,64 @@
+.editor {
+  margin-bottom: 20px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.label {
+  margin-bottom: 8px;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: var(--soft);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px 6px 0 0;
+}
+.editor .toolbar button {
+  background: var(--surface);
+  padding: 6px 10px;
+}
+.editor .toolbar button:hover,
+.editor .toolbar button[aria-pressed='true'] {
+  border-color: var(--navy);
+  background: var(--canvas);
+}
+.toolbar button:first-child {
+  font-weight: 700;
+}
+.toolbar button:nth-child(2) {
+  font-style: italic;
+  font-synthesis: style;
+}
+.input {
+  font-synthesis: style;
+  min-height: 180px;
+  padding: 12px;
+  font: inherit;
+  line-height: 1.7;
+  color: var(--ink);
+  background: var(--canvas);
+  border: 1px solid var(--line-strong);
+  border-radius: 0 0 6px 6px;
+  border-top: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.input:focus {
+  outline: none;
+}
+.input:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-muted);
+  pointer-events: none;
+}
+.input p,
+.input div {
+  margin: 0;
+}
+.input ul,
+.input ol {
+  margin: 6px 0;
+  padding-left: 26px;
+}

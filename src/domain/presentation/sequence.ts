@@ -97,13 +97,20 @@ export function updateTransition(
   id: string,
   tsunagiName: string,
   instructions: string,
+  instructionsFormat?: 'html',
 ): Presentation {
   byId(p.transitions, id)
   const text = transitionText(tsunagiName, instructions)
   return {
     ...p,
     transitions: p.transitions.map((item) =>
-      item.id === id ? { ...item, ...text } : item,
+      item.id === id
+        ? {
+            ...item,
+            ...text,
+            ...(instructionsFormat === undefined ? {} : { instructionsFormat }),
+          }
+        : item,
     ),
   }
 }
