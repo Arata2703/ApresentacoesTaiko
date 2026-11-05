@@ -1,6 +1,6 @@
 # Taiko / Palco
 
-Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. Etapa atual: M08, com criação, duplicação, remoção e ordenação de mapas disponíveis para validação, integradas ao arquivo completo da apresentação.
+Planejador de apresentações de Taiko com React, TypeScript, Vite e CSS Modules. Etapa atual: M09, com transições textuais, nome do tsunagi e prévias automáticas dos mapas anterior e próximo disponíveis para validação.
 
 ## Executar
 
@@ -60,7 +60,7 @@ A apresentação atual é salva automaticamente neste navegador e restaurada ao 
 
 Adicione as pessoas em **Integrantes**, na lateral; todos os nomes adicionados pertencem à apresentação. Dê duplo clique no nome para editar: Enter ou sair do campo salva, Esc cancela. Depois selecione um instrumento no mapa e marque seus tocadores. A remoção de alguém em uso pede confirmação e retira suas atribuições, preservando os instrumentos e textos.
 
-Consulte [o que pode ser usado e os limites da M06](docs/m06-integrantes.md) e [a gestão de mapas da M08](docs/m08-musicas.md). Para testar uma sequência com transições importadas, abra [o exemplo](examples/presentation-v1.json) pela interface. A criação/edição dessas transições será entregue na M09. O PDF de integrantes e os avisos automáticos de participação ainda não estão disponíveis.
+Consulte [a gestão de mapas da M08](docs/m08-musicas.md) e [as transições da M09](docs/m09-transicoes.md). Para testar uma sequência com transições importadas, abra [o exemplo](examples/presentation-v1.json) pela interface. Também é possível criá-las pela opção Adicionar transição, escolhendo entrada, intervalo ou saída. O PDF completo e os avisos automáticos de participação ainda não estão disponíveis.
 
 ## Núcleo lógico da M03
 
@@ -76,11 +76,11 @@ Consulte [o contrato e a migração da M04](docs/m04-arquivo.md) e o [arquivo de
 
 ## Próximas entregas
 
-A M07 foi validada: troca de bases compatíveis, medidas editáveis do palco e aviso de desenhos ilustrativos. O editor usa a paleta azul-marinho/branco/dourado do uniforme e um halo azul identifica imediatamente o instrumento selecionado. A M08 aguarda validação; consulte [o roteiro de músicas e sequência](docs/m08-musicas.md). A próxima etapa é M09, transições textuais com mapas automáticos.
+A M08 foi validada e commitada, incluindo a cópia local automática. A M09 foi validada e registrada em `937d2be`: consulte [o roteiro de transições e seus limites](docs/m09-transicoes.md). As instruções usam uma única caixa com negrito/itálico e listas diretamente no texto. O modo de etapas simultâneas foi retirado desta versão e está no [planejamento futuro](docs/evolucao-editor-transicoes.md). O editor mantém a paleta azul-marinho/branco/dourado e a seleção imediata dos instrumentos.
 
 Os tocadores aparecem como `A/B`. No palco, dê duplo clique no nome abaixo do instrumento para editar em um campo compacto com autocomplete. Enter ou sair do campo salva; Esc cancela. Nomes novos são incluídos na lista de integrantes. O instrumento selecionado não recebe uma moldura ao redor.
 
-Transições, materiais manuais, PDF completo e deploy. O salvamento automático da apresentação atual foi antecipado durante a validação da M08. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi e contagem automática ficam nas releases posteriores.
+Materiais manuais, PDF completo e deploy. O salvamento automático da apresentação atual foi antecipado durante a validação da M08. Os próximos marcos devem seguir o planejamento do MVP no Notion. Kumi, vínculos de instrumentos do tsunagi e contagem automática ficam nas releases posteriores.
 
 ## Organização
 
