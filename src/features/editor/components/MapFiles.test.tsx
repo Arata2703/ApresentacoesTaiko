@@ -21,6 +21,21 @@ afterEach(() => vi.resetAllMocks())
 const p = presentationFixture()
 const page = projectMap(p, firstMapId(p))
 
+it('exporta o mapa atual pela tela de integrantes sem exigir salvamento', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  const name = screen.getByLabelText('Nome da música')
+  await user.clear(name)
+  await user.type(name, 'Yatai de abertura')
+  await user.click(screen.getByRole('button', { name: /Integrantes/ }))
+  const button = screen.getByRole('button', { name: 'Exportar PDF deste mapa' })
+  expect(button).toBeEnabled()
+  await user.click(button)
+  expect(exportMap).toHaveBeenCalledWith(
+    expect.objectContaining({ song: 'Yatai de abertura' }),
+  )
+}, 15000)
+
 function upload(source: string, size = source.length) {
   fireEvent.change(screen.getByLabelText('Abrir apresentação'), {
     target: { files: [{ size, text: () => Promise.resolve(source) }] },

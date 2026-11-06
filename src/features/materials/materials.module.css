@@ -1,0 +1,78 @@
+.page {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(14px, 3vw, 24px);
+}
+.heading,
+.form,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.heading {
+  justify-content: space-between;
+}
+.heading h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 550;
+}
+.form {
+  align-items: end;
+  margin: 20px 0 12px;
+}
+.form label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+.form label:first-child {
+  flex: 1 1 180px;
+}
+.form input,
+.page button {
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: var(--canvas);
+  padding: 8px 10px;
+  color: var(--ink);
+}
+.form input {
+  min-width: 0;
+}
+.form input[type='number'] {
+  width: 90px;
+}
+.page button:not(:disabled):hover {
+  background: var(--soft);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.table th {
+  background: var(--soft);
+  font-size: 12px;
+}
+.table td:first-child {
+  width: 55%;
+}
+.actions button {
+  padding: 4px 7px;
+  font-size: 12px;
+}
+.page [role='status']:empty {
+  display: none;
+}

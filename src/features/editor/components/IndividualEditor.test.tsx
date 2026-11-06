@@ -44,9 +44,6 @@ describe('editor individual M07', () => {
     expect(screen.getByRole('combobox', { name: 'Base' })).toHaveValue(
       'okedo-eitetsu',
     )
-    await userEvent.dblClick(
-      screen.getByRole('button', { name: 'Editar tocadores de Okedo' }),
-    )
     await userEvent.type(
       screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
       'Ana',
@@ -54,9 +51,21 @@ describe('editor individual M07', () => {
     await userEvent.click(
       screen.getByRole('region', { name: 'Palco de 10 por 6 metros' }),
     )
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Integrantes (0)' }),
+    ).toBeVisible()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Editar tocadores de Okedo' }),
+    )
+    await userEvent.type(
+      screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+      'Ana{Enter}',
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar' }))
     expect(
       screen.getByRole('button', { name: /Okedo, tocador Ana/ }),
-    ).toHaveAttribute('aria-pressed', 'false')
+    ).toBeVisible()
     expect(
       screen.getByRole('button', { name: 'Integrantes (1)' }),
     ).toBeVisible()
@@ -102,11 +111,17 @@ describe('editor individual M07', () => {
     await userEvent.click(screen.getByText(/Medidas do palco/))
     const width = screen.getByLabelText('Largura do palco · m')
     const depth = screen.getByLabelText('Profundidade do palco · m')
+    const x = Number(
+      (screen.getByLabelText('Horizontal · m') as HTMLInputElement).value,
+    )
+    const y = Number(
+      (screen.getByLabelText('Profundidade · m') as HTMLInputElement).value,
+    )
     await userEvent.clear(width)
     await userEvent.click(
       screen.getByRole('button', { name: 'Aplicar medidas' }),
     )
-    expect(screen.getByRole('alert')).toHaveTextContent('maiores que zero')
+    expect(screen.getByRole('alert')).toHaveTextContent('positivas e finitas')
     expect(
       screen.getByRole('region', { name: 'Palco de 10 por 6 metros' }),
     ).toBeVisible()
@@ -116,13 +131,76 @@ describe('editor individual M07', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Aplicar medidas' }),
     )
+    const warning = screen.getByRole('alertdialog', {
+      name: 'Prosseguir com o redimensionamento?',
+    })
+    expect(within(warning).getByRole('listitem')).toHaveTextContent(
+      'Primeira música',
+    )
+    expect(warning).not.toHaveTextContent('Okedo')
+    await userEvent.click(
+      within(warning).getByRole('button', { name: 'Cancelar' }),
+    )
     expect(
-      screen.getByRole('region', { name: 'Palco de 1 por 1.5 metros' }),
+      screen.getByRole('region', { name: 'Palco de 10 por 6 metros' }),
     ).toBeVisible()
-    expect(screen.getByLabelText('Horizontal · m')).toHaveValue(1)
-    expect(screen.getByLabelText('Profundidade · m')).toHaveValue(1.5)
+    await userEvent.clear(width)
+    await userEvent.type(width, '9')
+    await userEvent.clear(depth)
+    await userEvent.type(depth, '5')
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Aplicar medidas' }),
+    )
+    expect(
+      screen.getByRole('region', { name: 'Palco de 9 por 5 metros' }),
+    ).toBeVisible()
+    expect(screen.getByLabelText('Horizontal · m')).toHaveValue(x - 0.5)
+    expect(screen.getByLabelText('Profundidade · m')).toHaveValue(y - 0.5)
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByText(/Medidas do palco/))
+    const newWidth = screen.getByLabelText('Largura do palco · m')
+    await userEvent.clear(newWidth)
+    await userEvent.type(newWidth, '1')
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Aplicar medidas' }),
+    )
+    await userEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', {
+        name: 'Confirmar',
+      }),
+    )
+    expect(
+      screen.getByRole('region', { name: 'Palco de 1 por 5 metros' }),
+    ).toBeVisible()
+    expect(screen.getByLabelText('Horizontal · m')).toHaveValue(
+      Math.max(0, Math.min(1, x - 4.5)),
+    )
   })
+  it('aplica medidas aos mapas existentes e aos mapas criados depois', async () => {
+    render(<App />)
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar mapa' }),
+    )
+    await userEvent.click(screen.getByText(/Medidas do palco/))
+    const width = screen.getByLabelText('Largura do palco · m')
+    await userEvent.clear(width)
+    await userEvent.type(width, '9')
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Aplicar medidas' }),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Abrir mapa Primeira música' }),
+    )
+    expect(
+      screen.getByRole('region', { name: 'Palco de 9 por 6 metros' }),
+    ).toBeVisible()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar mapa' }),
+    )
+    expect(
+      screen.getByRole('region', { name: 'Palco de 9 por 6 metros' }),
+    ).toBeVisible()
+  }, 15000)
   it('salva e reabre todos os tipos, bases, posição, rotação, palco e tocadores', () => {
     const { result } = renderHook(useStageEditor)
     act(() => result.current.changeBase(null))

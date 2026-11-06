@@ -5,7 +5,8 @@ import { PresentationSlides } from './PresentationSlides'
 import type { DropSide } from '../slideDropTarget'
 
 interface Props {
-  peopleView: boolean
+  view: 'slides' | 'people' | 'materials'
+  onMaterials: () => void
   onPeople: () => void
   presentation: Presentation
   activeMapId: string | null
@@ -22,7 +23,8 @@ export function PresentationSidebar({
   presentation,
   activeMapId,
   onSelect,
-  peopleView,
+  view,
+  onMaterials,
   onPeople,
   onAdd,
   onAddTransition,
@@ -65,10 +67,17 @@ export function PresentationSidebar({
     >
       <button
         className={styles.pageItem}
-        aria-pressed={peopleView}
+        aria-pressed={view === 'people'}
         onClick={onPeople}
       >
         Integrantes ({presentation.people.length})
+      </button>
+      <button
+        className={styles.pageItem}
+        aria-pressed={view === 'materials'}
+        onClick={onMaterials}
+      >
+        Materiais manuais
       </button>
       <div className={styles.sidebarHeading}>
         <span className={styles.eyebrow}>SLIDES</span>
@@ -102,7 +111,9 @@ export function PresentationSidebar({
       </div>
       <PresentationSlides
         slides={slides}
-        selectedId={peopleView ? null : (activeTransitionId ?? activeMapId)}
+        selectedId={
+          view !== 'slides' ? null : (activeTransitionId ?? activeMapId)
+        }
         onSelect={(id) =>
           slideIds.get(id) === 'map' ? onSelect(id) : onTransition(id)
         }

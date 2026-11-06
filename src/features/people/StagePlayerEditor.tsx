@@ -36,26 +36,27 @@ export function StagePlayerEditor({
   const [error, setError] = useState('')
   const finished = useRef(false)
   const parts = text.split('/')
-  const options = playerSuggestions(people, parts.at(-1)!)
+  const query = parts.at(-1)!.trim()
+  const options = playerSuggestions(people, query)
   const activeIndex = Math.min(active, options.length - 1)
+  const showOptions = open && options.length > 0
+  const showNotice = open && !options.length && Boolean(query)
 
-  function commit(value = text, selected = choices) {
+  function commit(value = text, selected = choices, allowRegistration = true) {
     if (finished.current) return
     try {
       const players = resolvePlayerDraft(value, people, selectedIds, selected)
-      onCommit(players)
       finished.current = true
+      if (!allowRegistration && players.some((player) => 'name' in player))
+        onCancel()
+      else onCommit(players)
     } catch (failure) {
       setError((failure as Error).message)
     }
   }
   function choose(option: PlayerSuggestion) {
-    const name =
-      option.kind === 'person'
-        ? people.find((person) => person.id === option.id)!.name
-        : option.name
-    const selected = { ...choices }
-    if (option.kind === 'person') selected[parts.length - 1] = option.id
+    const name = people.find((person) => person.id === option.id)!.name
+    const selected = { ...choices, [parts.length - 1]: option.id }
     setChoices(selected)
     const value = [...parts.slice(0, -1), name].join('/')
     setText(value)
@@ -72,21 +73,24 @@ export function StagePlayerEditor({
         role="combobox"
         aria-label="Tocadores no instrumento"
         aria-autocomplete="list"
-        aria-expanded={open}
+        aria-expanded={showOptions}
         aria-controls={`${id}-options`}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={
+          error ? `${id}-error` : showNotice ? `${id}-notice` : undefined
+        }
         aria-activedescendant={
           open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined
         }
         placeholder="Nome"
         value={text}
+        onDoubleClick={(event) => event.currentTarget.select()}
         onChange={(event) => {
           setText(event.target.value)
           setActive(0)
           setOpen(Boolean(event.target.value.trim()))
           setError('')
         }}
-        onBlur={() => commit()}
+        onBlur={() => commit(text, choices, false)}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault()
@@ -114,7 +118,7 @@ export function StagePlayerEditor({
           }
         }}
       />
-      {open && (
+      {showOptions && (
         <ul
           id={`${id}-options`}
           role="listbox"
@@ -123,7 +127,7 @@ export function StagePlayerEditor({
         >
           {options.map((option, index) => (
             <li
-              key={option.kind === 'person' ? option.id : 'create'}
+              key={option.id}
               id={`${id}-option-${index}`}
               role="option"
               aria-selected={index === activeIndex}
@@ -133,10 +137,16 @@ export function StagePlayerEditor({
               {option.label}
             </li>
           ))}
-          {!options.length && (
-            <li className={styles.empty}>Nenhum integrante encontrado.</li>
-          )}
         </ul>
+      )}
+      {showNotice && (
+        <p
+          id={`${id}-notice`}
+          role="status"
+          className={`${styles.options} ${styles.empty}`}
+        >
+          {query} não está na lista de integrantes.
+        </p>
       )}
       {error && (
         <p role="alert" id={`${id}-error`} className={styles.error}>

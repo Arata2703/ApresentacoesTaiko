@@ -1,7 +1,7 @@
 import type { Presentation } from './model'
 import { assertNewId, byId, named } from './rules'
 
-function material(name: string, quantity: number) {
+export function validateMaterial(name: string, quantity: number) {
   if (!Number.isInteger(quantity) || quantity <= 0)
     throw new Error('A quantidade deve ser um inteiro positivo.')
   return { name: named(name), quantity }
@@ -16,7 +16,7 @@ export function addMaterial(
   assertNewId(p, id)
   return {
     ...p,
-    materials: [...p.materials, { id, ...material(name, quantity) }],
+    materials: [...p.materials, { id, ...validateMaterial(name, quantity) }],
   }
 }
 
@@ -27,7 +27,7 @@ export function updateMaterial(
   quantity: number,
 ): Presentation {
   byId(p.materials, id)
-  const changes = material(name, quantity)
+  const changes = validateMaterial(name, quantity)
   return {
     ...p,
     materials: p.materials.map((item) =>

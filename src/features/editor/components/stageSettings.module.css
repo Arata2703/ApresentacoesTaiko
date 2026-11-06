@@ -26,17 +26,17 @@
   width: 125px;
 }
 .settings input,
-.settings button {
+.settings form button {
   padding: 8px;
   border: 1px solid var(--line-strong);
   border-radius: 5px;
   color: var(--ink);
   background: var(--surface);
 }
-.settings button {
+.settings form button {
   background: var(--soft);
 }
-.settings p {
+.settings form p {
   flex-basis: 100%;
   margin: 0;
   line-height: 1.6;

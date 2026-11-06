@@ -56,21 +56,42 @@ export function renameMap(
   return replaceMap(p, { ...byId(p.maps, id), title: named(title) })
 }
 
+export class StageResizeConflict extends Error {
+  constructor(
+    readonly affected: readonly {
+      id: string
+      title: string
+    }[],
+  ) {
+    super(
+      `Instrumentos ficariam fora do palco em: ${affected.map((map) => map.title).join(', ')}. As medidas foram mantidas.`,
+    )
+  }
+}
+
 export function resizeStage(
   p: Presentation,
-  id: string,
   stage: StageDimensions,
+  allowReposition = false,
 ): Presentation {
-  const map = byId(p.maps, id)
   const nextStage = dimensions(stage)
-  return replaceMap(p, {
-    ...map,
-    stage: nextStage,
-    instruments: map.instruments.map((item) => ({
-      ...item,
-      position: position(item.position, nextStage),
-    })),
+  const affected: { id: string; title: string }[] = []
+  const maps = p.maps.map((map) => {
+    const dx = (nextStage.width - map.stage.width) / 2
+    const dy = (nextStage.depth - map.stage.depth) / 2
+    let needsReposition = false
+    const instruments = map.instruments.map((item) => {
+      const point = { x: item.position.x + dx, y: item.position.y + dy }
+      const fitted = position(point, nextStage)
+      if (point.x !== fitted.x || point.y !== fitted.y) needsReposition = true
+      return { ...item, position: fitted }
+    })
+    if (needsReposition) affected.push({ id: map.id, title: map.title })
+    return { ...map, stage: nextStage, instruments }
   })
+  if (affected.length && !allowReposition)
+    throw new StageResizeConflict(affected)
+  return { ...p, maps }
 }
 
 export function removeMap(p: Presentation, id: string): Presentation {

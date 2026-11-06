@@ -121,13 +121,46 @@ describe('operações do mapa', () => {
     const p = addMap(createPresentation('show', 'Show'), 'one', 'Música', stage)
     stage.width = 99
     expect(p.maps[0]!.stage.width).toBe(10)
-    const next = resizeStage(example(), 'one', { width: 3, depth: 2 })
+    const next = resizeStage(example(), { width: 3, depth: 2 })
     expect(next.maps[0]!.stage).toEqual({ width: 3, depth: 2 })
+    expect(next.maps[1]!.stage).toEqual({ width: 3, depth: 2 })
     expect(next.maps[0]!.instruments.map((item) => item.position)).toEqual([
-      { x: 3, y: 2 },
-      { x: 3, y: 2 },
+      { x: 1.5, y: 1 },
+      { x: 1.5, y: 1 },
     ])
   })
+  it('preserva a formação em metros ao unificar medidas antigas pelo centro de cada mapa', () => {
+    let p = updateMapInstrument(example(), 'one', 'a', {
+      position: { x: 6, y: 2 },
+      rotation: 90,
+    })
+    p = addMapInstrument(p, 'two', 'c', 'fue')
+    const next = resizeStage(p, { width: 9, depth: 5 })
+    expect(next.maps[0]!.instruments[0]).toMatchObject({
+      position: { x: 5.5, y: 1.5 },
+      rotation: 90,
+    })
+    expect(next.maps[0]!.instruments[1]!.position).toEqual({ x: 4.5, y: 2.5 })
+    expect(next.maps[1]!.instruments[0]!.position).toEqual({ x: 4.5, y: 2.5 })
+    expect(p.maps[1]!.stage).toEqual({ width: 8, depth: 4 })
+  })
+  it.each([
+    { x: 0, y: 3 },
+    { x: 10, y: 3 },
+    { x: 5, y: 0 },
+    { x: 5, y: 6 },
+  ])(
+    'recusa a alteração global quando um instrumento ficaria fora em %j',
+    (point) => {
+      const p = freeze(
+        updateMapInstrument(example(), 'one', 'a', { position: point }),
+      )
+      expect(() => resizeStage(p, { width: 9, depth: 5 })).toThrow(
+        /Ibuki.*medidas foram mantidas/,
+      )
+      expect(p.maps.map((map) => map.stage.width)).toEqual([10, 8])
+    },
+  )
   it.each([
     { width: 0, depth: 6 },
     { width: -1, depth: 6 },
@@ -135,9 +168,7 @@ describe('operações do mapa', () => {
     { width: 10, depth: Infinity },
     { width: 10, depth: 0 },
   ])('recusa medidas inválidas %j', (stage) => {
-    expect(() => resizeStage(example(), 'one', stage)).toThrow(
-      'positivas e finitas',
-    )
+    expect(() => resizeStage(example(), stage)).toThrow('positivas e finitas')
   })
   it.each([
     { position: { x: NaN, y: 1 } },

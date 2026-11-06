@@ -173,15 +173,11 @@ export function useStageEditor() {
               ),
             },
       ),
-    resizeStage: (stage: StageDimensions) =>
-      setState((s) =>
-        s.mapId === null
-          ? s
-          : {
-              ...s,
-              presentation: resizeStage(s.presentation, s.mapId, stage),
-            },
-      ),
+    resizeStage: (stage: StageDimensions, allowReposition = false) =>
+      setState({
+        ...state,
+        presentation: resizeStage(state.presentation, stage, allowReposition),
+      }),
     ...mapActions(state, setState),
     cache,
     commitPlayers: (

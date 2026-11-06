@@ -135,7 +135,7 @@ describe('integrantes pela interface', () => {
     expect(screen.getByText(/Nenhum integrante/)).toBeVisible()
     expect(
       screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
-    ).toBeDisabled()
+    ).toBeEnabled()
     await userEvent.click(
       screen.getByRole('button', { name: 'Adicionar integrante' }),
     )

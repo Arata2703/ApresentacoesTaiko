@@ -50,7 +50,8 @@ export function mapActions(
             s.presentation,
             id,
             `Música ${s.presentation.maps.length + 1}`,
-            { width: 10, depth: 6 },
+            s.presentation.maps.find((map) => map.id === s.mapId)?.stage ??
+              s.presentation.maps[0]?.stage ?? { width: 10, depth: 6 },
             afterSlideId,
           ),
           id,

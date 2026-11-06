@@ -157,10 +157,9 @@ export function StageMap({
                   role="button"
                   tabIndex={0}
                   aria-label={`Editar tocadores de ${type.name}${item.player ? `: ${item.player}` : ''}`}
-                  title="Duplo clique para editar os tocadores"
+                  title="Clique para editar. Duplo clique para selecionar o texto."
                   className={`${styles.instrumentLabel} ${playerStyles.nameField}`}
-                  onClick={() => onSelect(item.id)}
-                  onDoubleClick={(event) =>
+                  onClick={(event) =>
                     edit(
                       item.id,
                       caretOffsetAtPoint(
@@ -190,7 +189,7 @@ export function StageMap({
       </div>
       <p className={styles.stageHint}>
         {instruments.length
-          ? 'Arraste ou use as setas para mover. Duplo clique no nome para editar os tocadores.'
+          ? 'Arraste ou use as setas para mover. Clique no nome para editar os tocadores.'
           : 'A grade é uma referência de posição. As dimensões dos ícones são ilustrativas.'}
       </p>
     </section>

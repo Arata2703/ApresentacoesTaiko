@@ -10,16 +10,15 @@ const people = [
 describe('sugestões e resolução de nomes', () => {
   it('busca sem diferenciar acentos/maiúsculas e distingue homônimos', () => {
     expect(playerSuggestions(people, 'JOA')).toContainEqual({
-      kind: 'person',
       id: 'b',
       label: 'João · pessoa 2',
     })
     expect(playerSuggestions(people, 'ana')).toEqual([
-      { kind: 'person', id: 'a', label: 'Ana · pessoa 1' },
-      { kind: 'person', id: 'c', label: 'Ana · pessoa 3' },
+      { id: 'a', label: 'Ana · pessoa 1' },
+      { id: 'c', label: 'Ana · pessoa 3' },
     ])
   })
-  it('limita sugestões, oferece criação e não oferece nomes inválidos', () => {
+  it('limita sugestões e retorna apenas integrantes existentes', () => {
     expect(
       playerSuggestions(
         Array.from({ length: 12 }, (_, index) => ({
@@ -29,9 +28,7 @@ describe('sugestões e resolução de nomes', () => {
         '',
       ),
     ).toHaveLength(8)
-    expect(playerSuggestions([], ' Bia ')).toEqual([
-      { kind: 'create', name: 'Bia', label: 'Adicionar “Bia” aos integrantes' },
-    ])
+    expect(playerSuggestions([], ' Bia ')).toEqual([])
     expect(playerSuggestions([], 'x'.repeat(81))).toEqual([])
     expect(playerSuggestions([], '')).toEqual([])
   })

@@ -9,6 +9,7 @@ import { EditorFooter } from './components/EditorFooter'
 import { useStageEditor } from './useStageEditor'
 import styles from './editor.module.css'
 import { useState } from 'react'
+import { MaterialsPage } from '../materials/MaterialsPage'
 import { PeoplePage } from '../people/PeoplePage'
 import { peopleActions } from '../people/peopleActions'
 import { StageSettings } from './components/StageSettings'
@@ -16,22 +17,30 @@ import { MusicActions } from './components/MusicActions'
 import { ShowOrder } from './components/ShowOrder'
 import { useTransitions } from '../transitions/useTransitions'
 import { TransitionEditor } from '../transitions/TransitionEditor'
+import { PlayerRegistrationDialog } from '../people/PlayerRegistrationDialog'
+import type { PlayerReference } from '../people/playerDraft'
 
 export function EditorPage() {
   const editor = useStageEditor()
-  const [peopleView, setPeopleView] = useState(false)
+  const [view, setView] = useState<'slides' | 'people' | 'materials'>('slides')
+  const [pendingPlayers, setPendingPlayers] = useState<{
+    instrumentId: string
+    players: readonly PlayerReference[]
+    names: string[]
+  } | null>(null)
   const people = peopleActions(editor.updatePresentation)
   const transitions = useTransitions(
     editor.presentation,
     editor.updatePresentation,
   )
-  const selectedSlideId = peopleView
-    ? undefined
-    : (transitions.selected?.id ?? editor.activeMapId ?? undefined)
+  const selectedSlideId =
+    view !== 'slides'
+      ? undefined
+      : (transitions.selected?.id ?? editor.activeMapId ?? undefined)
   function openMap(id: string) {
     transitions.close()
     editor.selectMap(id)
-    setPeopleView(false)
+    setView('slides')
   }
 
   return (
@@ -48,11 +57,11 @@ export function EditorPage() {
           onAdd={() => {
             transitions.close()
             editor.addMusic(selectedSlideId)
-            setPeopleView(false)
+            setView('slides')
           }}
           onAddTransition={() => {
             transitions.create(selectedSlideId)
-            setPeopleView(false)
+            setView('slides')
           }}
           onMove={editor.moveSlide}
           onReorder={editor.reorderSlide}
@@ -60,10 +69,11 @@ export function EditorPage() {
           activeTransitionId={transitions.selected?.id ?? null}
           onTransition={(id) => {
             transitions.open(id)
-            setPeopleView(false)
+            setView('slides')
           }}
-          peopleView={peopleView}
-          onPeople={() => setPeopleView(true)}
+          view={view}
+          onMaterials={() => setView('materials')}
+          onPeople={() => setView('people')}
           presentation={editor.presentation}
           activeMapId={editor.activeMapId}
           onSelect={(id) => {
@@ -73,13 +83,32 @@ export function EditorPage() {
         <main className={styles.workspace} id="workspace">
           <MapFiles
             presentation={editor.presentation}
-            page={peopleView || transitions.selected ? null : editor.page}
+            page={
+              view === 'materials' ||
+              (view === 'slides' && transitions.selected)
+                ? null
+                : editor.page
+            }
             onOpen={(presentation) => {
+              setPendingPlayers(null)
               editor.openPresentation(presentation)
               transitions.close()
-              setPeopleView(false)
+              setView('slides')
             }}
           />
+          {pendingPlayers && (
+            <PlayerRegistrationDialog
+              names={pendingPlayers.names}
+              onCancel={() => setPendingPlayers(null)}
+              onConfirm={() => {
+                editor.commitPlayers(
+                  pendingPlayers.instrumentId,
+                  pendingPlayers.players,
+                )
+                setPendingPlayers(null)
+              }}
+            />
+          )}
           <div className={styles.fileActions} aria-live="polite">
             <p>{editor.cache.message}</p>
             {editor.cache.blocked && (
@@ -88,17 +117,23 @@ export function EditorPage() {
               </button>
             )}
           </div>
-          {!peopleView && (
+          {view === 'slides' && (
             <ShowOrder
               presentation={editor.presentation}
               onAddEntry={() => transitions.create(null)}
             />
           )}
-          {peopleView ? (
+          {view === 'people' ? (
             <PeoplePage
               presentation={editor.presentation}
               actions={people}
-              onBack={() => setPeopleView(false)}
+              onBack={() => setView('slides')}
+            />
+          ) : view === 'materials' ? (
+            <MaterialsPage
+              presentation={editor.presentation}
+              onUpdate={editor.updatePresentation}
+              onBack={() => setView('slides')}
             />
           ) : transitions.selected ? (
             <TransitionEditor
@@ -128,7 +163,18 @@ export function EditorPage() {
                 <InstrumentCatalog onAdd={editor.addInstrument} />
                 <StageMap
                   people={editor.presentation.people}
-                  onCommitPlayers={editor.commitPlayers}
+                  onCommitPlayers={(instrumentId, players) => {
+                    const names = [
+                      ...new Set(
+                        players.flatMap((player) =>
+                          'name' in player ? [player.name] : [],
+                        ),
+                      ),
+                    ]
+                    if (names.length)
+                      setPendingPlayers({ instrumentId, players, names })
+                    else editor.commitPlayers(instrumentId, players)
+                  }}
                   stage={editor.page.stage}
                   instruments={editor.instruments}
                   selectedId={editor.selectedId}
@@ -140,7 +186,7 @@ export function EditorPage() {
                   onBaseChange={editor.changeBase}
                   people={editor.presentation.people}
                   onAssign={editor.assignPlayers}
-                  onManage={() => setPeopleView(true)}
+                  onManage={() => setView('people')}
                   stage={editor.page.stage}
                   selected={editor.selected}
                   onChange={editor.changeSelected}
