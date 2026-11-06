@@ -7,12 +7,19 @@ Estas regras valem para qualquer chat ou agente que modificar o projeto.
 - Antes de cada commit, execute `npm run check` e só faça o commit se todos os passos passarem. O hook pre-commit também executa esse comando.
 - Cada funcionalidade nova deve incluir testes automatizados dos comportamentos entregues. Correções de bugs devem ter um teste de regressão que reproduza o problema.
 - Atualize os testes quando um requisito mudar; preserve a verificação dos comportamentos que continuam válidos.
+- Sempre que implementar ou atualizar testes, inclua na resposta final uma tabela com uma linha para cada teste criado ou alterado durante o turno. Informe o arquivo, o nome do teste, o cenário exercitado e o comportamento esperado. Nos testes parametrizados, descreva os casos cobertos. A tabela deve permitir que o usuário avalie a relevância de cada teste e identifique cenários que ainda precisam de cobertura.
 - Teste regras de domínio isoladas e os fluxos de interface do ponto de vista do usuário, incluindo entradas inválidas, limites, erros e prevenção de perda de dados quando aplicável.
 - Use Vitest, Testing Library e user-event. Evite testar detalhes internos, classes CSS, snapshots extensos e mocks excessivos. Não escreva testes que apenas repitam a implementação.
 - Mantenha os limites de cobertura configurados em `vitest.config.ts`. Arquivos novos em `src` devem entrar no relatório, mesmo sem teste. Não reduza limites ou exclua código funcional apenas para fazer a verificação passar.
 - Cobertura não prova ausência de bugs nem qualidade visual. Confira no navegador quando a alteração afetar layout ou interações; não trate a cobertura como substituta dos critérios de aceite.
 - Se uma verificação falhar ou não puder ser executada, corrija a causa ou relate o bloqueio. Não declare verificação concluída sem evidência.
 - Não contorne os hooks com `--no-verify`, `HUSKY=0`, `core.hooksPath` alternativo ou outro mecanismo para fazer commit de mudanças não verificadas.
+
+## Revisão de código antes de cada commit
+
+- Revise todas as alterações que entrarão no commit. Identifique lógica duplicada e código sem uso, e verifique se as mudanças respeitam a arquitetura e as regras de modularização do projeto.
+- Avalie se os princípios de programação orientada a objetos (POO) e os padrões de projeto cabíveis estão sendo aplicados. Use-os quando ajudarem a resolver um problema concreto e mantiverem o código simples.
+- Corrija os problemas identificados antes do commit. Se a refatoração exigir uma decisão do usuário, explique o problema, as opções e seus impactos, e aguarde a orientação antes de prosseguir com a parte afetada.
 
 ## Modularização
 
