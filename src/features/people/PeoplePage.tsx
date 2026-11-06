@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { Presentation } from '../../domain/presentation/model'
-import { personIsAssigned } from '../../domain/presentation/people'
-import { PersonRow } from './PersonRow'
+import { DataTable } from '../../components/DataTable'
 import type { peopleActions } from './peopleActions'
 import styles from './people.module.css'
 
@@ -52,28 +51,67 @@ export function PeoplePage({ presentation, actions, onBack }: Props) {
       {!presentation.people.length && (
         <p>Nenhum integrante. Adicione o primeiro integrante acima.</p>
       )}
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th scope="col">Nome do integrante</th>
-              <th scope="col">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {presentation.people.map((person, index) => (
-              <PersonRow
-                key={person.id}
-                person={person}
-                number={index + 1}
-                assigned={personIsAssigned(presentation, person.id)}
-                onRename={actions.rename}
-                onRemove={actions.remove}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        rows={presentation.people}
+        rowId={(person) => person.id}
+        rowLabel={(person, index) => `Pessoa ${index + 1}: ${person.name}`}
+        columns={[
+          {
+            id: 'name',
+            title: 'Nome do integrante',
+            kind: 'editable',
+            input: 'text',
+            maxLength: 80,
+            value: (person) => person.name,
+            label: (person, index) =>
+              `Editar nome de ${person.name} (pessoa ${index + 1})`,
+            inputLabel: (person, index) =>
+              `Novo nome de ${person.name} (pessoa ${index + 1})`,
+            validate: (value) =>
+              value.trim() ? '' : 'Informe um nome de 1 a 80 caracteres.',
+            save: (person, value) => actions.rename(person.id, value),
+          },
+          {
+            id: 'remove',
+            kind: 'remove',
+            label: (person, index) =>
+              `Remover ${person.name} (pessoa ${index + 1})`,
+            confirmation: (person) => {
+              const songs = presentation.maps.filter((map) =>
+                map.instruments.some((item) =>
+                  item.playerIds.includes(person.id),
+                ),
+              )
+              const transitions = presentation.transitions.filter((item) =>
+                item.participantIds.includes(person.id),
+              )
+              return (
+                <>
+                  <p>Deseja remover {person.name} da apresentação?</p>
+                  {(songs.length > 0 || transitions.length > 0) && (
+                    <p>A remoção também retira suas atribuições.</p>
+                  )}
+                  {songs.length > 0 && (
+                    <p>
+                      <strong>Músicas:</strong>{' '}
+                      {songs.map((map) => map.title).join(', ')}
+                    </p>
+                  )}
+                  {transitions.length > 0 && (
+                    <p>
+                      <strong>Tsunagis:</strong>{' '}
+                      {transitions
+                        .map((item) => item.tsunagiName || 'Sem nome')
+                        .join(', ')}
+                    </p>
+                  )}
+                </>
+              )
+            },
+            remove: (person) => actions.remove(person.id),
+          },
+        ]}
+      />
       <p className={styles.hint}>
         Guarde as alterações em Baixar apresentação editável. O PDF da lista de
         integrantes ainda não está disponível.

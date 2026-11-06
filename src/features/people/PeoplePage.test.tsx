@@ -50,14 +50,15 @@ async function save() {
 }
 
 describe('integrantes pela interface', () => {
-  it('permite editar pela célula inteira sem reiniciar um rascunho já em edição', async () => {
+  it('edita o nome com duplo clique e salva com Enter', async () => {
     render(<App />)
     await people()
     await add('Ana')
-    const cell = within(
-      screen.getByRole('row', { name: 'Pessoa 1: Ana' }),
-    ).getAllByRole('cell')[0]!
-    await userEvent.dblClick(cell)
+    await userEvent.dblClick(
+      screen.getByRole('button', {
+        name: 'Editar nome de Ana (pessoa 1)',
+      }),
+    )
     const input = screen.getByLabelText('Novo nome de Ana (pessoa 1)')
     await userEvent.clear(input)
     await userEvent.type(input, 'Ana Silva')
@@ -159,6 +160,11 @@ describe('integrantes pela interface', () => {
         name: 'Remover Ana (pessoa 2)',
       }),
     )
+    const confirmation = screen.getByRole('alertdialog')
+    expect(confirmation).not.toHaveTextContent('atribuições')
+    await userEvent.click(
+      within(confirmation).getByRole('button', { name: 'Confirmar' }),
+    )
     expect(screen.getByText('1 integrante')).toBeVisible()
     expect((await save()).p.people).toEqual([before.p.people[0]])
   })
@@ -257,7 +263,7 @@ describe('integrantes pela interface', () => {
   it('inclui todos os cadastrados e confirma remoção de pessoa atribuída', async () => {
     render(<App />)
     const p = assignInstrumentPlayers(presentationFixture(), 'a', 'drum', [
-      'ana',
+      'joao',
     ])
     await open(serializePresentation(p))
     await people()
@@ -271,9 +277,11 @@ describe('integrantes pela interface', () => {
     expect(screen.getByRole('alertdialog')).toHaveTextContent(
       'retira suas atribuições',
     )
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(p.maps[0]!.title)
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Tsunagis: Ponte')
     await userEvent.click(
       screen.getByRole('button', {
-        name: 'Cancelar remoção de João (pessoa 2)',
+        name: 'Cancelar',
       }),
     )
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
@@ -282,13 +290,13 @@ describe('integrantes pela interface', () => {
     )
     await userEvent.click(
       screen.getByRole('button', {
-        name: 'Confirmar remoção de João (pessoa 2)',
+        name: 'Confirmar',
       }),
     )
     const saved = await save()
     expect(saved.p.rosterIds).toEqual(['ana'])
     expect(saved.p.people).toEqual([p.people[0]])
-    expect(saved.p.maps).toEqual(p.maps)
+    expect(saved.p.maps[0]?.instruments[0]?.playerIds).toEqual([])
     expect(
       saved.p.transitions.find((item) => item.id === 'middle')!.participantIds,
     ).toEqual([])

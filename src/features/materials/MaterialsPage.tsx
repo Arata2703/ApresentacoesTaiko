@@ -1,8 +1,5 @@
 import { useState } from 'react'
-import type {
-  ManualMaterial,
-  Presentation,
-} from '../../domain/presentation/model'
+import type { Presentation } from '../../domain/presentation/model'
 import {
   addMaterial,
   removeMaterial,
@@ -10,6 +7,7 @@ import {
   validateMaterial,
 } from '../../domain/presentation/materials'
 import { exportMaterials } from '../../integrations/exportMaterials'
+import { DataTable } from '../../components/DataTable'
 import styles from './materials.module.css'
 
 interface Props {
@@ -19,7 +17,6 @@ interface Props {
 }
 
 export function MaterialsPage({ presentation, onUpdate, onBack }: Props) {
-  const [editing, setEditing] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [quantity, setQuantity] = useState('1')
   const [error, setError] = useState('')
@@ -27,27 +24,16 @@ export function MaterialsPage({ presentation, onUpdate, onBack }: Props) {
   const [exporting, setExporting] = useState(false)
   const materials = presentation.materials
 
-  function select(item: ManualMaterial | null) {
-    setEditing(item?.id ?? null)
-    setName(item?.name ?? '')
-    setQuantity(item ? String(item.quantity) : '1')
-    setError('')
-  }
-
   function save() {
     try {
       const values = validateMaterial(name, Number(quantity))
-      if (editing) {
-        onUpdate((current) =>
-          updateMaterial(current, editing, values.name, values.quantity),
-        )
-      } else {
-        const id = crypto.randomUUID()
-        onUpdate((current) =>
-          addMaterial(current, id, values.name, values.quantity),
-        )
-      }
-      select(null)
+      const id = crypto.randomUUID()
+      onUpdate((current) =>
+        addMaterial(current, id, values.name, values.quantity),
+      )
+      setName('')
+      setQuantity('1')
+      setError('')
     } catch (error) {
       setError((error as Error).message)
     }
@@ -101,57 +87,64 @@ export function MaterialsPage({ presentation, onUpdate, onBack }: Props) {
             onChange={(event) => setQuantity(event.target.value)}
           />
         </label>
-        <button type="submit">
-          {editing ? 'Salvar material' : 'Adicionar material'}
-        </button>
-        {editing && (
-          <button type="button" onClick={() => select(null)}>
-            Cancelar edição
-          </button>
-        )}
+        <button type="submit">Adicionar material</button>
       </form>
       {error && <p role="alert">{error}</p>}
       {materials.length === 0 ? (
         <p>Nenhum material cadastrado.</p>
       ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th scope="col">Material</th>
-              <th scope="col">Quantidade</th>
-              <th scope="col">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {materials.map((item) => (
-              <tr key={item.id}>
-                <td>{item.name}</td>
-                <td>{item.quantity}</td>
-                <td>
-                  <div className={styles.actions}>
-                    <button
-                      type="button"
-                      aria-label={`Editar ${item.name}`}
-                      onClick={() => select(item)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`Remover ${item.name}`}
-                      onClick={() => {
-                        onUpdate((current) => removeMaterial(current, item.id))
-                        if (editing === item.id) select(null)
-                      }}
-                    >
-                      Remover
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable
+          rows={materials}
+          rowId={(item) => item.id}
+          rowLabel={(item) => `${item.name} ${item.quantity}`}
+          columns={[
+            {
+              id: 'name',
+              title: 'Material',
+              kind: 'editable',
+              input: 'text',
+              maxLength: 80,
+              label: (item) => `Editar nome de ${item.name}`,
+              value: (item) => item.name,
+              validate: (value) =>
+                value.trim() ? '' : 'Informe um nome de 1 a 80 caracteres.',
+              save: (item, name) =>
+                onUpdate((current) =>
+                  updateMaterial(current, item.id, name, item.quantity),
+                ),
+            },
+            {
+              id: 'quantity',
+              title: 'Quantidade',
+              kind: 'editable',
+              input: 'number',
+              min: 1,
+              label: (item) => `Editar quantidade de ${item.name}`,
+              value: (item) => item.quantity,
+              validate: (value) =>
+                Number.isSafeInteger(Number(value)) && Number(value) >= 1
+                  ? ''
+                  : 'A quantidade deve ser um inteiro positivo.',
+              save: (item, quantity) =>
+                onUpdate((current) =>
+                  updateMaterial(current, item.id, item.name, quantity),
+                ),
+            },
+            {
+              id: 'remove',
+              kind: 'remove',
+              label: (item) => `Remover ${item.name}`,
+              confirmation: (item) => (
+                <p>
+                  Deseja remover {item.name} do inventário? Quantidade:{' '}
+                  {item.quantity}.
+                </p>
+              ),
+              remove: (item) =>
+                onUpdate((current) => removeMaterial(current, item.id)),
+            },
+          ]}
+        />
       )}
       <button
         type="button"

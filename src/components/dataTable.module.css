@@ -1,0 +1,86 @@
+.wrapper {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  text-align: left;
+}
+.table th,
+.table td {
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  overflow-wrap: anywhere;
+}
+.table th {
+  background: var(--soft);
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+.table .remove {
+  width: 48px;
+  padding-inline: 0;
+  text-align: center;
+}
+.number {
+  width: 28%;
+}
+.cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+.value {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  cursor: text;
+}
+.table td:has(.value):hover,
+.table .editing {
+  background: var(--soft);
+}
+.table .invalid {
+  background: #fce8e8;
+  color: #8a2531;
+}
+.table td input.input {
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+}
+.table .icon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  background: transparent;
+  border-color: var(--line);
+}
+.arrows {
+  display: grid;
+  gap: 2px;
+}
+.table .arrows button {
+  padding: 0;
+  width: 26px;
+  min-height: 19px;
+  line-height: 1;
+}
+.table .arrows button:disabled {
+  opacity: 0.45;
+}
+.error {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
