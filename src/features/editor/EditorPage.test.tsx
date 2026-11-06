@@ -36,6 +36,8 @@ describe('fluxos da primeira tela', () => {
     await user.clear(screen.getByLabelText('Nome da música'))
     expect(screen.getByText('Música sem título')).toBeVisible()
     await user.type(screen.getByLabelText('Nome da música'), 'Ibuki')
+    await user.keyboard('{Enter}')
+    expect(screen.getByLabelText('Nome da música')).not.toHaveFocus()
     expect(
       within(screen.getByLabelText('Páginas da apresentação')).getByText(
         'Ibuki',

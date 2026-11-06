@@ -1,4 +1,4 @@
-import { PDFDocument, rgb, type PDFFont } from 'pdf-lib'
+import { breakTextIntoLines, PDFDocument, rgb, type PDFFont } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import { getInstrumentType, stageSize } from '../domain/stage'
 import type { MapDraft } from './mapFile'
@@ -6,22 +6,21 @@ import type { StageDimensions } from '../domain/presentation/model'
 
 export type MapPdfInput = MapDraft & { stage?: StageDimensions }
 
-function fittedSize(font: PDFFont, text: string, width: number, size: number) {
+function assertSupportedText(font: PDFFont, text: string) {
   const supported = new Set(font.getCharacterSet())
   if ([...text].some((char) => !supported.has(char.codePointAt(0)!))) {
     throw new Error(
       'Há caracteres sem suporte na fonte desta demonstração. Revise os nomes antes de exportar.',
     )
   }
-  const result = Math.min(
+}
+
+function fittedSize(font: PDFFont, text: string, width: number, size: number) {
+  assertSupportedText(font, text)
+  return Math.min(
     size,
     (width / Math.max(1, font.widthOfTextAtSize(text, size))) * size,
   )
-  if (result < 8)
-    throw new Error(
-      'Um nome é longo demais para o PDF de demonstração. Abrevie-o antes de exportar.',
-    )
-  return result
 }
 
 /** Vector output: stage geometry and labels remain sharp when printed. */
@@ -96,17 +95,36 @@ export async function createMapPdf(
       thickness: 2,
     })
     const label = `${type.name}${item.player ? ` - ${item.player}` : ''}`
-    const size = fittedSize(font, label, 120, 10)
-    const labelWidth = font.widthOfTextAtSize(label, size)
+    assertSupportedText(font, label)
+    const size = Math.max(
+      8,
+      Math.min(10, 1200 / font.widthOfTextAtSize(label, 10)),
+    )
+    const lines = breakTextIntoLines(label, [''], 180, (text) =>
+      font.widthOfTextAtSize(text, size),
+    )
+    const labelWidth = Math.max(
+      ...lines.map((line) => font.widthOfTextAtSize(line, size)),
+    )
     const labelX = Math.max(36, Math.min(805 - labelWidth, cx - labelWidth / 2))
+    const lineHeight = 11
+    const labelHeight = lines.length * lineHeight + 3
+    const labelY = Math.max(47, cy - 15 - labelHeight)
     page.drawRectangle({
       x: labelX - 2,
-      y: cy - 29,
+      y: labelY,
       width: labelWidth + 4,
-      height: 14,
+      height: labelHeight,
       color: rgb(1, 1, 1),
     })
-    page.drawText(label, { x: labelX, y: cy - 26, font, size, color: ink })
+    page.drawText(lines.join('\n'), {
+      x: labelX,
+      y: labelY + labelHeight - lineHeight,
+      lineHeight,
+      font,
+      size,
+      color: ink,
+    })
   }
   page.drawText(
     `FUNDO DO PALCO | ${stage.width} x ${stage.depth} m | Ícones ilustrativos`,

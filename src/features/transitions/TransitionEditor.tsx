@@ -20,7 +20,7 @@ export function TransitionEditor({
   presentation: Presentation
   transition: TextTransition
   onChange: (name: string, text: string, format?: 'html') => void
-  onReview: () => void
+  onReview: (id: string) => void
   onRemove: () => void
   onOpenMap: (id: string) => void
 }) {
@@ -48,7 +48,9 @@ export function TransitionEditor({
             A sequência mudou. Confira os mapas e revise as instruções desta
             transição.
           </p>
-          <button onClick={onReview}>Marcar transição como revisada</button>
+          <button onClick={() => onReview(t.id)}>
+            Marcar transição como revisada
+          </button>
         </div>
       )}
       <div className={styles.maps}>

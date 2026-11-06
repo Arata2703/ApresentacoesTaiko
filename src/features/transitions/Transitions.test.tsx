@@ -10,6 +10,38 @@ async function create(name = 'Adicionar transição') {
   await userEvent.click(screen.getByRole('button', { name }))
 }
 describe('tela de transição textual', () => {
+  it('marca como revisada pelo editor da transição e mantém a tela aberta', async () => {
+    const p = presentationFixture()
+    savePresentationCache(
+      {
+        ...p,
+        transitions: p.transitions.map((transition) =>
+          transition.id === 'middle'
+            ? { ...transition, needsReview: true }
+            : transition,
+        ),
+      },
+      'b',
+    )
+    render(<App />)
+    await userEvent.click(
+      screen.getByRole('button', { name: /Abrir transição .*: Ponte/ }),
+    )
+    const editor = screen.getByRole('region', { name: 'Editor de transição' })
+    expect(within(editor).getByRole('alert')).toBeVisible()
+    await userEvent.click(
+      within(editor).getByRole('button', {
+        name: 'Marcar transição como revisada',
+      }),
+    )
+    expect(within(editor).queryByRole('alert')).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('region', { name: 'Editor de transição' }),
+    ).toBeVisible()
+    expect(within(editor).getByLabelText('Nome do tsunagi')).toHaveValue(
+      'Ponte',
+    )
+  })
   it('cria entre músicas e atualiza mapas automaticamente sem perder instruções', async () => {
     render(<App />)
     await userEvent.clear(screen.getByLabelText('Nome da música'))

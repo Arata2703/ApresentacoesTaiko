@@ -52,9 +52,12 @@ export function useTransitions(
           ),
         )
     },
-    review: (transitionId = selected?.id) => {
-      if (transitionId)
-        update((current) => reviewTransition(current, transitionId))
+    review: (transitionId: string) => {
+      update((current) =>
+        current.transitions.some((transition) => transition.id === transitionId)
+          ? reviewTransition(current, transitionId)
+          : current,
+      )
     },
     remove: () => {
       if (selected) {

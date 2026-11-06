@@ -18,7 +18,7 @@ describe('operações de transição na interface', () => {
     })
     act(() => {
       result.current.transitions.change('Ignorar', '')
-      result.current.transitions.review()
+      result.current.transitions.review('missing')
       result.current.transitions.remove()
       result.current.transitions.create('missing')
     })
@@ -47,7 +47,7 @@ describe('operações de transição na interface', () => {
       instructions: 'Mover bases.\nAguardar sinal.',
       needsReview: true,
     })
-    act(() => result.current.transitions.review())
+    act(() => result.current.transitions.review(middle))
     expect(result.current.transitions.selected!.needsReview).toBe(false)
     await waitFor(() =>
       expect(
@@ -57,6 +57,7 @@ describe('operações de transição na interface', () => {
       ).toBe('Ponte'),
     )
     act(() => result.current.transitions.remove())
+    act(() => result.current.transitions.review(middle))
     expect(result.current.transitions.selected).toBeUndefined()
     expect(result.current.editor.presentation.maps).toHaveLength(2)
     act(() => result.current.transitions.open('missing'))

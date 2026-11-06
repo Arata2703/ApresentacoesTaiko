@@ -59,21 +59,22 @@ describe('PDF vetorial real', () => {
     )
     expect(pdf.getTitle()).toBe('Apresentação sem título - Música sem título')
   })
-  it('recusa nomes que não cabem ou glifos sem suporte em vez de perder conteúdo', async () => {
+  it('informa quando a fonte não contém um caractere do mapa', async () => {
     await expect(
       createMapPdf({ title: '打', song: '', instruments: [] }, font),
     ).rejects.toThrow('caracteres sem suporte')
-    await expect(
-      createMapPdf(
-        {
-          title: '',
-          song: '',
-          instruments: [
-            { ...createInstrument('okedo', 'a', 0), player: 'W'.repeat(80) },
-          ],
-        },
-        font,
-      ),
-    ).rejects.toThrow('longo demais')
+  })
+  it('exporta um mapa com nome de tocador de 80 caracteres', async () => {
+    const bytes = await createMapPdf(
+      {
+        title: '',
+        song: '',
+        instruments: [
+          { ...createInstrument('okedo', 'a', 0), player: 'W'.repeat(80) },
+        ],
+      },
+      font,
+    )
+    expect((await PDFDocument.load(bytes)).getPageCount()).toBe(1)
   })
 })
