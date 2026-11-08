@@ -80,9 +80,7 @@ export function useStageEditor() {
     state.mapId,
     cached.error,
   )
-  const [message, setMessage] = useState(
-    'Escolha um instrumento no catálogo para começar.',
-  )
+  const [message, setMessage] = useState('')
   const page = projectMap(state.presentation, state.mapId)
   const instruments = page?.instruments ?? []
   const selected = instruments.find((entry) => entry.id === state.selectedId)

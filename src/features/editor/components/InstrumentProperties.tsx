@@ -22,8 +22,10 @@ export function InstrumentProperties(props: Props) {
     props
   const selectedType = selected && getInstrumentType(selected.kind)
   return (
-    <aside className={styles.properties} aria-labelledby="properties-title">
-      <p className={styles.eyebrow}>PROPRIEDADES</p>
+    <aside
+      className={styles.properties}
+      aria-label="Propriedades do instrumento"
+    >
       {selected && selectedType ? (
         <>
           <h2 id="properties-title">{selectedType.name}</h2>
@@ -106,10 +108,6 @@ export function InstrumentProperties(props: Props) {
         </>
       ) : (
         <>
-          <h2 id="properties-title">
-            Cada detalhe <br />
-            no seu lugar.
-          </h2>
           <div className={styles.selectionSketch} aria-hidden="true">
             <span />
             <i />
@@ -117,10 +115,6 @@ export function InstrumentProperties(props: Props) {
             <i />
             <i />
           </div>
-          <p className={styles.propertyCaption}>
-            Selecione um instrumento no palco para definir o tocador, a posição
-            e a rotação.
-          </p>
         </>
       )}
     </aside>

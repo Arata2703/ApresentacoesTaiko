@@ -187,11 +187,12 @@ export function StageMap({
         <span>FUNDO DO PALCO</span>
         <span>{stage.width} m</span>
       </div>
-      <p className={styles.stageHint}>
-        {instruments.length
-          ? 'Arraste ou use as setas para mover. Clique no nome para editar os tocadores.'
-          : 'A grade é uma referência de posição. As dimensões dos ícones são ilustrativas.'}
-      </p>
+      {instruments.length > 0 && (
+        <p className={styles.stageHint}>
+          Arraste ou use as setas para mover. Clique no nome para editar os
+          tocadores.
+        </p>
+      )}
     </section>
   )
 }

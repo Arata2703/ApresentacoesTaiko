@@ -15,7 +15,7 @@ vi.mock('../../integrations/download', () => ({ download: vi.fn() }))
 afterEach(() => vi.clearAllMocks())
 
 async function people() {
-  await userEvent.click(screen.getByRole('button', { name: /^Integrantes \(/ }))
+  await userEvent.click(screen.getByRole('button', { name: 'Integrantes' }))
 }
 async function add(name: string) {
   await userEvent.type(screen.getByLabelText('Nome do novo integrante'), name)
@@ -135,7 +135,7 @@ describe('integrantes pela interface', () => {
     await people()
     expect(screen.getByText(/Nenhum integrante/)).toBeVisible()
     expect(
-      screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
+      screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
     ).toBeEnabled()
     await userEvent.click(
       screen.getByRole('button', { name: 'Adicionar integrante' }),

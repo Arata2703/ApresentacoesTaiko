@@ -113,8 +113,7 @@ export function PeoplePage({ presentation, actions, onBack }: Props) {
         ]}
       />
       <p className={styles.hint}>
-        Guarde as alterações em Baixar apresentação editável. O PDF da lista de
-        integrantes ainda não está disponível.
+        A lista de integrantes faz parte do PDF da apresentação.
       </p>
     </section>
   )

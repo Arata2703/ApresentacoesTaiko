@@ -80,8 +80,8 @@ describe('tela de transição textual', () => {
       ),
     ).toBeVisible()
     expect(
-      screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
-    ).toBeDisabled()
+      screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
+    ).toBeEnabled()
     await userEvent.click(
       screen.getByRole('button', { name: 'Editar mapa anterior' }),
     )

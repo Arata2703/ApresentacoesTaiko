@@ -49,20 +49,6 @@
   background: transparent;
   padding: 3px 0;
 }
-.localLabel {
-  color: var(--ink-muted);
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-}
-.localLabel > span {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #b8a476;
-}
 .version {
   font-size: 10px;
   letter-spacing: 1.3px;
@@ -156,13 +142,6 @@
 }
 .noteIcon {
   font-size: 25px;
-  color: var(--ink-muted);
-}
-.scopeNote {
-  margin: auto 10px 0;
-  padding-top: 42px;
-  font-size: 11px;
-  line-height: 1.7;
   color: var(--ink-muted);
 }
 .workspace {
@@ -672,9 +651,6 @@
   .removeButton {
     max-width: 320px;
   }
-  .scopeNote {
-    padding-top: 24px;
-  }
   .miniMap {
     padding: 16px;
   }
@@ -839,18 +815,12 @@
 .header .projectHeading input {
   color: var(--surface);
 }
-.header .localLabel {
-  color: #c5cbe7;
-}
 .header .brandDivider,
 .header .logo {
   color: var(--gold);
 }
 .header .logo {
   background: #ffffff12;
-}
-.header .localLabel > span {
-  background: var(--gold);
 }
 .header .version {
   background: #ffffff12;

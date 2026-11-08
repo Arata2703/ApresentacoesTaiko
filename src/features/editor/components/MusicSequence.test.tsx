@@ -5,6 +5,7 @@ import App from '../../../App'
 import { ShowOrder } from './ShowOrder'
 import { presentationFixture } from '../../../test/presentationFixture'
 import { createPresentation } from '../../../domain/presentation/presentation'
+import { savePresentationCache } from '../../../integrations/presentationCache'
 
 describe('sequência de músicas na interface', () => {
   it('cria mapas, duplica, renomeia a cópia e confirma exclusão sem apagar o original', async () => {
@@ -64,33 +65,82 @@ describe('sequência de músicas na interface', () => {
     const order = screen.getByRole('list')
     expect(
       within(order)
-        .getAllByRole('listitem')
-        .map((li) => li.textContent),
-    ).toEqual(['Primeira música', 'Yatai'])
+        .getAllByRole('button')
+        .map((button) => button.getAttribute('aria-label')),
+    ).toEqual(['Abrir música 1: Primeira música', 'Abrir música 2: Yatai'])
+    await userEvent.click(
+      within(order).getByRole('button', { name: 'Abrir música 2: Yatai' }),
+    )
+    expect(screen.getByLabelText('Nome da música')).toHaveValue('Yatai')
   })
   it('mostra tsunagi sem nome e revisão e trata a apresentação vazia', async () => {
     const p = presentationFixture()
     const { unmount } = render(
       <ShowOrder
         onAddEntry={() => {}}
+        onBack={() => {}}
+        onOpen={() => {}}
         presentation={{
           ...p,
+          maps: p.maps.map((map) => ({ ...map, title: '' })),
           transitions: p.transitions.map((t) => ({ ...t, needsReview: true })),
         }}
       />,
     )
-    await userEvent.click(screen.getByText(/Ordem da apresentação/))
-    expect(await screen.findByText(/Tsunagi: Ponte/)).toBeVisible()
-    expect(screen.getAllByText(/Tsunagi: Sem nome/)).toHaveLength(2)
+    expect(
+      await screen.findByRole('button', { name: 'Abrir tsunagi 3: Ponte' }),
+    ).toBeVisible()
+    expect(
+      screen.getAllByRole('button', { name: /Abrir tsunagi \d+: Sem nome/ }),
+    ).toHaveLength(2)
     expect(screen.getAllByText(/Revisar transição/)).toHaveLength(3)
+    expect(
+      screen.getAllByRole('button', {
+        name: /Abrir música .*Música sem título/,
+      }),
+    ).toHaveLength(2)
     unmount()
     render(
       <ShowOrder
         onAddEntry={() => {}}
+        onBack={() => {}}
+        onOpen={() => {}}
         presentation={createPresentation('empty', 'Vazia')}
       />,
     )
-    await userEvent.click(screen.getByText(/Ordem da apresentação/))
     expect(screen.getByText(/Nenhuma música ou transição/)).toBeVisible()
   })
+})
+
+it('abre músicas e tsunagis pelo diagrama e retorna à edição pela navegação', async () => {
+  savePresentationCache(presentationFixture(), 'a')
+  const user = userEvent.setup()
+  render(<App />)
+  const orderButton = screen.getByRole('button', {
+    name: 'Ordem da apresentação',
+  })
+  await user.click(orderButton)
+  expect(orderButton).toHaveAttribute('aria-pressed', 'true')
+  const diagram = screen.getByRole('region', { name: 'Ordem da apresentação' })
+  expect(within(diagram).getAllByRole('listitem')).toHaveLength(5)
+  await user.click(
+    within(diagram).getByRole('button', { name: 'Abrir tsunagi 3: Ponte' }),
+  )
+  expect(
+    screen.getByRole('region', { name: 'Editor de transição' }),
+  ).toBeVisible()
+  expect(screen.getByLabelText('Nome do tsunagi')).toHaveValue('Ponte')
+  await user.click(orderButton)
+  await user.click(screen.getByRole('button', { name: 'Voltar aos mapas' }))
+  expect(
+    screen.getByRole('region', { name: 'Editor de transição' }),
+  ).toBeVisible()
+  await user.click(orderButton)
+  await user.click(
+    screen.getByRole('button', { name: 'Abrir música 2: Yatai' }),
+  )
+  expect(screen.getByLabelText('Nome da música')).toHaveValue('Yatai')
+  await user.click(orderButton)
+  await user.click(screen.getByRole('button', { name: 'Voltar aos mapas' }))
+  expect(screen.getByLabelText('Nome da música')).toHaveValue('Yatai')
 })

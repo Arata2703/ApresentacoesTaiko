@@ -8,16 +8,10 @@ export function usePresentationCache(
   initialError: string,
 ) {
   const [enabled, setEnabled] = useState(!initialError)
-  const [message, setMessage] = useState(
-    initialError || 'Preparando salvamento automático…',
-  )
+  const [message, setMessage] = useState(initialError)
   useEffect(() => {
     if (!enabled) return
-    const save = () =>
-      setMessage(
-        savePresentationCache(presentation, mapId) ||
-          'Salvo automaticamente neste navegador. Baixe o arquivo editável para ter um backup.',
-      )
+    const save = () => setMessage(savePresentationCache(presentation, mapId))
     const timer = window.setTimeout(save, 0)
     window.addEventListener('pagehide', save)
     return () => {

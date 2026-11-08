@@ -54,9 +54,7 @@ describe('salvamento automático', () => {
     expect(result.current.presentation.maps).toHaveLength(2)
     write.mockRestore()
     act(() => result.current.setSong('Yatai'))
-    await waitFor(() =>
-      expect(result.current.cache.message).toContain('Salvo automaticamente'),
-    )
+    await waitFor(() => expect(result.current.cache.message).toBe(''))
   })
   it('não sobrescreve uma cópia danificada sem ação explícita', async () => {
     localStorage.setItem(presentationCacheKey, 'damaged')
@@ -68,7 +66,11 @@ describe('salvamento automático', () => {
         name: 'Substituir cópia local pelos dados atuais',
       }),
     )
-    await screen.findByText(/Salvo automaticamente neste navegador/)
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/Não foi possível restaurar/),
+      ).not.toBeInTheDocument(),
+    )
     expect(readPresentationCache().data?.presentation.title).toBe(
       'Minha apresentação',
     )

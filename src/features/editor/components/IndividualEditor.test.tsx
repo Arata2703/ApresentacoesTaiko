@@ -32,8 +32,8 @@ describe('editor individual M07', () => {
     )
     expect(drum).toHaveAttribute('aria-pressed', 'false')
     expect(
-      screen.getByRole('heading', { name: 'Cada detalhe no seu lugar.' }),
-    ).toBeVisible()
+      screen.queryByRole('combobox', { name: 'Base' }),
+    ).not.toBeInTheDocument()
     expect(
       screen.queryByRole('combobox', { name: 'Base' }),
     ).not.toBeInTheDocument()
@@ -52,9 +52,7 @@ describe('editor individual M07', () => {
       screen.getByRole('region', { name: 'Palco de 10 por 6 metros' }),
     )
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: 'Integrantes (0)' }),
-    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Integrantes' })).toBeVisible()
     await userEvent.click(
       screen.getByRole('button', { name: 'Editar tocadores de Okedo' }),
     )
@@ -66,9 +64,7 @@ describe('editor individual M07', () => {
     expect(
       screen.getByRole('button', { name: /Okedo, tocador Ana/ }),
     ).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: 'Integrantes (1)' }),
-    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Integrantes' })).toBeVisible()
   })
   it('oferece apenas bases compatíveis, permite retirar base e preserva atribuições', async () => {
     render(<App />)

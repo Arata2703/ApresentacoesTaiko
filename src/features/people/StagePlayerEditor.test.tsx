@@ -49,9 +49,7 @@ describe('edição direta do rótulo no palco', () => {
     expect(
       screen.getByRole('button', { name: /Fue, sem tocador/ }),
     ).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: 'Integrantes (3)' }),
-    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Integrantes' })).toBeVisible()
   }, 15000)
   it('posiciona o cursor junto ao clique e insere no meio do nome', async () => {
     render(<App />)
@@ -118,9 +116,7 @@ describe('edição direta do rótulo no palco', () => {
     )
     await userEvent.keyboard('{Enter}')
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Kaory, Rafael')
-    expect(
-      screen.getByRole('button', { name: 'Integrantes (0)' }),
-    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Integrantes' })).toBeVisible()
     await userEvent.click(screen.getByRole('button', { name: 'Confirmar' }))
     expect(
       screen.queryByRole('combobox', { name: 'Tocadores no instrumento' }),
@@ -128,9 +124,7 @@ describe('edição direta do rótulo no palco', () => {
     expect(
       screen.getByRole('button', { name: /Okedo, tocador Kaory\/Rafael/ }),
     ).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: 'Integrantes (2)' }),
-    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Integrantes' })).toBeVisible()
     expect(
       screen.getByRole('checkbox', { name: 'Kaory · pessoa 1' }),
     ).toBeChecked()
@@ -149,9 +143,7 @@ describe('edição direta do rótulo no palco', () => {
     expect(
       screen.getByRole('button', { name: /Okedo, sem tocador/ }),
     ).toBeVisible()
-    expect(
-      screen.getByRole('button', { name: 'Integrantes (2)' }),
-    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Integrantes' })).toBeVisible()
   })
   it('autocomplete escolhe o homônimo pelo ID e mantém a identidade em edição sem alteração', async () => {
     render(<App />)

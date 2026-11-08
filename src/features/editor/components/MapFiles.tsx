@@ -6,19 +6,17 @@ import {
   maxProjectBytes,
   type ImportResult,
 } from '../../../integrations/presentationFile'
-import type { MapPdfInput } from '../../../integrations/mapPdf'
 import { download } from '../../../integrations/download'
-import { exportMap } from '../../../integrations/exportMap'
+import { exportPresentationPdf } from '../../../integrations/exportPresentationPdf'
 import styles from '../editor.module.css'
 
 interface Props {
   presentation: Presentation
-  page: MapPdfInput | null
   onOpen: (presentation: Presentation) => void
 }
 type Candidate = Extract<ImportResult, { status: 'valid' }>
 
-export function MapFiles({ presentation, page, onOpen }: Props) {
+export function MapFiles({ presentation, onOpen }: Props) {
   const [pending, setPending] = useState<Candidate | null>(null)
   const [message, setMessage] = useState(
     'Baixe a apresentação editável para guardar uma cópia de segurança ou transferir para outro dispositivo.',
@@ -65,13 +63,10 @@ export function MapFiles({ presentation, page, onOpen }: Props) {
   }
 
   async function pdf() {
-    if (!page) return
     setBusy(true)
     try {
-      await exportMap(page)
-      setMessage(
-        'PDF A4 horizontal do mapa selecionado baixado. Baixe também a apresentação editável para continuar depois.',
-      )
+      await exportPresentationPdf(presentation)
+      setMessage('PDF A4 horizontal da apresentação baixado.')
     } catch (error) {
       setMessage(
         error instanceof Error
@@ -102,8 +97,8 @@ export function MapFiles({ presentation, page, onOpen }: Props) {
             onChange={(event) => void open(event)}
           />
         </label>
-        <button onClick={() => void pdf()} disabled={busy || page === null}>
-          {busy ? 'Processando…' : 'Exportar PDF deste mapa'}
+        <button onClick={() => void pdf()} disabled={busy}>
+          Exportar PDF da apresentação
         </button>
       </div>
       <p aria-live="polite">{message}</p>
@@ -125,7 +120,7 @@ export function MapFiles({ presentation, page, onOpen }: Props) {
               onOpen(pending.presentation)
               setPending(null)
               setMessage(
-                'Apresentação reaberta. Todos os dados foram preservados; o PDF exporta somente o mapa selecionado.',
+                'Apresentação reaberta. Todos os dados foram preservados.',
               )
             }}
           >

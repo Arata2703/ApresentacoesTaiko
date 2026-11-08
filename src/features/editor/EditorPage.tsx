@@ -22,7 +22,9 @@ import type { PlayerReference } from '../people/playerDraft'
 
 export function EditorPage() {
   const editor = useStageEditor()
-  const [view, setView] = useState<'slides' | 'people' | 'materials'>('slides')
+  const [view, setView] = useState<'slides' | 'people' | 'materials' | 'order'>(
+    'slides',
+  )
   const [pendingPlayers, setPendingPlayers] = useState<{
     instrumentId: string
     players: readonly PlayerReference[]
@@ -73,6 +75,7 @@ export function EditorPage() {
           }}
           view={view}
           onMaterials={() => setView('materials')}
+          onOrder={() => setView('order')}
           onPeople={() => setView('people')}
           presentation={editor.presentation}
           activeMapId={editor.activeMapId}
@@ -83,12 +86,6 @@ export function EditorPage() {
         <main className={styles.workspace} id="workspace">
           <MapFiles
             presentation={editor.presentation}
-            page={
-              view === 'materials' ||
-              (view === 'slides' && transitions.selected)
-                ? null
-                : editor.page
-            }
             onOpen={(presentation) => {
               setPendingPlayers(null)
               editor.openPresentation(presentation)
@@ -109,19 +106,15 @@ export function EditorPage() {
               }}
             />
           )}
-          <div className={styles.fileActions} aria-live="polite">
-            <p>{editor.cache.message}</p>
-            {editor.cache.blocked && (
-              <button onClick={editor.cache.enable}>
-                Substituir cópia local pelos dados atuais
-              </button>
-            )}
-          </div>
-          {view === 'slides' && (
-            <ShowOrder
-              presentation={editor.presentation}
-              onAddEntry={() => transitions.create(null)}
-            />
+          {editor.cache.message && (
+            <div className={styles.fileActions} aria-live="polite">
+              <p>{editor.cache.message}</p>
+              {editor.cache.blocked && (
+                <button onClick={editor.cache.enable}>
+                  Substituir cópia local pelos dados atuais
+                </button>
+              )}
+            </div>
           )}
           {view === 'people' ? (
             <PeoplePage
@@ -134,6 +127,22 @@ export function EditorPage() {
               presentation={editor.presentation}
               onUpdate={editor.updatePresentation}
               onBack={() => setView('slides')}
+            />
+          ) : view === 'order' ? (
+            <ShowOrder
+              presentation={editor.presentation}
+              onBack={() => setView('slides')}
+              onAddEntry={() => {
+                transitions.create(null)
+                setView('slides')
+              }}
+              onOpen={(item) => {
+                if (item.kind === 'map') openMap(item.id)
+                else {
+                  transitions.open(item.id)
+                  setView('slides')
+                }
+              }}
             />
           ) : transitions.selected ? (
             <TransitionEditor

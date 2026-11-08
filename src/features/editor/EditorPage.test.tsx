@@ -6,20 +6,14 @@ import { catalog } from '../../domain/stage'
 import { addPlayerToSelected } from '../../test/addPlayer'
 
 describe('fluxos da primeira tela', () => {
-  it('começa vazio e avisa que o trabalho ainda não é salvo', () => {
+  it('começa vazio e mantém os controles de edição disponíveis', () => {
     render(<App />)
     expect(
       screen.getByRole('heading', { name: 'O palco é seu.' }),
     ).toBeVisible()
     expect(
-      screen.getByRole('heading', { name: 'Cada detalhe no seu lugar.' }),
-    ).toBeVisible()
-    expect(
-      screen.getByText(/Sessão local · salvamento automático no navegador/),
-    ).toBeVisible()
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Escolha um instrumento',
-    )
+      screen.queryByRole('combobox', { name: 'Base' }),
+    ).not.toBeInTheDocument()
   })
 
   it('atualiza títulos e usa um título alternativo para música sem nome', async () => {
@@ -123,8 +117,8 @@ describe('fluxos da primeira tela', () => {
       screen.queryByRole('button', { name: /Okedo, tocador Ana/ }),
     ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: 'Cada detalhe no seu lugar.' }),
-    ).toBeVisible()
+      screen.queryByRole('combobox', { name: 'Base' }),
+    ).not.toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent('Okedo removido.')
     await user.click(screen.getByRole('button', { name: /Shime, sem tocador/ }))
     await user.click(

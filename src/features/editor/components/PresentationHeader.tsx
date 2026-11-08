@@ -26,9 +26,6 @@ export function PresentationHeader(props: Props) {
           onChange={(event) => onTitleChange(event.target.value)}
           maxLength={80}
         />
-        <span className={styles.localLabel}>
-          <span /> Sessão local · salvamento automático no navegador
-        </span>
       </div>
       <span className={styles.version}>TRANSIÇÕES · M09</span>
     </header>

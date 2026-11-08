@@ -117,22 +117,3 @@
 .confirm button {
   margin-right: 8px;
 }
-.order {
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  font-size: 13px;
-}
-.order summary {
-  cursor: pointer;
-}
-.order li {
-  padding: 4px 0;
-  overflow-wrap: anywhere;
-}
-.review {
-  color: #8b5823;
-}

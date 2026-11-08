@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MapFiles } from './MapFiles'
 import { download } from '../../../integrations/download'
-import { exportMap } from '../../../integrations/exportMap'
+import { exportPresentationPdf } from '../../../integrations/exportPresentationPdf'
 import { serializeMap } from '../../../integrations/mapFile'
 import {
   importPresentation,
@@ -11,28 +11,34 @@ import {
 } from '../../../integrations/presentationFile'
 import { createPresentation } from '../../../domain/presentation/presentation'
 import { presentationFixture } from '../../../test/presentationFixture'
-import { projectMap, firstMapId } from '../editorProjection'
 import App from '../../../App'
 import { addPlayerToSelected } from '../../../test/addPlayer'
 
 vi.mock('../../../integrations/download', () => ({ download: vi.fn() }))
-vi.mock('../../../integrations/exportMap', () => ({ exportMap: vi.fn() }))
+vi.mock('../../../integrations/exportPresentationPdf', () => ({
+  exportPresentationPdf: vi.fn(),
+}))
 afterEach(() => vi.resetAllMocks())
 const p = presentationFixture()
-const page = projectMap(p, firstMapId(p))
 
-it('exporta o mapa atual pela tela de integrantes sem exigir salvamento', async () => {
+it('exporta a apresentação pela tela de integrantes sem exigir salvamento', async () => {
   const user = userEvent.setup()
   render(<App />)
   const name = screen.getByLabelText('Nome da música')
   await user.clear(name)
   await user.type(name, 'Yatai de abertura')
   await user.click(screen.getByRole('button', { name: /Integrantes/ }))
-  const button = screen.getByRole('button', { name: 'Exportar PDF deste mapa' })
+  const button = screen.getByRole('button', {
+    name: 'Exportar PDF da apresentação',
+  })
   expect(button).toBeEnabled()
   await user.click(button)
-  expect(exportMap).toHaveBeenCalledWith(
-    expect.objectContaining({ song: 'Yatai de abertura' }),
+  expect(exportPresentationPdf).toHaveBeenCalledWith(
+    expect.objectContaining({
+      maps: expect.arrayContaining([
+        expect.objectContaining({ title: 'Yatai de abertura' }),
+      ]),
+    }),
   )
 }, 15000)
 
@@ -110,26 +116,11 @@ describe('arquivos e primeiro fluxo integrado', () => {
     expect(screen.getByRole('slider')).toHaveValue('135')
     expect(screen.getByLabelText('Nome da música')).toHaveValue('Ibuki')
     await user.click(
-      screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
+      screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
     )
-    expect(exportMap).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Festival',
-        song: 'Ibuki',
-        stage: { width: 10, depth: 6 },
-        instruments: [
-          expect.objectContaining({
-            id: instrument.id,
-            player: 'Ana Silva',
-            x: 3.25,
-            y: 4,
-            rotation: 135,
-          }),
-        ],
-      }),
-    )
+    expect(exportPresentationPdf).toHaveBeenCalledWith(loaded.presentation)
     expect(
-      await screen.findByText(/PDF A4 horizontal do mapa selecionado baixado/),
+      await screen.findByText(/PDF A4 horizontal da apresentação baixado/),
     ).toBeVisible()
   }, 15000)
   it('abre formato completo, navega mapas e preserva pessoas, bases, transições e materiais ao salvar', async () => {
@@ -205,7 +196,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
       screen.getByRole('button', { name: /Shime, tocador João Silva/ }),
     ).toBeVisible()
   })
-  it('oferece criar o primeiro mapa de uma apresentação vazia e só então libera PDF', async () => {
+  it('permite exportar a apresentação antes e depois de criar o primeiro mapa', async () => {
     render(<App />)
     await confirmOpen(
       serializePresentation(createPresentation('empty', 'Vazia')),
@@ -214,8 +205,8 @@ describe('arquivos e primeiro fluxo integrado', () => {
       screen.getByRole('heading', { name: 'Apresentação sem mapas' }),
     ).toBeVisible()
     expect(
-      screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
-    ).toBeDisabled()
+      screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
+    ).toBeEnabled()
     await userEvent.click(
       screen.getByRole('button', { name: 'Criar primeiro mapa' }),
     )
@@ -226,7 +217,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
       screen.getByRole('button', { name: /Okedo, sem tocador/ }),
     ).toBeVisible()
     expect(
-      screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
+      screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
     ).toBeEnabled()
   })
   it.each([
@@ -256,7 +247,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
   )
   it('trata seleção vazia, arquivo grande e falha de leitura', async () => {
     const open = vi.fn()
-    render(<MapFiles presentation={p} page={page} onOpen={open} />)
+    render(<MapFiles presentation={p} onOpen={open} />)
     fireEvent.change(screen.getByLabelText('Abrir apresentação'), {
       target: { files: [] },
     })
@@ -271,7 +262,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
     })
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
+        screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
       ).toBeEnabled(),
     )
     expect(open).not.toHaveBeenCalled()
@@ -280,7 +271,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
     const view = render(
       <MapFiles
         presentation={{ ...p, title: '' }}
-        page={page}
+
         onOpen={vi.fn()}
       />,
     )
@@ -291,7 +282,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
       screen.getByText(/Não foi possível baixar a apresentação/),
     ).toBeVisible()
     expect(download).not.toHaveBeenCalled()
-    view.rerender(<MapFiles presentation={p} page={page} onOpen={vi.fn()} />)
+    view.rerender(<MapFiles presentation={p} onOpen={vi.fn()} />)
     vi.mocked(download).mockImplementation(() => {
       throw new Error('download')
     })
@@ -300,35 +291,35 @@ describe('arquivos e primeiro fluxo integrado', () => {
     )
     expect(screen.getByText(/Seu trabalho foi preservado/)).toBeVisible()
   })
-  it('bloqueia ações enquanto gera PDF e só exporta o mapa selecionado', async () => {
+  it('bloqueia ações enquanto gera PDF e exporta a apresentação completa', async () => {
     let finish!: () => void
-    vi.mocked(exportMap).mockImplementation(
+    vi.mocked(exportPresentationPdf).mockImplementation(
       () =>
         new Promise<void>((resolve) => {
           finish = resolve
         }),
     )
-    render(<MapFiles presentation={p} page={page} onOpen={vi.fn()} />)
+    render(<MapFiles presentation={p} onOpen={vi.fn()} />)
     await userEvent.click(
-      screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
+      screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
     )
     expect(
       screen.getByRole('button', { name: 'Baixar apresentação editável' }),
     ).toBeDisabled()
     expect(screen.getByLabelText('Abrir apresentação')).toBeDisabled()
-    expect(exportMap).toHaveBeenCalledWith(page)
+    expect(exportPresentationPdf).toHaveBeenCalledWith(p)
     finish()
     expect(
-      await screen.findByText(/PDF A4 horizontal do mapa selecionado baixado/),
+      await screen.findByText(/PDF A4 horizontal da apresentação baixado/),
     ).toBeVisible()
   })
   it.each([new Error('Fonte indisponível'), 'falha'])(
     'exibe falha de PDF e reabilita os controles: %s',
     async (error) => {
-      vi.mocked(exportMap).mockRejectedValue(error)
-      render(<MapFiles presentation={p} page={page} onOpen={vi.fn()} />)
+      vi.mocked(exportPresentationPdf).mockRejectedValue(error)
+      render(<MapFiles presentation={p} onOpen={vi.fn()} />)
       await userEvent.click(
-        screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
+        screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
       )
       expect(
         await screen.findByText(
@@ -338,8 +329,26 @@ describe('arquivos e primeiro fluxo integrado', () => {
         ),
       ).toBeVisible()
       expect(
-        screen.getByRole('button', { name: 'Exportar PDF deste mapa' }),
+        screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
       ).toBeEnabled()
     },
   )
+})
+
+it('exporta a apresentação completa mesmo sem mapa ativo e recupera de falha', async () => {
+  const user = userEvent.setup()
+  render(<MapFiles presentation={p} onOpen={vi.fn()} />)
+  vi.mocked(exportPresentationPdf)
+    .mockRejectedValueOnce(new Error('Fonte indisponível'))
+    .mockResolvedValueOnce(undefined)
+  const button = screen.getByRole('button', {
+    name: 'Exportar PDF da apresentação',
+  })
+  await user.click(button)
+  expect(await screen.findByText('Fonte indisponível')).toBeVisible()
+  await user.click(button)
+  expect(
+    await screen.findByText('PDF A4 horizontal da apresentação baixado.'),
+  ).toBeVisible()
+  expect(exportPresentationPdf).toHaveBeenLastCalledWith(p)
 })

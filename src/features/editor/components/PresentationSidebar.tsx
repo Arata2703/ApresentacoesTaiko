@@ -5,7 +5,8 @@ import { PresentationSlides } from './PresentationSlides'
 import type { DropSide } from '../slideDropTarget'
 
 interface Props {
-  view: 'slides' | 'people' | 'materials'
+  view: 'slides' | 'people' | 'materials' | 'order'
+  onOrder: () => void
   onMaterials: () => void
   onPeople: () => void
   presentation: Presentation
@@ -24,6 +25,7 @@ export function PresentationSidebar({
   activeMapId,
   onSelect,
   view,
+  onOrder,
   onMaterials,
   onPeople,
   onAdd,
@@ -70,7 +72,7 @@ export function PresentationSidebar({
         aria-pressed={view === 'people'}
         onClick={onPeople}
       >
-        Integrantes ({presentation.people.length})
+        Integrantes
       </button>
       <button
         className={styles.pageItem}
@@ -78,6 +80,13 @@ export function PresentationSidebar({
         onClick={onMaterials}
       >
         Materiais manuais
+      </button>
+      <button
+        className={styles.pageItem}
+        aria-pressed={view === 'order'}
+        onClick={onOrder}
+      >
+        Ordem da apresentação
       </button>
       <div className={styles.sidebarHeading}>
         <span className={styles.eyebrow}>SLIDES</span>
@@ -122,10 +131,6 @@ export function PresentationSidebar({
         onReview={onReview}
       />
       {!slides.length && <p>Nenhum slide nesta apresentação.</p>}
-      <div className={styles.scopeNote}>
-        A apresentação editável guarda todos os dados. O PDF contém somente o
-        mapa selecionado. As transições são salvas no arquivo editável.
-      </div>
     </aside>
   )
 }
