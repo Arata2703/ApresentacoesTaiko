@@ -51,6 +51,7 @@ describe('sequência de músicas na interface', () => {
     )
     await userEvent.keyboard('{Alt>}{ArrowUp}{ArrowDown}{/Alt}')
     await userEvent.click(screen.getByRole('button', { name: 'Remover mapa' }))
+    expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveFocus()
     await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Remover mapa' }))

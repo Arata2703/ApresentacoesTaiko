@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, it, vi } from 'vitest'
@@ -31,8 +32,12 @@ it('exibe conteúdo formatado e executa a ação escolhida entre três botões',
     'Revisar',
     'Prosseguir',
   ])
-  for (const button of buttons) expect(button).not.toHaveFocus()
-  await user.click(within(popup).getByRole('button', { name: 'Revisar' }))
+  expect(within(popup).getByRole('button', { name: 'Cancelar' })).toHaveFocus()
+  await user.keyboard('{ArrowLeft}')
+  expect(
+    within(popup).getByRole('button', { name: 'Prosseguir' }),
+  ).toHaveFocus()
+  await user.keyboard('{ArrowRight}{Tab}{Enter}')
   expect(review).toHaveBeenCalledOnce()
   expect(cancel).not.toHaveBeenCalled()
   expect(proceed).not.toHaveBeenCalled()
@@ -67,4 +72,86 @@ it('executa o descarte configurado ao clicar fora, inclusive em qualquer lado do
     fireEvent.click(popup, { clientX, clientY })
   }
   expect(dismiss).toHaveBeenCalledTimes(4)
+})
+
+function PopupExample() {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Abrir confirmação
+      </button>
+      {open && (
+        <ConfirmationPopup
+          title="Confirmação"
+          dismissActionIndex={0}
+          actions={[{ label: 'Cancelar', onClick: () => setOpen(false) }]}
+        >
+          <p>Revise antes de continuar.</p>
+        </ConfirmationPopup>
+      )}
+    </>
+  )
+}
+
+it.each(['Escape', 'Cancelar'])(
+  'devolve o foco ao controle de origem ao fechar por %s',
+  async (action) => {
+    const user = userEvent.setup()
+    render(<PopupExample />)
+    const origin = screen.getByRole('button', { name: 'Abrir confirmação' })
+    await user.click(origin)
+    expect(screen.getByRole('alertdialog')).toBeVisible()
+    if (action === 'Escape') await user.keyboard('{Escape}')
+    else await user.click(screen.getByRole('button', { name: 'Cancelar' }))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(origin).toHaveFocus()
+  },
+)
+
+it.each([true, false])(
+  'trata cancelamento nativo com ação disponível = %s',
+  (available) => {
+    const dismiss = vi.fn()
+    render(
+      <ConfirmationPopup
+        title="Confirmação"
+        dismissActionIndex={0}
+        actions={available ? [{ label: 'Cancelar', onClick: dismiss }] : []}
+      >
+        <p>Aguarde.</p>
+      </ConfirmationPopup>,
+    )
+    const event = new Event('cancel', { cancelable: true })
+    fireEvent(screen.getByRole('alertdialog'), event)
+    expect(event.defaultPrevented).toBe(true)
+    expect(dismiss).toHaveBeenCalledTimes(available ? 1 : 0)
+  },
+)
+
+it('foca a ação de cancelamento configurada e navega com setas verticais, Home e End', async () => {
+  const user = userEvent.setup()
+  const proceed = vi.fn()
+  render(
+    <ConfirmationPopup
+      title="Escolher ação"
+      dismissActionIndex={1}
+      actions={[
+        { label: 'Revisar', onClick: vi.fn() },
+        { label: 'Cancelar', onClick: vi.fn() },
+        { label: 'Confirmar', onClick: proceed },
+      ]}
+    >
+      <p>Escolha uma ação.</p>
+    </ConfirmationPopup>,
+  )
+  expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveFocus()
+  await user.keyboard('{ArrowDown}')
+  expect(screen.getByRole('button', { name: 'Confirmar' })).toHaveFocus()
+  await user.keyboard('{ArrowUp}')
+  expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveFocus()
+  await user.keyboard('{Home}')
+  expect(screen.getByRole('button', { name: 'Revisar' })).toHaveFocus()
+  await user.keyboard('{End} ')
+  expect(proceed).toHaveBeenCalledOnce()
 })

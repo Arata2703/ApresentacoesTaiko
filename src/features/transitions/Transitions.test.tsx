@@ -171,6 +171,7 @@ describe('tela de transição textual', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Remover transição' }),
     )
+    expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveFocus()
     await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
     await userEvent.click(

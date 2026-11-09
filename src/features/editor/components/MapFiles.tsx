@@ -119,11 +119,24 @@ export function MapFiles({ presentation, onOpen }: Props) {
         </ConfirmationPopup>
       )}
       {pending && (
-        <div
-          role="alertdialog"
-          aria-label="Substituir apresentação atual"
-          aria-describedby="replace-project-description"
+        <ConfirmationPopup
+          title="Substituir apresentação atual"
+          dismissActionIndex={1}
+          actions={[
+            {
+              label: 'Substituir e abrir',
+              onClick: () => {
+                onOpen(pending.presentation)
+                setPending(null)
+                setMessage(
+                  'Apresentação reaberta. Todos os dados foram preservados.',
+                )
+              },
+            },
+            { label: 'Cancelar abertura', onClick: () => setPending(null) },
+          ]}
         >
+          {' '}
           <p id="replace-project-description">
             Abrir “{pending.presentation.title}” substituirá a apresentação
             atual. Baixe seu trabalho antes de continuar.
@@ -131,19 +144,7 @@ export function MapFiles({ presentation, onOpen }: Props) {
           {pending.warnings.map((warning) => (
             <p key={warning}>{warning}</p>
           ))}
-          <button
-            onClick={() => {
-              onOpen(pending.presentation)
-              setPending(null)
-              setMessage(
-                'Apresentação reaberta. Todos os dados foram preservados.',
-              )
-            }}
-          >
-            Substituir e abrir
-          </button>
-          <button onClick={() => setPending(null)}>Cancelar abertura</button>
-        </div>
+        </ConfirmationPopup>
       )}
     </section>
   )

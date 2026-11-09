@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ConfirmationPopup } from '../../components/ConfirmationPopup'
 import type {
   Presentation,
   TextTransition,
@@ -74,18 +75,20 @@ export function TransitionEditor({
       />
       <button onClick={() => setRemoving(true)}>Remover transição</button>
       {removing && (
-        <div
-          className={styles.warning}
-          role="alertdialog"
-          aria-label="Remover transição"
+        <ConfirmationPopup
+          title="Remover transição"
+          dismissActionIndex={1}
+          actions={[
+            { label: 'Confirmar remoção da transição', onClick: onRemove },
+            { label: 'Cancelar', onClick: () => setRemoving(false) },
+          ]}
         >
+          {' '}
           <p>
             Remover esta transição e suas instruções? Os mapas e integrantes
             serão mantidos.
           </p>
-          <button onClick={onRemove}>Confirmar remoção da transição</button>
-          <button onClick={() => setRemoving(false)}>Cancelar</button>
-        </div>
+        </ConfirmationPopup>
       )}
     </section>
   )

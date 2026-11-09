@@ -103,6 +103,9 @@ describe('arquivos e primeiro fluxo integrado', () => {
     )
     upload(source)
     await screen.findByRole('alertdialog')
+    expect(
+      screen.getByRole('button', { name: 'Cancelar abertura' }),
+    ).toHaveFocus()
     await user.click(screen.getByRole('button', { name: 'Cancelar abertura' }))
     expect(
       screen.getByRole('heading', { name: 'O palco é seu.' }),

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ConfirmationPopup } from '../../../components/ConfirmationPopup'
 import styles from './musicSequence.module.css'
 
 export function MusicActions({
@@ -16,19 +17,21 @@ export function MusicActions({
       <button onClick={onDuplicate}>Duplicar mapa</button>
       <button onClick={() => setConfirming(true)}>Remover mapa</button>
       {confirming && (
-        <div
-          className={styles.confirm}
-          role="alertdialog"
-          aria-label={`Remover mapa ${song}`}
+        <ConfirmationPopup
+          title={`Remover mapa ${song}`}
+          dismissActionIndex={1}
+          actions={[
+            { label: 'Confirmar remoção do mapa', onClick: onRemove },
+            { label: 'Cancelar', onClick: () => setConfirming(false) },
+          ]}
         >
+          {' '}
           <p>
             Remover o mapa “{song}” e seus instrumentos? Os integrantes e os
             textos das transições serão preservados. Transições afetadas serão
             sinalizadas para revisão.
           </p>
-          <button onClick={onRemove}>Confirmar remoção do mapa</button>
-          <button onClick={() => setConfirming(false)}>Cancelar</button>
-        </div>
+        </ConfirmationPopup>
       )}
     </div>
   )

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
 import type { NumberColumn, TextColumn } from './tableColumns'
 import styles from './dataTable.module.css'
 
@@ -13,12 +13,21 @@ export function EditableCell<Row>({
 }) {
   const [draft, setDraft] = useState<string | null>(null)
   const [attempted, setAttempted] = useState(false)
+  const errorId = useId()
+  const valueElement = useRef<HTMLSpanElement>(null)
+  const restoreFocus = useRef(false)
   const value = String(column.value(row))
   const editing = draft !== null
   const current = draft ?? value
   const error = column.validate(current, row)
   const showError = editing && error && (attempted || column.input === 'number')
   const label = column.label(row, index)
+  useLayoutEffect(() => {
+    if (!editing && restoreFocus.current) {
+      restoreFocus.current = false
+      valueElement.current?.focus()
+    }
+  }, [editing])
 
   function open() {
     if (!editing) {
@@ -32,13 +41,14 @@ export function EditableCell<Row>({
     else column.save(row, next)
   }
 
-  function commit() {
+  function commit(focusCell = false) {
     if (draft === null) return
     if (error) {
       setAttempted(true)
       return
     }
     if (draft !== value) save(draft)
+    restoreFocus.current = focusCell
     setDraft(null)
   }
 
@@ -65,6 +75,7 @@ export function EditableCell<Row>({
             autoFocus
             aria-label={column.inputLabel?.(row, index) ?? label}
             aria-invalid={Boolean(showError)}
+            aria-describedby={showError ? errorId : undefined}
             inputMode={column.input === 'number' ? 'numeric' : undefined}
             maxLength={column.input === 'text' ? column.maxLength : undefined}
             value={draft}
@@ -76,13 +87,17 @@ export function EditableCell<Row>({
             onKeyDown={(event) => {
               if (event.key === 'Enter' || event.key === 'Escape') {
                 event.preventDefault()
-                if (event.key === 'Enter') commit()
-                else setDraft(null)
+                if (event.key === 'Enter') commit(true)
+                else {
+                  restoreFocus.current = true
+                  setDraft(null)
+                }
               }
             }}
           />
         ) : (
           <span
+            ref={valueElement}
             role="button"
             tabIndex={0}
             className={styles.value}
@@ -134,7 +149,7 @@ export function EditableCell<Row>({
         )}
       </div>
       {showError && (
-        <p role="alert" className={styles.error}>
+        <p id={errorId} role="alert" className={styles.error}>
           {error}
         </p>
       )}
