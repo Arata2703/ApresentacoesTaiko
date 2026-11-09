@@ -29,3 +29,8 @@ work/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Arquivos locais da Cloudflare
+.wrangler/
+.dev.vars
+.dev.vars.*
