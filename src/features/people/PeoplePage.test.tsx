@@ -135,7 +135,7 @@ describe('integrantes pela interface', () => {
     await people()
     expect(screen.getByText(/Nenhum integrante/)).toBeVisible()
     expect(
-      screen.getByRole('button', { name: 'Exportar PDF da apresentação' }),
+      screen.getByRole('button', { name: 'Exportar apresentação' }),
     ).toBeEnabled()
     await userEvent.click(
       screen.getByRole('button', { name: 'Adicionar integrante' }),

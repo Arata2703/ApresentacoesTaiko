@@ -7,7 +7,8 @@ import {
   type ImportResult,
 } from '../../../integrations/presentationFile'
 import { download } from '../../../integrations/download'
-import { exportPresentationPdf } from '../../../integrations/exportPresentationPdf'
+import { exportPresentation } from '../../../integrations/exportPresentation'
+import { ConfirmationPopup } from '../../../components/ConfirmationPopup'
 import styles from '../editor.module.css'
 
 interface Props {
@@ -22,6 +23,7 @@ export function MapFiles({ presentation, onOpen }: Props) {
     'Baixe a apresentação editável para guardar uma cópia de segurança ou transferir para outro dispositivo.',
   )
   const [busy, setBusy] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
   function save() {
     try {
@@ -62,18 +64,23 @@ export function MapFiles({ presentation, onOpen }: Props) {
     }
   }
 
-  async function pdf() {
+  async function exportFiles() {
     setBusy(true)
+    setExporting(true)
+    setMessage('')
     try {
-      await exportPresentationPdf(presentation)
-      setMessage('PDF A4 horizontal da apresentação baixado.')
+      await exportPresentation(presentation)
+      setMessage(
+        'Apresentação exportada. O ZIP contém o PDF e o arquivo editável.',
+      )
     } catch (error) {
       setMessage(
         error instanceof Error
           ? error.message
-          : 'Falha ao gerar PDF. Tente novamente.',
+          : 'Falha ao exportar a apresentação. Tente novamente.',
       )
     } finally {
+      setExporting(false)
       setBusy(false)
     }
   }
@@ -97,11 +104,20 @@ export function MapFiles({ presentation, onOpen }: Props) {
             onChange={(event) => void open(event)}
           />
         </label>
-        <button onClick={() => void pdf()} disabled={busy}>
-          Exportar PDF da apresentação
+        <button onClick={() => void exportFiles()} disabled={busy}>
+          {exporting ? 'Gerando arquivos…' : 'Exportar apresentação'}
         </button>
       </div>
       <p aria-live="polite">{message}</p>
+      {exporting && (
+        <ConfirmationPopup
+          title="Exportando apresentação"
+          actions={[]}
+          dismissActionIndex={0}
+        >
+          <p role="status">Gerando o PDF e o arquivo editável. Aguarde…</p>
+        </ConfirmationPopup>
+      )}
       {pending && (
         <div
           role="alertdialog"
