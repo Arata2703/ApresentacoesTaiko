@@ -1,6 +1,10 @@
 import { useId, useLayoutEffect, useRef, useState } from 'react'
 import type { Person } from '../../domain/presentation/model'
-import { playerSuggestions, type PlayerSuggestion } from './playerSuggestions'
+import {
+  normalizePlayerName,
+  playerSuggestions,
+  type PlayerSuggestion,
+} from './playerSuggestions'
 import { resolvePlayerDraft, type PlayerReference } from './playerDraft'
 import styles from './stagePlayerEditor.module.css'
 
@@ -20,6 +24,7 @@ export function StagePlayerEditor({
   initialCaret,
 }: Props) {
   const input = useRef<HTMLInputElement>(null)
+  const activeOption = useRef<HTMLLIElement>(null)
   useLayoutEffect(() => {
     if (initialCaret !== undefined)
       input.current!.setSelectionRange(initialCaret, initialCaret)
@@ -38,9 +43,19 @@ export function StagePlayerEditor({
   const parts = text.split('/')
   const query = parts.at(-1)!.trim()
   const options = playerSuggestions(people, query)
-  const activeIndex = Math.min(active, options.length - 1)
-  const showOptions = open && options.length > 0
-  const showNotice = open && !options.length && Boolean(query)
+  const canRegister =
+    Boolean(query) &&
+    !people.some(
+      (person) =>
+        normalizePlayerName(person.name) === normalizePlayerName(query),
+    )
+  const optionCount = options.length + Number(canRegister)
+  const activeIndex = Math.min(active, optionCount - 1)
+  const showOptions = open && optionCount > 0
+  useLayoutEffect(() => {
+    if (showOptions)
+      activeOption.current?.scrollIntoView?.({ block: 'nearest' })
+  }, [showOptions, activeIndex])
 
   function commit(value = text, selected = choices, allowRegistration = true) {
     if (finished.current) return
@@ -62,9 +77,19 @@ export function StagePlayerEditor({
     setText(value)
     commit(value, selected)
   }
+  function chooseActive() {
+    if (activeIndex === options.length) commit()
+    else choose(options[activeIndex]!)
+  }
 
   return (
     <div className={styles.editor}>
+      <span
+        aria-hidden="true"
+        className={`${styles.nameField} ${styles.measure}`}
+      >
+        {text || 'Nome'}
+      </span>
       <input
         ref={input}
         className={`${styles.nameField} ${styles.editing}`}
@@ -75,9 +100,7 @@ export function StagePlayerEditor({
         aria-autocomplete="list"
         aria-expanded={showOptions}
         aria-controls={`${id}-options`}
-        aria-describedby={
-          error ? `${id}-error` : showNotice ? `${id}-notice` : undefined
-        }
+        aria-describedby={error ? `${id}-error` : undefined}
         aria-activedescendant={
           open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined
         }
@@ -99,21 +122,21 @@ export function StagePlayerEditor({
           } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             event.preventDefault()
             setOpen(true)
-            setActive((index) =>
-              !options.length
+            setActive(
+              !optionCount
                 ? 0
                 : !open
                   ? event.key === 'ArrowDown'
                     ? 0
-                    : options.length - 1
-                  : (index +
+                    : optionCount - 1
+                  : (activeIndex +
                       (event.key === 'ArrowDown' ? 1 : -1) +
-                      options.length) %
-                    options.length,
+                      optionCount) %
+                    optionCount,
             )
           } else if (event.key === 'Enter') {
             event.preventDefault()
-            if (open && activeIndex >= 0) choose(options[activeIndex]!)
+            if (open && activeIndex >= 0) chooseActive()
             else commit()
           }
         }}
@@ -127,26 +150,31 @@ export function StagePlayerEditor({
         >
           {options.map((option, index) => (
             <li
+              ref={index === activeIndex ? activeOption : undefined}
               key={option.id}
               id={`${id}-option-${index}`}
               role="option"
+              aria-label={option.label}
               aria-selected={index === activeIndex}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => choose(option)}
             >
-              {option.label}
+              {option.name}
             </li>
           ))}
+          {canRegister && (
+            <li
+              ref={activeIndex === options.length ? activeOption : undefined}
+              id={`${id}-option-${options.length}`}
+              role="option"
+              aria-selected={activeIndex === options.length}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => commit()}
+            >
+              Adicionar “{query}” à lista de integrantes
+            </li>
+          )}
         </ul>
-      )}
-      {showNotice && (
-        <p
-          id={`${id}-notice`}
-          role="status"
-          className={`${styles.options} ${styles.empty}`}
-        >
-          {query} não está na lista de integrantes.
-        </p>
       )}
       {error && (
         <p role="alert" id={`${id}-error`} className={styles.error}>

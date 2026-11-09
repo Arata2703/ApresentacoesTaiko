@@ -1,14 +1,15 @@
 .editor {
   position: relative;
   z-index: 6;
-  width: 146px;
+  display: inline-grid;
+  width: max-content;
   max-width: 70vw;
   font-size: 12px;
 }
 .nameField {
   display: block;
   box-sizing: border-box;
-  width: 146px;
+  width: max-content;
   max-width: 70vw;
   height: 26px;
   min-width: 0;
@@ -26,6 +27,17 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.measure {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre;
+}
+.editor input.nameField {
+  grid-area: 1 / 1;
+  width: 0;
+  min-width: 100%;
+}
 .nameField.editing {
   background: var(--soft);
   outline: none;
@@ -35,7 +47,7 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  width: 190px;
+  width: 160px;
   max-width: 70vw;
   list-style: none;
   margin: 3px 0 0;
@@ -57,11 +69,12 @@
 .options [role='option']:hover {
   background: var(--soft);
 }
-.empty {
-  padding: 6px;
-  color: var(--ink-muted);
-}
 .error {
+  position: absolute;
+  top: 100%;
+  width: 160px;
+  max-width: 70vw;
+  box-sizing: border-box;
   padding: 5px;
   margin: 3px 0 0;
   border: 1px solid #d1a59a;

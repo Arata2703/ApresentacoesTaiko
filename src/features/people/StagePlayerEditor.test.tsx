@@ -6,6 +6,10 @@ import App from '../../App'
 import { presentationFixture } from '../../test/presentationFixture'
 import { serializePresentation } from '../../integrations/presentationFile'
 import { addPerson } from '../../domain/presentation/people'
+import {
+  savePresentationCache,
+  readPresentationCache,
+} from '../../integrations/presentationCache'
 
 async function loadExample() {
   const p = addPerson(presentationFixture(), 'ana2', 'Ana')
@@ -33,12 +37,14 @@ describe('edição direta do rótulo no palco', () => {
       'Bia',
     )
     expect(
-      screen.getByText('Bia não está na lista de integrantes.'),
-    ).toBeVisible()
+      screen.queryByText('Bia não está na lista de integrantes.'),
+    ).not.toBeInTheDocument()
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
     expect(
-      screen.queryByRole('listbox', { name: 'Sugestões de tocadores' }),
-    ).not.toBeInTheDocument()
+      screen.getByRole('option', {
+        name: 'Adicionar “Bia” à lista de integrantes',
+      }),
+    ).toBeVisible()
     await userEvent.keyboard('{Enter}')
     const dialog = screen.getByRole('alertdialog', {
       name: 'Confirmar cadastro de tocadores',
@@ -247,7 +253,6 @@ describe('edição direta do rótulo no palco', () => {
     )
     await userEvent.keyboard('{ArrowDown}{ArrowUp}{Enter}')
     expect(screen.getByRole('alert')).toHaveTextContent('1 a 80')
-    expect(screen.getByText(/não está na lista de integrantes/)).toBeVisible()
     await userEvent.clear(
       screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
     )
@@ -260,3 +265,124 @@ describe('edição direta do rótulo no palco', () => {
     expect(onCommit).toHaveBeenCalledExactlyOnceWith([{ name: 'Bia' }])
   })
 })
+
+it('adiciona um nome parcial pelas sugestões, confirma o cadastro e preserva o integrante existente', async () => {
+  savePresentationCache(addPerson(presentationFixture(), 'kaory', 'Kaory'), 'b')
+  const user = userEvent.setup()
+  render(<App />)
+  const edit = () =>
+    screen.getByRole('button', { name: 'Editar tocadores de Fue' })
+  await user.click(edit())
+  await user.type(
+    screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+    'Ka',
+  )
+  const existing = screen.getByRole('option', { name: 'Kaory · pessoa 3' })
+  const create = screen.getByRole('option', {
+    name: 'Adicionar “Ka” à lista de integrantes',
+  })
+  expect(existing).toHaveTextContent(/^Kaory$/)
+  expect(existing).toHaveAttribute('aria-selected', 'true')
+  await user.keyboard('{ArrowUp}')
+  expect(create).toHaveAttribute('aria-selected', 'true')
+  await user.keyboard('{ArrowDown}')
+  expect(existing).toHaveTextContent(/^Kaory$/)
+  expect(existing).toHaveAttribute('aria-selected', 'true')
+  await user.keyboard('{ArrowUp}{Enter}')
+  expect(screen.getByRole('alertdialog')).toHaveTextContent(
+    'Ka não está na lista de integrantes',
+  )
+  expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveFocus()
+  await user.click(screen.getByRole('button', { name: 'Cancelar' }))
+  expect(
+    readPresentationCache().data?.presentation.people.map(
+      (person) => person.name,
+    ),
+  ).toEqual(['Ana', 'João', 'Kaory'])
+  await user.click(edit())
+  await user.type(
+    screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
+    'Ka',
+  )
+  await user.click(
+    screen.getByRole('option', {
+      name: 'Adicionar “Ka” à lista de integrantes',
+    }),
+  )
+  await user.click(screen.getByRole('button', { name: 'Confirmar' }))
+  expect(
+    screen.getByRole('button', { name: /Fue, tocador Ka\. Use/ }),
+  ).toBeVisible()
+  expect(screen.getByRole('checkbox', { name: 'Ka · pessoa 4' })).toBeChecked()
+  expect(
+    screen.getByRole('checkbox', { name: 'Kaory · pessoa 3' }),
+  ).not.toBeChecked()
+})
+
+it.each(['Kaory', 'kaory', 'Káory'])(
+  'reutiliza o integrante com nome equivalente a %s sem oferecer novo cadastro',
+  async (name) => {
+    const onCommit = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <StagePlayerEditor
+        people={[{ id: 'kaory', name: 'Kaory' }]}
+        selectedIds={[]}
+        onCommit={onCommit}
+        onCancel={vi.fn()}
+      />,
+    )
+    await user.type(screen.getByRole('combobox'), name)
+    expect(
+      screen.queryByRole('option', { name: /Adicionar/ }),
+    ).not.toBeInTheDocument()
+    await user.keyboard('{ArrowUp}{Enter}')
+    expect(onCommit).toHaveBeenCalledExactlyOnceWith([{ id: 'kaory' }])
+  },
+)
+
+it('inclui o novo nome após a barra e preserva as atribuições anteriores', async () => {
+  const onCommit = vi.fn()
+  const user = userEvent.setup()
+  render(
+    <StagePlayerEditor
+      people={[
+        { id: 'joao', name: 'João' },
+        { id: 'kaory', name: 'Kaory' },
+      ]}
+      selectedIds={['joao']}
+      onCommit={onCommit}
+      onCancel={vi.fn()}
+    />,
+  )
+  await user.type(screen.getByRole('combobox'), '/Ka')
+  await user.keyboard('{ArrowUp}{Enter}')
+  expect(onCommit).toHaveBeenCalledExactlyOnceWith([
+    { id: 'joao' },
+    { name: 'Ka' },
+  ])
+})
+
+it.each(['clique', 'teclado'])(
+  'oferece cadastro sem correspondências por %s',
+  async (mode) => {
+    const onCommit = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <StagePlayerEditor
+        people={[{ id: 'kaory', name: 'Kaory' }]}
+        selectedIds={[]}
+        onCommit={onCommit}
+        onCancel={vi.fn()}
+      />,
+    )
+    await user.type(screen.getByRole('combobox'), 'Bia')
+    const option = screen.getByRole('option', {
+      name: 'Adicionar “Bia” à lista de integrantes',
+    })
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    if (mode === 'clique') await user.click(option)
+    else await user.keyboard('{ArrowUp}{Enter}')
+    expect(onCommit).toHaveBeenCalledExactlyOnceWith([{ name: 'Bia' }])
+  },
+)

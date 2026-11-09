@@ -26,6 +26,7 @@ export function PlayerAssignments({
           <label key={person.id} className={styles.assignment}>
             <input
               type="checkbox"
+              aria-label={`${person.name} · pessoa ${index + 1}`}
               checked={selectedIds.includes(person.id)}
               onChange={(event) =>
                 onAssign(
@@ -35,7 +36,7 @@ export function PlayerAssignments({
                 )
               }
             />
-            {person.name} · pessoa {index + 1}
+            {person.name}
           </label>
         ))}
       </div>

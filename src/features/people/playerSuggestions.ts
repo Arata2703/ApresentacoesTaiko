@@ -1,6 +1,6 @@
 import type { Person } from '../../domain/presentation/model'
 
-export type PlayerSuggestion = { id: string; label: string }
+export type PlayerSuggestion = { id: string; name: string; label: string }
 
 export function normalizePlayerName(value: string) {
   return value
@@ -20,6 +20,7 @@ export function playerSuggestions(
     .slice(0, 8)
     .map(({ person, index }) => ({
       id: person.id,
+      name: person.name,
       label: `${person.name} · pessoa ${index + 1}`,
     }))
 }

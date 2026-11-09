@@ -11,11 +11,12 @@ describe('sugestões e resolução de nomes', () => {
   it('busca sem diferenciar acentos/maiúsculas e distingue homônimos', () => {
     expect(playerSuggestions(people, 'JOA')).toContainEqual({
       id: 'b',
+      name: 'João',
       label: 'João · pessoa 2',
     })
     expect(playerSuggestions(people, 'ana')).toEqual([
-      { id: 'a', label: 'Ana · pessoa 1' },
-      { id: 'c', label: 'Ana · pessoa 3' },
+      { id: 'a', name: 'Ana', label: 'Ana · pessoa 1' },
+      { id: 'c', name: 'Ana', label: 'Ana · pessoa 3' },
     ])
   })
   it('limita sugestões e retorna apenas integrantes existentes', () => {
