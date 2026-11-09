@@ -120,6 +120,7 @@ export function StageMap({
               }
             >
               <button
+                data-button-style="instrument"
                 className={styles.instrumentButton}
                 onClick={() => {
                   setEditingId(null)

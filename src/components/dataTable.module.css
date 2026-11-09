@@ -64,8 +64,6 @@
   width: 32px;
   height: 32px;
   padding: 4px;
-  background: transparent;
-  border-color: var(--line);
 }
 .arrows {
   display: grid;
@@ -76,9 +74,6 @@
   width: 26px;
   min-height: 19px;
   line-height: 1;
-}
-.table .arrows button:disabled {
-  opacity: 0.45;
 }
 .error {
   margin: 4px 0 0;

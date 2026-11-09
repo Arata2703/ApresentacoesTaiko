@@ -16,13 +16,8 @@
   border-radius: 6px 6px 0 0;
 }
 .editor .toolbar button {
-  background: var(--surface);
+  --button-background: var(--surface);
   padding: 6px 10px;
-}
-.editor .toolbar button:hover,
-.editor .toolbar button[aria-pressed='true'] {
-  border-color: var(--navy);
-  background: var(--canvas);
 }
 .toolbar button:first-child {
   font-weight: 700;

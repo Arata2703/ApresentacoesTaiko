@@ -32,11 +32,6 @@
   width: min(100%, 440px);
 }
 .editor button {
-  font: inherit;
-  color: var(--ink);
-  background: var(--soft);
-  border: 1px solid var(--line-strong);
-  border-radius: 5px;
   padding: 8px 12px;
   font-size: 12px;
 }

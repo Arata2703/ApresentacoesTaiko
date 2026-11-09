@@ -30,15 +30,7 @@
   width: min(100%, 320px);
 }
 .page button {
-  border: 1px solid var(--line-strong);
-  background: var(--soft);
   padding: 6px 10px;
-  border-radius: 4px;
-  color: var(--navy);
-}
-.page button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 .personHeading {
   display: flex;
@@ -76,9 +68,5 @@
   flex-shrink: 0;
 }
 .assignments button {
-  border: 1px solid var(--line-strong);
-  background: var(--soft);
-  color: var(--navy);
-  border-radius: 4px;
   padding: 8px;
 }

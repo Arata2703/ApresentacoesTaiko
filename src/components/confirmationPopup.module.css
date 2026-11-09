@@ -37,10 +37,3 @@
 .actions:empty {
   display: none;
 }
-.actions button {
-  padding: 8px;
-  border: 1px solid var(--line-strong);
-  border-radius: 5px;
-  color: var(--ink);
-  background: var(--soft);
-}

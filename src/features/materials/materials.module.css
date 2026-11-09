@@ -32,8 +32,7 @@
 .form label:first-child {
   flex: 1 1 180px;
 }
-.form input,
-.page button {
+.form input {
   border: 1px solid var(--line-strong);
   border-radius: 5px;
   background: var(--canvas);
@@ -45,9 +44,6 @@
 }
 .form input[type='number'] {
   width: 90px;
-}
-.page button:not(:disabled):hover {
-  background: var(--soft);
 }
 .page [role='status']:empty {
   display: none;

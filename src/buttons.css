@@ -1,0 +1,54 @@
+button:where(:not([data-button-style='instrument'])),
+input::file-selector-button {
+  --button-background: #e5edfb;
+  --button-hover: #f2f6ff;
+  --button-focus: #f7faff;
+  --button-active: #d9e5fa;
+  --button-color: var(--ink);
+  font: inherit;
+  color: var(--button-color);
+  background: var(--button-background);
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  padding: 7px 12px;
+  transition:
+    background-color 120ms,
+    box-shadow 120ms;
+}
+:root button:where(:not([data-button-style='instrument'])):not(:disabled):hover,
+:root input[type='file']:not(:disabled):hover::file-selector-button {
+  background: var(--button-hover);
+  box-shadow: 0 2px 3px #09074718;
+}
+:root
+  button:where(:not([data-button-style='instrument'])):not(:disabled):is(
+    :focus,
+    [aria-pressed='true']
+  ),
+:root input[type='file']:not(:disabled):focus::file-selector-button {
+  outline: none;
+  background: var(--button-focus);
+  box-shadow:
+    0 3px 0 var(--line-strong),
+    0 4px 7px #0907471c;
+}
+input[type='file']:focus-visible {
+  outline: none;
+}
+:root
+  button:where(:not([data-button-style='instrument'])):not(:disabled):active,
+:root input[type='file']:not(:disabled):active::file-selector-button {
+  background: var(--button-active);
+  box-shadow: 0 1px 0 var(--line-strong);
+}
+button:where(:not([data-button-style='instrument'])):disabled,
+input:disabled::file-selector-button {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  button:where(:not([data-button-style='instrument'])),
+  input::file-selector-button {
+    transition: none;
+  }
+}

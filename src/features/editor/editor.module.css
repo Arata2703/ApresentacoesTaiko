@@ -96,8 +96,6 @@
   flex-direction: column;
   gap: 14px;
   padding: 12px;
-  background: var(--soft);
-  border: 1px solid var(--line-strong);
   border-radius: 8px;
 }
 .pageNumber {
@@ -205,12 +203,12 @@
   gap: 4px;
 }
 .catalogItem {
+  background: transparent;
   display: flex;
   align-items: center;
   gap: 9px;
   padding: 9px 6px;
   border: 1px solid transparent;
-  background: transparent;
   text-align: left;
   border-radius: 6px;
   font-size: 11px;
@@ -382,9 +380,6 @@
 }
 .emptyStage button {
   border: 0;
-  background: var(--ink);
-  border-radius: 5px;
-  color: var(--canvas);
   padding: 10px 15px;
   font-size: 11px;
 }
@@ -551,14 +546,11 @@
   color: var(--ink);
 }
 .removeButton {
-  background: transparent;
-  border: 1px solid var(--line);
   padding: 9px;
   width: 100%;
-  border-radius: 5px;
   font-size: 10px;
   margin-top: 32px;
-  color: #935c48;
+  --button-color: #935c48;
 }
 .footer {
   display: flex;
@@ -758,13 +750,6 @@
 }
 .fileActions button {
   padding: 8px 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 5px;
-  background: var(--soft);
-  color: var(--navy);
-}
-.fileActions button:disabled {
-  opacity: 0.6;
 }
 .fileButtons label {
   display: flex;
@@ -780,11 +765,7 @@
   width: 100%;
   text-align: left;
   margin-bottom: 12px;
-  background: var(--surface);
-}
-.pageItem[aria-pressed='true'] {
-  background: var(--soft);
-  outline: 1px solid var(--ink-muted);
+  --button-background: var(--surface);
 }
 
 .instrumentButton {

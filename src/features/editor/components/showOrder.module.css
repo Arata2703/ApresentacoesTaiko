@@ -18,14 +18,7 @@
   font-weight: 550;
 }
 .page button {
-  border: 1px solid var(--line-strong);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--ink);
   padding: 8px 10px;
-}
-.page button:hover {
-  background: var(--soft);
 }
 .entry {
   margin-top: 16px;
@@ -47,6 +40,7 @@
   max-width: 100%;
 }
 .flow button {
+  --button-background: var(--surface);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -64,7 +58,7 @@
   flex: 0 0 24px;
 }
 .flow .transition {
-  background: var(--soft);
+  --button-background: var(--soft);
 }
 .flow strong {
   font-size: 16px;

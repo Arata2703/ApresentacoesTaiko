@@ -18,6 +18,7 @@ export function InstrumentCatalog(props: Props) {
           <button
             key={item.kind}
             className={styles.catalogItem}
+            data-button-style="instrument"
             onClick={() => onAdd(item.kind)}
             aria-label={`Adicionar ${item.name}`}
           >
