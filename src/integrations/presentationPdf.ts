@@ -9,6 +9,7 @@ import {
   type Fonts,
 } from './pdfInstructions'
 import { drawLabel, drawStage, muted, navy, rule, soft } from './pdfStage'
+import { drawPdfOrder } from './pdfOrder'
 
 const width = 841.89
 const height = 595.28
@@ -152,21 +153,7 @@ export async function createPresentationPdf(
     presentation.people.map((person) => [person.name]),
     'Nenhum integrante cadastrado.',
   )
-  table(
-    'Ordem da apresentação',
-    'Sequência de músicas e tsunagis',
-    [
-      { title: 'Ordem', width: 80 },
-      { title: 'Tipo', width: 155 },
-      { title: 'Nome', width: bodyWidth - 235 },
-    ],
-    slides.map((slide, index) => [
-      String(index + 1).padStart(2, '0'),
-      slide.kind === 'map' ? 'Música' : 'Tsunagi',
-      slide.title,
-    ]),
-    'Nenhum slide cadastrado.',
-  )
+  drawPdfOrder(fonts, slides, addPage)
 
   slides.forEach((slide, index) => {
     const order = String(index + 1).padStart(2, '0')

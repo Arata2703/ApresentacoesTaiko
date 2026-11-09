@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { PDFDocument } from 'pdf-lib'
 import { expect, it } from 'vitest'
+import { addMap } from '../domain/presentation/maps'
 import { presentationFixture } from '../test/presentationFixture'
 import { createPresentation } from '../domain/presentation/presentation'
 import { createPresentationPdf } from './presentationPdf'
@@ -94,3 +95,20 @@ it('quebra palavras longas e continua um parágrafo maior que a coluna sem perde
     ['ghi', 'j'],
   ])
 })
+
+it.each([0, 1, 20, 21, 40])(
+  'exporta %i itens em diagramas com até vinte blocos por página, sem duplicar mapas',
+  async (count) => {
+    let p = createPresentation('diagram', 'Ordem')
+    for (let i = 0; i < count; i++) {
+      p = addMap(p, `map-${i}`, i === 0 ? 'W'.repeat(80) : `Música ${i + 1}`, {
+        width: 12,
+        depth: 8,
+      })
+    }
+    const pdf = await PDFDocument.load(await createPresentationPdf(p, fonts))
+    expect(pdf.getPageCount()).toBe(
+      2 + Math.max(1, Math.ceil(count / 20)) + count,
+    )
+  },
+)
