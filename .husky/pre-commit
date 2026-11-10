@@ -1,1 +1,5 @@
-npm run check
+if [ "$OS" = "Windows_NT" ]; then
+  npm.cmd run check
+else
+  npm run check
+fi
