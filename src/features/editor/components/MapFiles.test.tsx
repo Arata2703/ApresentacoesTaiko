@@ -223,7 +223,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
   })
   it.each([
     'inválido',
-    JSON.stringify({ format: 'taiko-presentation', version: 2 }),
+    JSON.stringify({ format: 'taiko-presentation', version: 3 }),
     JSON.stringify({
       format: 'taiko-presentation',
       version: 1,
@@ -270,11 +270,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
   })
   it('não gera backup de estado inválido e exibe falha de download', async () => {
     const view = render(
-      <MapFiles
-        presentation={{ ...p, title: '' }}
-
-        onOpen={vi.fn()}
-      />,
+      <MapFiles presentation={{ ...p, title: '' }} onOpen={vi.fn()} />,
     )
     await userEvent.click(
       screen.getByRole('button', { name: 'Baixar apresentação editável' }),

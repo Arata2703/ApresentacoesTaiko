@@ -1,4 +1,5 @@
 import type { Presentation } from '../../domain/presentation/model'
+import { customInstrumentFor } from '../../domain/presentation/customInstruments'
 
 export function validateReferences(p: Presentation) {
   const ids = [
@@ -10,9 +11,17 @@ export function validateReferences(p: Presentation) {
     ]),
     ...p.transitions.map((item) => item.id),
     ...p.materials.map((item) => item.id),
+    ...(p.customInstruments ?? []).map((item) => item.id),
   ]
   if (new Set(ids).size !== ids.length)
     throw new Error('Há IDs repetidos entre entidades da apresentação.')
+  for (const map of p.maps) {
+    for (const item of map.instruments) {
+      const custom = customInstrumentFor(p, item)
+      if (custom && custom.kind !== item.kind)
+        throw new Error('Ícone incompatível com o instrumento cadastrado.')
+    }
+  }
   const people = new Set(p.people.map((item) => item.id))
   const assignments = [
     ...p.rosterIds,

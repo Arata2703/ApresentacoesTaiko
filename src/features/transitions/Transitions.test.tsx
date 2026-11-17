@@ -199,7 +199,7 @@ describe('tela de transição textual', () => {
       screen.getByRole('button', { name: /Abrir transição .*: Ponte/ }),
     )
     expect(screen.getByText('Ana/João')).toBeVisible()
-    expect(screen.getByText('Fue')).toBeVisible()
+    expect(screen.getByText('Shinobue')).toBeVisible()
     expect(screen.getByLabelText('Instruções da transição')).toHaveTextContent(
       'Mover okedo.Levar bases para o fundo.',
     )

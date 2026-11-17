@@ -26,6 +26,7 @@ export function assertNewId(presentation: Presentation, id: string) {
     ]),
     ...presentation.transitions.map((item) => item.id),
     ...presentation.materials.map((item) => item.id),
+    ...(presentation.customInstruments ?? []).map((item) => item.id),
   ]
   if (!id.trim() || id !== id.trim() || ids.includes(id))
     throw new Error('ID vazio, inválido ou já utilizado.')

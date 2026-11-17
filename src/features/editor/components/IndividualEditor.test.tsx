@@ -91,7 +91,9 @@ describe('editor individual M07', () => {
       screen.getByRole('combobox', { name: 'Base' }),
       'shime-tachidai',
     )
-    await userEvent.click(screen.getByRole('button', { name: 'Adicionar Fue' }))
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Adicionar Shinobue' }),
+    )
     expect(screen.getByRole('combobox', { name: 'Base' })).toHaveValue('')
     expect(
       within(screen.getByRole('combobox', { name: 'Base' })).getAllByRole(
@@ -222,7 +224,7 @@ describe('editor individual M07', () => {
     if (reopened.status !== 'valid') throw new Error('Falha ao reabrir')
     act(() => result.current.openPresentation(reopened.presentation))
     expect(result.current.presentation).toEqual(saved)
-    expect(result.current.instruments).toHaveLength(12)
+    expect(result.current.instruments).toHaveLength(catalog.length)
     expect(result.current.instruments.at(-1)?.player).toBe('Ana')
     act(() =>
       result.current.openPresentation(createPresentation('empty', 'Vazia')),

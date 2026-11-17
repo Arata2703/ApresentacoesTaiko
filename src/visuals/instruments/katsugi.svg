@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
+  <path d="M -45 -20 Q -45 -25 -40 -25 H 40 Q 45 -25 45 -20 V 20 Q 45 25 40 25 H -40 Q -45 25 -45 20 Z" fill="#292b2f" />
+  <path d="M -43 -23 H -37 V 23 H -43 Z M 37 -23 H 43 V 23 H 37 Z" fill="#ecd5a2" />
+  <path d="M 5 -19 L -5 -13 L 5 -7 L -5 -1 L 5 5 L -5 11 L 5 17 M -38 -13 H -5 M -38 -1 H -5 M -38 11 H -5 M 5 -19 H 38 M 5 -7 H 38 M 5 5 H 38 M 5 17 H 38" fill="none" stroke="#ffffff" stroke-width="2.5" />
+</svg>

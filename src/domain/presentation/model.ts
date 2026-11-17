@@ -24,10 +24,17 @@ export interface Position {
 export interface MapInstrument {
   readonly id: string
   readonly kind: InstrumentKind
+  readonly customInstrumentId?: string
   readonly baseId: BaseId | null
   readonly playerIds: readonly string[]
   readonly position: Position
   readonly rotation: number
+}
+export interface CustomInstrument {
+  readonly id: string
+  readonly name: string
+  readonly kind: InstrumentKind
+  readonly png?: string
 }
 export interface MusicMap {
   readonly id: string
@@ -61,4 +68,5 @@ export interface Presentation {
   readonly transitions: readonly TextTransition[]
   readonly sequence: readonly SequenceItem[]
   readonly materials: readonly ManualMaterial[]
+  readonly customInstruments?: readonly CustomInstrument[]
 }

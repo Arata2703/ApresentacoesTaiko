@@ -1,8 +1,17 @@
-import { rgb, type PDFPage } from 'pdf-lib'
-import type { MusicMap, Person } from '../domain/presentation/model'
+import { rgb, type PDFImage, type PDFPage } from 'pdf-lib'
+import type { MusicMap, Presentation } from '../domain/presentation/model'
+import { customInstrumentFor } from '../domain/presentation/customInstruments'
 import { getInstrumentType } from '../domain/stage'
 import type { Fonts } from './pdfInstructions'
 import { pdfTextWidth } from './pdfText'
+import { drawPdfInstrument, drawPdfInstrumentImage } from './pdfInstrument'
+
+export type StagePdfCatalog = Pick<
+  Presentation,
+  'people' | 'customInstruments'
+> & {
+  images: ReadonlyMap<string, PDFImage>
+}
 
 export const navy = rgb(0.063, 0.09, 0.275)
 export const muted = rgb(0.28, 0.34, 0.46)
@@ -36,7 +45,7 @@ export function drawStage(
   page: PDFPage,
   fonts: Fonts,
   map: MusicMap | null,
-  people: readonly Person[],
+  catalog: StagePdfCatalog,
   box: { x: number; y: number; width: number; height: number },
   missing: string,
 ) {
@@ -91,7 +100,9 @@ export function drawStage(
   }
   const compact = box.width < 300
   const r = Math.min(compact ? 7 : 12, width / 9, height / 12)
-  const names = new Map(people.map((person) => [person.id, person.name]))
+  const names = new Map(
+    catalog.people.map((person) => [person.id, person.name]),
+  )
   for (const item of map.instruments) {
     const cx = Math.max(
       x + r,
@@ -101,34 +112,12 @@ export function drawStage(
       y + r,
       Math.min(y + height - r, y + height - item.position.y * scale),
     )
-    const color =
-      item.kind === 'shime' ? rgb(0.76, 0.8, 0.9) : rgb(0.91, 0.76, 0.62)
-    if (item.kind === 'shime')
-      page.drawRectangle({
-        x: cx - r,
-        y: cy - r * 0.68,
-        width: 2 * r,
-        height: 1.36 * r,
-        color,
-        borderColor: navy,
-        borderWidth: 0.7,
-      })
-    else
-      page.drawCircle({
-        x: cx,
-        y: cy,
-        size: r,
-        color,
-        borderColor: navy,
-        borderWidth: 0.7,
-      })
-    const angle = (item.rotation * Math.PI) / 180
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx + Math.sin(angle) * r, y: cy + Math.cos(angle) * r },
-      color: navy,
-      thickness: 0.7,
-    })
+    const image =
+      item.customInstrumentId === undefined
+        ? undefined
+        : catalog.images.get(item.customInstrumentId)
+    if (image) drawPdfInstrumentImage(page, image, cx, cy, r, item.rotation)
+    else drawPdfInstrument(page, item, cx, cy, r)
   }
   for (const item of map.instruments) {
     const cx = x + item.position.x * scale
@@ -137,7 +126,10 @@ export function drawStage(
       .map((id) => names.get(id))
       .filter(Boolean)
       .join('/')
-    const label = players || getInstrumentType(item.kind).name
+    const label =
+      players ||
+      customInstrumentFor(catalog, item)?.name ||
+      getInstrumentType(item.kind).name
     const size = compact ? 8 : 10
     const span = Math.min(width, compact ? 120 : 220)
     const labelWidth = Math.min(span, pdfTextWidth(fonts[1], label, size))

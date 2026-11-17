@@ -1,10 +1,13 @@
 import { readFile } from 'node:fs/promises'
 import { PDFDocument } from 'pdf-lib'
 import { expect, it } from 'vitest'
-import { addMap } from '../domain/presentation/maps'
+import { addMap, addMapInstrument } from '../domain/presentation/maps'
 import { presentationFixture } from '../test/presentationFixture'
 import { createPresentation } from '../domain/presentation/presentation'
+import { addCustomInstrument } from '../domain/presentation/customInstruments'
+import { iconPng } from '../test/iconPng'
 import { createPresentationPdf } from './presentationPdf'
+import { importPresentation, serializePresentation } from './presentationFile'
 import { instructionBlocks, paginateInstructions } from './pdfInstructions'
 
 const fonts = (await Promise.all(
@@ -18,9 +21,46 @@ const fonts = (await Promise.all(
   ),
 )) as [Uint8Array, Uint8Array, Uint8Array, Uint8Array]
 
+it('reabre ícones próprios e incorpora a imagem no PDF da apresentação', async () => {
+  let p = addCustomInstrument(presentationFixture(), {
+    id: 'custom-1',
+    name: 'Tambor próprio',
+    kind: 'okedo',
+    png: iconPng,
+  })
+  p = addCustomInstrument(p, {
+    id: 'custom-2',
+    name: 'Tambor de ensaio',
+    kind: 'shime',
+  })
+  p = addMapInstrument(p, 'a', 'placement-1', 'okedo', 'custom-1')
+  p = addMapInstrument(p, 'a', 'placement-2', 'shime', 'custom-2')
+  const archive = serializePresentation(p)
+  expect(JSON.parse(archive).version).toBe(2)
+  expect(importPresentation(archive)).toMatchObject({
+    status: 'valid',
+    presentation: p,
+  })
+  const pdf = await PDFDocument.load(await createPresentationPdf(p, fonts))
+  expect(
+    pdf.getPages().some((page) =>
+      page.node
+        .Resources()
+        ?.keys()
+        .some((key) => key.decodeText() === 'XObject'),
+    ),
+  ).toBe(true)
+})
+
 it('gera PDF A4 horizontal com páginas para listas, mapas e tsunagis', async () => {
+  const presentation = addMapInstrument(
+    presentationFixture(),
+    'a',
+    'take',
+    'take',
+  )
   const pdf = await PDFDocument.load(
-    await createPresentationPdf(presentationFixture(), fonts),
+    await createPresentationPdf(presentation, fonts),
   )
   expect(pdf.getTitle()).toBe('Mostra Japão')
   expect(pdf.getPages().map((page) => page.getSize())).toEqual(

@@ -1,4 +1,9 @@
-import { catalog, type InstrumentKind } from '../stage'
+import {
+  catalog,
+  catalogInstrumentKind,
+  type InstrumentKind,
+  type InstrumentType,
+} from '../stage'
 import type { BaseId } from './model'
 
 export interface BaseDefinition {
@@ -23,20 +28,18 @@ export const bases: readonly BaseDefinition[] = [
   {
     id: 'nagado-suwaridai',
     name: 'Nagado suwaridai',
-    kinds: ['nagado-p', 'nagado-m', 'nagado-g'],
+    kinds: ['nagado'],
   },
   {
     id: 'nagado-tachi',
     name: 'Nagado tachi',
-    kinds: ['nagado-p', 'nagado-m', 'nagado-g'],
+    kinds: ['nagado'],
   },
 ]
-const defaultBases: Record<InstrumentKind, BaseId | null> = {
+const defaultBases: Record<InstrumentType['kind'], BaseId | null> = {
   okedo: 'okedo-suwaridai',
   shime: 'shime-suwaridai',
-  'nagado-p': 'nagado-suwaridai',
-  'nagado-m': 'nagado-suwaridai',
-  'nagado-g': 'nagado-suwaridai',
+  nagado: 'nagado-suwaridai',
   tekan: null,
   take: null,
   katsugi: null,
@@ -44,6 +47,7 @@ const defaultBases: Record<InstrumentKind, BaseId | null> = {
   chyappa: null,
   fue: null,
   oodaiko: null,
+  hiradaiko: null,
 }
 export const instrumentDefinitions: readonly InstrumentDefinition[] =
   catalog.map(({ kind, name, appearance }) => ({
@@ -56,7 +60,9 @@ export const instrumentDefinitions: readonly InstrumentDefinition[] =
   }))
 
 export function instrumentDefinition(kind: InstrumentKind) {
-  const definition = instrumentDefinitions.find((item) => item.kind === kind)
+  const definition = instrumentDefinitions.find(
+    (item) => item.kind === catalogInstrumentKind(kind),
+  )
   if (!definition) throw new Error('Instrumento fora do catálogo do MVP.')
   return definition
 }
@@ -64,6 +70,18 @@ export function instrumentDefinition(kind: InstrumentKind) {
 export function assertCompatibleBase(kind: InstrumentKind, id: BaseId | null) {
   if (id === null) return
   const base = bases.find((item) => item.id === id)
-  if (!base || !base.kinds.includes(kind))
+  if (!base || !base.kinds.includes(catalogInstrumentKind(kind)))
     throw new Error('Base incompatível com o instrumento.')
+}
+
+export function assertMapInstrumentBase(
+  kind: InstrumentKind,
+  id: BaseId | null,
+  custom: boolean,
+) {
+  if (!custom) {
+    assertCompatibleBase(kind, id)
+  } else if (id !== null && !bases.some((base) => base.id === id)) {
+    throw new Error('Base desconhecida.')
+  }
 }

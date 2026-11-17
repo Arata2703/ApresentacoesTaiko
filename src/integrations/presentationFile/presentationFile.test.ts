@@ -131,7 +131,7 @@ describe('contrato versionado da apresentação', () => {
     'não tenta converter versão futura de %s',
     (format) => {
       expect(
-        importPresentation(JSON.stringify({ format, version: 2 })),
+        importPresentation(JSON.stringify({ format, version: 3 })),
       ).toMatchObject({ status: 'unsupported-version' })
     },
   )

@@ -3,6 +3,7 @@ import fontkit from '@pdf-lib/fontkit'
 import { getInstrumentType, stageSize } from '../domain/stage'
 import type { MapDraft } from './mapFile'
 import type { StageDimensions } from '../domain/presentation/model'
+import { drawPdfInstrument } from './pdfInstrument'
 
 export type MapPdfInput = MapDraft & { stage?: StageDimensions }
 
@@ -78,22 +79,7 @@ export async function createMapPdf(
     const type = getInstrumentType(item.kind)
     const cx = x + (item.x / stage.width) * width
     const cy = y + height - (item.y / stage.depth) * height
-    const radians = (item.rotation * Math.PI) / 180
-    page.drawEllipse({
-      x: cx,
-      y: cy,
-      xScale: 16,
-      yScale: 12,
-      color: rgb(0.9, 0.78, 0.55),
-      borderColor: ink,
-      borderWidth: 1,
-    })
-    page.drawLine({
-      start: { x: cx, y: cy },
-      end: { x: cx + Math.sin(radians) * 16, y: cy + Math.cos(radians) * 16 },
-      color: ink,
-      thickness: 2,
-    })
+    drawPdfInstrument(page, item, cx, cy, 16, true)
     const label = `${type.name}${item.player ? ` - ${item.player}` : ''}`
     assertSupportedText(font, label)
     const size = Math.max(
