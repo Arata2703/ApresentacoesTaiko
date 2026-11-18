@@ -174,6 +174,9 @@ export function EditorPage() {
                   onAdd={editor.addInstrument}
                   custom={editor.presentation.customInstruments ?? []}
                   onCreate={editor.registerInstrument}
+                  presentation={editor.presentation}
+                  onEdit={editor.editInstrument}
+                  onRemove={editor.removeCatalogInstrument}
                 />
                 <StageMap
                   people={editor.presentation.people}

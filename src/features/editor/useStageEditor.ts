@@ -1,3 +1,7 @@
+import {
+  updateCustomInstrument,
+  removeCustomInstrument,
+} from '../../domain/presentation/customInstruments'
 import { useState } from 'react'
 import type {
   BaseId,
@@ -258,6 +262,17 @@ export function useStageEditor() {
     selectInstrument,
     addInstrument,
     registerInstrument,
+    editInstrument: (id: string, input: Omit<CustomInstrument, 'id'>) => {
+      const presentation = updateCustomInstrument(state.presentation, id, input)
+      serializePresentation(presentation)
+      setState({ ...state, presentation })
+      setMessage('Instrumento atualizado no catálogo e nos mapas.')
+    },
+    removeCatalogInstrument: (id: string) => {
+      const presentation = removeCustomInstrument(state.presentation, id)
+      setState({ ...state, presentation })
+      setMessage('Instrumento removido do catálogo.')
+    },
     changeSelected,
     removeSelected,
     moveInstrument,
