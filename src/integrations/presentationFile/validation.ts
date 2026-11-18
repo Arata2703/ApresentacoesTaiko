@@ -3,7 +3,10 @@ import {
   assertMapInstrumentBase,
   instrumentDefinition,
 } from '../../domain/presentation/catalog'
-import { validateIconPng } from '../../domain/presentation/customInstruments'
+import {
+  validateIconPng,
+  normalizeInstrumentAbbreviation,
+} from '../../domain/presentation/customInstruments'
 import type {
   BaseId,
   MapInstrument,
@@ -183,9 +186,15 @@ export function validateStructure(value: unknown): Presentation {
             const item = record(value)
             const kind = string(item.kind) as InstrumentKind
             instrumentDefinition(kind)
+            const abbreviation = normalizeInstrumentAbbreviation(
+              item.abbreviation === undefined
+                ? undefined
+                : string(item.abbreviation),
+            )
             return {
               id: id(item.id),
               name: name(item.name),
+              ...(abbreviation === undefined ? {} : { abbreviation }),
               kind,
               ...(item.png === undefined
                 ? {}

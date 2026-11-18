@@ -21,7 +21,7 @@ export function duplicateMap(
   let next = addMap(p, id, `${source.title.slice(0, 72)} (cópia)`, source.stage)
   source.instruments.forEach((item, index) => {
     const newId = instrumentIds[index]!
-    next = addMapInstrument(next, id, newId, item.kind)
+    next = addMapInstrument(next, id, newId, item.kind, item.customInstrumentId)
     next = setInstrumentBase(next, id, newId, item.baseId)
     next = assignInstrumentPlayers(next, id, newId, item.playerIds)
     next = updateMapInstrument(next, id, newId, {

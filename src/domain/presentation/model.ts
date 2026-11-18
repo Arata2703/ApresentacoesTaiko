@@ -31,6 +31,7 @@ export interface MapInstrument {
   readonly rotation: number
 }
 export interface CustomInstrument {
+  readonly abbreviation?: string
   readonly id: string
   readonly name: string
   readonly kind: InstrumentKind

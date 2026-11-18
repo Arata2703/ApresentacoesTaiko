@@ -4,6 +4,8 @@
 
 .toggle {
   width: 100%;
+  gap: 4px;
+  padding-inline: 2px;
 }
 
 .form:not([hidden]) {
@@ -38,4 +40,20 @@
 .form p {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+}
+.form .actions button {
+  width: auto;
+  flex: 1 0 auto;
+}
+
+.toggleLabel {
+  overflow-wrap: normal;
+  word-break: normal;
 }

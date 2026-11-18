@@ -27,6 +27,7 @@ export function catalogInstrumentKind(
   }
 }
 export interface InstrumentType {
+  abbreviation?: string
   kind: CatalogInstrumentKind
   name: string
   appearance: 'drum' | 'flat' | 'flute' | 'hand'
@@ -45,7 +46,13 @@ export type InstrumentChanges = Partial<
 >
 export const stageSize = { width: 10, depth: 6 }
 export const catalog: InstrumentType[] = [
-  { kind: 'okedo', name: 'Okedo', appearance: 'drum', base: 'Suwaridai' },
+  {
+    kind: 'okedo',
+    name: 'Okedo',
+    abbreviation: 'Oke',
+    appearance: 'drum',
+    base: 'Suwaridai',
+  },
   { kind: 'shime', name: 'Shime', appearance: 'flat', base: 'Suwaridai' },
   {
     kind: 'tekan',
@@ -62,6 +69,7 @@ export const catalog: InstrumentType[] = [
   {
     kind: 'katsugi',
     name: 'Katsugi',
+    abbreviation: 'Katsu',
     appearance: 'drum',
     base: 'Sem base definida',
   },
@@ -80,6 +88,7 @@ export const catalog: InstrumentType[] = [
   {
     kind: 'fue',
     name: 'Shinobue',
+    abbreviation: 'Fue',
     appearance: 'flute',
     base: 'Sem base definida',
   },
@@ -89,10 +98,17 @@ export const catalog: InstrumentType[] = [
     appearance: 'drum',
     base: 'Sem base definida',
   },
-  { kind: 'nagado', name: 'Nagado', appearance: 'drum', base: 'Suwaridai' },
+  {
+    kind: 'nagado',
+    name: 'Nagado',
+    abbreviation: 'Naga',
+    appearance: 'drum',
+    base: 'Suwaridai',
+  },
   {
     kind: 'hiradaiko',
     name: 'Hiradaiko',
+    abbreviation: 'Hira',
     appearance: 'flat',
     base: 'Sem base definida',
   },

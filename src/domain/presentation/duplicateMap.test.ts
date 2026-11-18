@@ -1,3 +1,9 @@
+import {
+  addCustomInstrument,
+  updateCustomInstrument,
+} from './customInstruments'
+import { addMapInstrument, setInstrumentBase } from './maps'
+import { iconPng } from '../../test/iconPng'
 import { describe, expect, it } from 'vitest'
 import { duplicateMap } from './duplicateMap'
 import { presentationFixture } from '../../test/presentationFixture'
@@ -34,5 +40,27 @@ describe('duplicação de mapa', () => {
     expect(() => duplicateMap(source, 'missing', 'new', [])).toThrow(
       'inexistente',
     )
+  })
+})
+
+it('preserva o vínculo personalizado ao duplicar e acompanha a edição do catálogo', () => {
+  let p = addCustomInstrument(presentationFixture(), {
+    id: 'custom',
+    name: 'Tambor',
+    kind: 'shime',
+    png: iconPng,
+  })
+  p = addMapInstrument(p, 'a', 'custom-one', 'shime', 'custom')
+  p = setInstrumentBase(p, 'a', 'custom-one', 'okedo-eitetsu')
+  p = duplicateMap(p, 'a', 'copy', ['builtin-copy', 'custom-copy'])
+  const copy = p.maps.find((map) => map.id === 'copy')!.instruments[1]!
+  expect(copy).toEqual({ ...p.maps[0]!.instruments[1], id: 'custom-copy' })
+  const edited = updateCustomInstrument(p, 'custom', {
+    name: 'Revisado',
+    kind: 'nagado',
+  })
+  expect(edited.maps.find((map) => map.id === 'copy')!.instruments[1]).toEqual({
+    ...copy,
+    kind: 'nagado',
   })
 })
