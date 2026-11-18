@@ -1,4 +1,4 @@
-import { catalog, type StageInstrument } from '../domain/stage'
+import { isInstrumentKind, type StageInstrument } from '../domain/stage'
 
 /** Deliberately limited to the M02 spike, not the future presentation format. */
 export interface MapDraft {
@@ -59,7 +59,7 @@ export function parseMap(source: string): MapDraft {
       typeof item.id !== 'string' ||
       !item.id ||
       ids.has(item.id) ||
-      !catalog.some((type) => type.kind === item.kind) ||
+      !isInstrumentKind(item.kind) ||
       !text(item.player) ||
       !between(item.x, 0.5, 9.5) ||
       !between(item.y, 0.6, 5.4) ||
@@ -71,7 +71,7 @@ export function parseMap(source: string): MapDraft {
     ids.add(item.id)
     return {
       id: item.id,
-      kind: item.kind as StageInstrument['kind'],
+      kind: item.kind,
       player: item.player as string,
       x: item.x as number,
       y: item.y as number,

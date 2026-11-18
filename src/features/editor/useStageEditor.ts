@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type {
   BaseId,
+  CustomInstrument,
   Presentation,
   StageDimensions,
 } from '../../domain/presentation/model'
@@ -21,6 +22,11 @@ import {
 import { getInstrumentType, type InstrumentKind } from '../../domain/stage'
 import { addPerson } from '../../domain/presentation/people'
 import { named } from '../../domain/presentation/rules'
+import {
+  addCustomInstrument,
+  customInstrumentFor,
+} from '../../domain/presentation/customInstruments'
+import { serializePresentation } from '../../integrations/presentationFile'
 import type { PlayerReference } from '../people/playerDraft'
 import {
   firstMapId,
@@ -89,13 +95,19 @@ export function useStageEditor() {
     setState((s) => ({ ...s, selectedId: id }))
   }
 
-  function addInstrument(kind: InstrumentKind) {
+  function addInstrument(kind: InstrumentKind, customInstrumentId?: string) {
     const id = crypto.randomUUID()
     setState((s) => {
       if (s.mapId === null) return s
       const map = s.presentation.maps.find((entry) => entry.id === s.mapId)!
       const count = map.instruments.length
-      const p = addMapInstrument(s.presentation, s.mapId, id, kind)
+      const p = addMapInstrument(
+        s.presentation,
+        s.mapId,
+        id,
+        kind,
+        customInstrumentId,
+      )
       const presentation = updateMapInstrument(p, map.id, id, {
         position: {
           x: map.stage.width * (0.2 + (count % 4) * 0.2),
@@ -104,7 +116,23 @@ export function useStageEditor() {
       })
       return { ...s, presentation, selectedId: id }
     })
-    setMessage(`${getInstrumentType(kind).name} adicionado ao palco.`)
+    const custom = customInstrumentFor(state.presentation, {
+      customInstrumentId,
+    })
+    setMessage(
+      `${custom?.name ?? getInstrumentType(kind).name} adicionado ao palco.`,
+    )
+  }
+
+  function registerInstrument(input: Omit<CustomInstrument, 'id'>) {
+    const presentation = addCustomInstrument(state.presentation, {
+      ...input,
+      id: crypto.randomUUID(),
+    })
+    // Check the archive limit before accepting an image into the presentation.
+    serializePresentation(presentation)
+    setState({ ...state, presentation })
+    setMessage(`${input.name.trim()} cadastrado no catálogo.`)
   }
 
   function changeSelected(changes: InstrumentTransform) {
@@ -138,7 +166,7 @@ export function useStageEditor() {
       ),
       selectedId: null,
     }))
-    setMessage(`${getInstrumentType(selected.kind).name} removido.`)
+    setMessage(`${selected.name} removido.`)
   }
 
   function moveInstrument(id: string, dx: number, dy: number) {
@@ -229,6 +257,7 @@ export function useStageEditor() {
     song: state.songDraft,
     selectInstrument,
     addInstrument,
+    registerInstrument,
     changeSelected,
     removeSelected,
     moveInstrument,

@@ -1,5 +1,5 @@
 import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
-import { getInstrumentType, type InstrumentKind } from '../../../domain/stage'
+import type { InstrumentKind } from '../../../domain/stage'
 import { InstrumentSymbol } from './InstrumentSymbol'
 import type {
   StageDimensions,
@@ -105,12 +105,13 @@ export function StageMap({
           </div>
         )}
         {instruments.map((item) => {
-          const type = getInstrumentType(item.kind)
           return (
             <div
               key={item.id}
               data-stage-instrument
-              className={`${styles.stageInstrument} ${selectedId === item.id ? styles.selected : ''}`}
+              className={`${styles.stageInstrument} ${
+                selectedId === item.id ? styles.selected : ''
+              }`}
               style={
                 {
                   '--x': `${(item.x / stage.width) * 100}%`,
@@ -135,10 +136,12 @@ export function StageMap({
                 onLostPointerCapture={drag.end}
                 onKeyDown={(event) => handleKeyDown(event, item.id)}
                 aria-pressed={selectedId === item.id}
-                aria-label={`${type.name}${item.player ? `, tocador ${item.player}` : ', sem tocador'}. Use as setas para mover.`}
+                aria-label={`${item.name}${
+                  item.player ? `, tocador ${item.player}` : ', sem tocador'
+                }. Use as setas para mover.`}
               >
                 <span className={styles.rotating}>
-                  <InstrumentSymbol kind={item.kind} />
+                  <InstrumentSymbol kind={item.kind} png={item.png} />
                 </span>
               </button>
               {editingId === item.id && selectedId === item.id ? (
@@ -157,7 +160,9 @@ export function StageMap({
                 <span
                   role="button"
                   tabIndex={0}
-                  aria-label={`Editar tocadores de ${type.name}${item.player ? `: ${item.player}` : ''}`}
+                  aria-label={`Editar tocadores de ${item.name}${
+                    item.player ? `: ${item.player}` : ''
+                  }`}
                   title="Clique para editar. Duplo clique para selecionar o texto."
                   className={`${styles.instrumentLabel} ${playerStyles.nameField}`}
                   onClick={(event) =>
@@ -177,7 +182,7 @@ export function StageMap({
                     }
                   }}
                 >
-                  {item.player || type.name}
+                  {item.player || item.name}
                 </span>
               )}
             </div>

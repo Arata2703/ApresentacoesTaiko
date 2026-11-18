@@ -1,5 +1,6 @@
 import type { InstrumentKind } from '../stage'
-import { assertCompatibleBase, instrumentDefinition } from './catalog'
+import { assertMapInstrumentBase, instrumentDefinition } from './catalog'
+import { customInstrumentFor } from './customInstruments'
 import type {
   BaseId,
   MapInstrument,
@@ -64,7 +65,9 @@ export class StageResizeConflict extends Error {
     }[],
   ) {
     super(
-      `Instrumentos ficariam fora do palco em: ${affected.map((map) => map.title).join(', ')}. As medidas foram mantidas.`,
+      `Instrumentos ficariam fora do palco em: ${affected
+        .map((map) => map.title)
+        .join(', ')}. As medidas foram mantidas.`,
     )
   }
 }
@@ -108,14 +111,19 @@ export function addMapInstrument(
   mapId: string,
   id: string,
   kind: InstrumentKind,
+  customInstrumentId?: string,
 ): Presentation {
   const map = byId(p.maps, mapId)
   assertNewId(p, id)
   const definition = instrumentDefinition(kind)
+  const custom = customInstrumentFor(p, { customInstrumentId })
+  if (custom && custom.kind !== kind)
+    throw new Error('Ícone incompatível com o instrumento cadastrado.')
   const item: MapInstrument = {
     id,
     kind,
-    baseId: definition.defaultBaseId,
+    ...(custom ? { customInstrumentId: custom.id } : {}),
+    baseId: custom ? null : definition.defaultBaseId,
     playerIds: [],
     position: { x: map.stage.width / 2, y: map.stage.depth / 2 },
     rotation: 0,
@@ -152,7 +160,11 @@ export function setInstrumentBase(
 ): Presentation {
   const map = byId(p.maps, mapId)
   const item = byId(map.instruments, id)
-  assertCompatibleBase(item.kind, baseId)
+  assertMapInstrumentBase(
+    item.kind,
+    baseId,
+    item.customInstrumentId !== undefined,
+  )
   return replaceMap(p, {
     ...map,
     instruments: map.instruments.map((entry) =>

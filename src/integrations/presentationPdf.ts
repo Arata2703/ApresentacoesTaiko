@@ -8,7 +8,15 @@ import {
   instructionPages,
   type Fonts,
 } from './pdfInstructions'
-import { drawLabel, drawStage, muted, navy, rule, soft } from './pdfStage'
+import {
+  drawLabel,
+  drawStage,
+  muted,
+  navy,
+  rule,
+  soft,
+  type StagePdfCatalog,
+} from './pdfStage'
 import { drawPdfOrder } from './pdfOrder'
 
 const width = 841.89
@@ -32,6 +40,20 @@ export async function createPresentationPdf(
   ])
   const title = presentation.title || 'Apresentação sem título'
   pdf.setTitle(title)
+  const images = new Map(
+    await Promise.all(
+      (presentation.customInstruments ?? []).flatMap((item) =>
+        item.png === undefined
+          ? []
+          : [pdf.embedPng(item.png).then((image) => [item.id, image] as const)],
+      ),
+    ),
+  )
+  const stageCatalog: StagePdfCatalog = {
+    people: presentation.people,
+    customInstruments: presentation.customInstruments,
+    images,
+  }
 
   function addPage(section: string, heading: string, subtitle: string) {
     const page = pdf.addPage([width, height])
@@ -168,14 +190,14 @@ export async function createPresentationPdf(
         page,
         fonts,
         map,
-        presentation.people,
+        stageCatalog,
         { x: margin, y: 87, width: bodyWidth, height: 321 },
         '',
       )
       drawLabel(
         page,
         fonts,
-        'Símbolos ilustrativos · Retângulo: Shime · Círculo: demais instrumentos',
+        'Símbolos ilustrativos em vista superior',
         margin,
         65,
         bodyWidth,
@@ -186,7 +208,9 @@ export async function createPresentationPdf(
       return
     }
     const { previous, next } = transitionMaps(presentation, slide.transition.id)
-    const subtitle = `${previous?.title || (previous ? 'Música sem título' : 'Entrada')} para ${next?.title || (next ? 'Música sem título' : 'Saída')}`
+    const subtitle = `${
+      previous?.title || (previous ? 'Música sem título' : 'Entrada')
+    } para ${next?.title || (next ? 'Música sem título' : 'Saída')}`
     const lines = instructionPages(slide.transition, fonts, 466, 333)
     lines.forEach((content, part) => {
       const page = addPage(
@@ -198,7 +222,7 @@ export async function createPresentationPdf(
         page,
         fonts,
         previous,
-        presentation.people,
+        stageCatalog,
         { x: margin, y: 246, width: 255, height: 170 },
         'Sem mapa anterior',
       )
@@ -206,7 +230,7 @@ export async function createPresentationPdf(
         page,
         fonts,
         next,
-        presentation.people,
+        stageCatalog,
         { x: margin, y: 51, width: 255, height: 170 },
         'Sem próximo mapa',
       )

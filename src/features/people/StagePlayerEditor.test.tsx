@@ -30,7 +30,7 @@ describe('edição direta do rótulo no palco', () => {
     render(<App />)
     await loadExample()
     await userEvent.click(
-      screen.getByRole('button', { name: 'Editar tocadores de Fue' }),
+      screen.getByRole('button', { name: 'Editar tocadores de Shinobue' }),
     )
     await userEvent.type(
       screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
@@ -53,7 +53,7 @@ describe('edição direta do rótulo no palco', () => {
     await userEvent.keyboard('{Tab}{Escape}')
     expect(dialog).not.toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /Fue, sem tocador/ }),
+      screen.getByRole('button', { name: /Shinobue, sem tocador/ }),
     ).toBeVisible()
     expect(screen.getByRole('button', { name: 'Integrantes' })).toBeVisible()
   }, 15000)
@@ -155,7 +155,7 @@ describe('edição direta do rótulo no palco', () => {
     render(<App />)
     await loadExample()
     await userEvent.click(
-      screen.getByRole('button', { name: 'Editar tocadores de Fue' }),
+      screen.getByRole('button', { name: 'Editar tocadores de Shinobue' }),
     )
     await userEvent.type(
       screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
@@ -166,7 +166,7 @@ describe('edição direta do rótulo no palco', () => {
       screen.getByRole('option', { name: 'Ana · pessoa 3' }),
     )
     await userEvent.click(
-      screen.getByRole('button', { name: /Fue, tocador Ana/ }),
+      screen.getByRole('button', { name: /Shinobue, tocador Ana/ }),
     )
     expect(
       screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
@@ -175,7 +175,7 @@ describe('edição direta do rótulo no palco', () => {
       screen.getByRole('checkbox', { name: 'Ana · pessoa 3' }),
     ).toBeChecked()
     await userEvent.click(
-      screen.getByRole('button', { name: 'Editar tocadores de Fue: Ana' }),
+      screen.getByRole('button', { name: 'Editar tocadores de Shinobue: Ana' }),
     )
     await userEvent.keyboard('{Enter}')
     expect(
@@ -185,14 +185,14 @@ describe('edição direta do rótulo no palco', () => {
   it('aceita teclado para editar/autocompletar, salva ao sair e cancela sem alterar o instrumento', async () => {
     render(<App />)
     await loadExample()
-    screen.getByRole('button', { name: 'Editar tocadores de Fue' }).focus()
+    screen.getByRole('button', { name: 'Editar tocadores de Shinobue' }).focus()
     await userEvent.keyboard('x{F2}')
     await userEvent.keyboard('{ArrowDown}{ArrowUp}{ArrowDown}{Enter}')
     expect(
-      screen.getByRole('button', { name: /Fue, tocador Ana/ }),
+      screen.getByRole('button', { name: /Shinobue, tocador Ana/ }),
     ).toBeVisible()
     await userEvent.click(
-      screen.getByRole('button', { name: 'Editar tocadores de Fue: Ana' }),
+      screen.getByRole('button', { name: 'Editar tocadores de Shinobue: Ana' }),
     )
     await userEvent.clear(
       screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
@@ -203,10 +203,10 @@ describe('edição direta do rótulo no palco', () => {
     )
     await userEvent.keyboard('{Escape}')
     expect(
-      screen.getByRole('button', { name: /Fue, tocador Ana/ }),
+      screen.getByRole('button', { name: /Shinobue, tocador Ana/ }),
     ).toBeVisible()
     await userEvent.click(
-      screen.getByRole('button', { name: 'Editar tocadores de Fue: Ana' }),
+      screen.getByRole('button', { name: 'Editar tocadores de Shinobue: Ana' }),
     )
     await userEvent.clear(
       screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
@@ -217,7 +217,7 @@ describe('edição direta do rótulo no palco', () => {
     )
     await userEvent.click(screen.getByLabelText('Nome da música'))
     expect(
-      screen.getByRole('button', { name: /Fue, tocador João/ }),
+      screen.getByRole('button', { name: /Shinobue, tocador João/ }),
     ).toBeVisible()
   })
   it('não confirma nomes ambíguos/inválidos e não duplica confirmação ao perder foco', async () => {
@@ -271,7 +271,7 @@ it('adiciona um nome parcial pelas sugestões, confirma o cadastro e preserva o 
   const user = userEvent.setup()
   render(<App />)
   const edit = () =>
-    screen.getByRole('button', { name: 'Editar tocadores de Fue' })
+    screen.getByRole('button', { name: 'Editar tocadores de Shinobue' })
   await user.click(edit())
   await user.type(
     screen.getByRole('combobox', { name: 'Tocadores no instrumento' }),
@@ -311,7 +311,7 @@ it('adiciona um nome parcial pelas sugestões, confirma o cadastro e preserva o 
   )
   await user.click(screen.getByRole('button', { name: 'Confirmar' }))
   expect(
-    screen.getByRole('button', { name: /Fue, tocador Ka\. Use/ }),
+    screen.getByRole('button', { name: /Shinobue, tocador Ka\. Use/ }),
   ).toBeVisible()
   expect(screen.getByRole('checkbox', { name: 'Ka · pessoa 4' })).toBeChecked()
   expect(

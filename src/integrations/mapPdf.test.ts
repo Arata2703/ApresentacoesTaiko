@@ -43,6 +43,7 @@ describe('PDF vetorial real', () => {
             rotation: 90,
           },
           createInstrument('fue', 'b', 1),
+          createInstrument('take', 'c', 2),
         ],
       },
       font,

@@ -8,17 +8,32 @@ import {
 } from './stage'
 
 describe('catálogo e criação', () => {
-  it('oferece os 12 tipos sem identidades duplicadas', () => {
-    expect(catalog).toHaveLength(12)
-    expect(new Set(catalog.map((item) => item.kind)).size).toBe(12)
+  it('oferece um único Nagado, Hiradaiko e Shinobue sem identidades duplicadas', () => {
+    expect(catalog).toHaveLength(11)
+    expect(new Set(catalog.map((item) => item.kind)).size).toBe(11)
+    expect(
+      catalog
+        .filter((item) => item.name.startsWith('Nagado'))
+        .map((item) => item.name),
+    ).toEqual(['Nagado'])
+    expect(catalog).toContainEqual(
+      expect.objectContaining({ kind: 'hiradaiko', name: 'Hiradaiko' }),
+    )
+    expect(catalog).toContainEqual(
+      expect.objectContaining({ kind: 'fue', name: 'Shinobue' }),
+    )
     for (const type of catalog) expect(getInstrumentType(type.kind)).toBe(type)
   })
-  it.each(['okedo', 'shime', 'nagado-p', 'nagado-m', 'nagado-g'] as const)(
-    '%s começa com a base suwaridai',
-    (kind) => {
-      expect(getInstrumentType(kind).base).toBe('Suwaridai')
-    },
-  )
+  it.each([
+    'okedo',
+    'shime',
+    'nagado',
+    'nagado-p',
+    'nagado-m',
+    'nagado-g',
+  ] as const)('%s começa com a base suwaridai', (kind) => {
+    expect(getInstrumentType(kind).base).toBe('Suwaridai')
+  })
   it('cria instâncias independentes em posições dentro do palco', () => {
     for (let count = 0; count < 20; count++) {
       const item = createInstrument('okedo', `id-${count}`, count)

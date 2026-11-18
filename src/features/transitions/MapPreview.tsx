@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react'
-import { getInstrumentType } from '../../domain/stage'
 import type { projectMap } from '../editor/editorProjection'
 import { InstrumentSymbol } from '../editor/components/InstrumentSymbol'
 import styles from './transitions.module.css'
@@ -40,9 +39,9 @@ export function MapPreview({
                 }
               >
                 <span style={{ transform: `rotate(${item.rotation}deg)` }}>
-                  <InstrumentSymbol kind={item.kind} small />
+                  <InstrumentSymbol kind={item.kind} png={item.png} small />
                 </span>
-                <span>{item.player || getInstrumentType(item.kind).name}</span>
+                <span>{item.player || item.name}</span>
               </div>
             ))}
             {!map.instruments.length && (

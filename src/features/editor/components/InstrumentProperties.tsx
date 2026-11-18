@@ -28,7 +28,7 @@ export function InstrumentProperties(props: Props) {
     >
       {selected && selectedType ? (
         <>
-          <h2 id="properties-title">{selectedType.name}</h2>
+          <h2 id="properties-title">{selected.name}</h2>
           <p className={styles.propertyCaption}>Instrumento selecionado</p>
           <PlayerAssignments
             people={people}
@@ -48,7 +48,11 @@ export function InstrumentProperties(props: Props) {
             >
               <option value="">Sem base definida</option>
               {bases
-                .filter((base) => base.kinds.includes(selected.kind))
+                .filter(
+                  (base) =>
+                    selected.customInstrumentId !== undefined ||
+                    base.kinds.includes(selectedType.kind),
+                )
                 .map((base) => (
                   <option key={base.id} value={base.id}>
                     {base.name}

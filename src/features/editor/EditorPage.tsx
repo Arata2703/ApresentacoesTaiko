@@ -169,7 +169,12 @@ export function EditorPage() {
                 onApply={editor.resizeStage}
               />
               <div className={styles.editor}>
-                <InstrumentCatalog onAdd={editor.addInstrument} />
+                <InstrumentCatalog
+                  key={editor.presentation.id}
+                  onAdd={editor.addInstrument}
+                  custom={editor.presentation.customInstruments ?? []}
+                  onCreate={editor.registerInstrument}
+                />
                 <StageMap
                   people={editor.presentation.people}
                   onCommitPlayers={(instrumentId, players) => {

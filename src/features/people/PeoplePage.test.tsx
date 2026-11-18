@@ -251,7 +251,7 @@ describe('integrantes pela interface', () => {
       screen.getByRole('button', { name: 'Abrir mapa Yatai' }),
     )
     expect(
-      screen.getByRole('button', { name: /Fue, tocador Ana Silva/ }),
+      screen.getByRole('button', { name: /Shinobue, tocador Ana Silva/ }),
     ).toBeVisible()
     await userEvent.click(
       screen.getByRole('button', { name: 'Abrir mapa Ibuki' }),

@@ -5,6 +5,7 @@ import { migrateMap } from './legacy'
 
 export const presentationFormat = 'taiko-presentation'
 export const presentationVersion = 1
+const customCatalogVersion = 2
 export const maxProjectBytes = 5_000_000
 export type ImportResult =
   | {
@@ -37,7 +38,9 @@ function encode(data: Presentation): string {
   const source = JSON.stringify(
     {
       format: presentationFormat,
-      version: presentationVersion,
+      version: data.customInstruments?.length
+        ? customCatalogVersion
+        : presentationVersion,
       presentation: data,
     },
     null,
@@ -87,7 +90,13 @@ export function importPresentation(source: string): ImportResult {
       throw new Error('Versão ausente ou inválida.')
     const supportedVersion =
       envelope.format === presentationFormat ? presentationVersion : 1
-    if (envelope.version !== supportedVersion)
+    if (
+      envelope.version !== supportedVersion &&
+      !(
+        envelope.format === presentationFormat &&
+        envelope.version === customCatalogVersion
+      )
+    )
       return {
         status: 'unsupported-version',
         message:

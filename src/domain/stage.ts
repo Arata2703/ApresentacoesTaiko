@@ -1,4 +1,4 @@
-export type InstrumentKind =
+type CatalogInstrumentKind =
   | 'okedo'
   | 'shime'
   | 'tekan'
@@ -8,11 +8,26 @@ export type InstrumentKind =
   | 'chyappa'
   | 'fue'
   | 'oodaiko'
-  | 'nagado-p'
-  | 'nagado-m'
-  | 'nagado-g'
+  | 'nagado'
+  | 'hiradaiko'
+
+export type InstrumentKind =
+  CatalogInstrumentKind | 'nagado-p' | 'nagado-m' | 'nagado-g'
+
+export function catalogInstrumentKind(
+  kind: InstrumentKind,
+): CatalogInstrumentKind {
+  switch (kind) {
+    case 'nagado-p':
+    case 'nagado-m':
+    case 'nagado-g':
+      return 'nagado'
+    default:
+      return kind
+  }
+}
 export interface InstrumentType {
-  kind: InstrumentKind
+  kind: CatalogInstrumentKind
   name: string
   appearance: 'drum' | 'flat' | 'flute' | 'hand'
   base: string
@@ -62,19 +77,36 @@ export const catalog: InstrumentType[] = [
     appearance: 'hand',
     base: 'Sem base definida',
   },
-  { kind: 'fue', name: 'Fue', appearance: 'flute', base: 'Sem base definida' },
+  {
+    kind: 'fue',
+    name: 'Shinobue',
+    appearance: 'flute',
+    base: 'Sem base definida',
+  },
   {
     kind: 'oodaiko',
     name: 'Oodaiko',
     appearance: 'drum',
     base: 'Sem base definida',
   },
-  { kind: 'nagado-p', name: 'Nagado P', appearance: 'drum', base: 'Suwaridai' },
-  { kind: 'nagado-m', name: 'Nagado M', appearance: 'drum', base: 'Suwaridai' },
-  { kind: 'nagado-g', name: 'Nagado G', appearance: 'drum', base: 'Suwaridai' },
+  { kind: 'nagado', name: 'Nagado', appearance: 'drum', base: 'Suwaridai' },
+  {
+    kind: 'hiradaiko',
+    name: 'Hiradaiko',
+    appearance: 'flat',
+    base: 'Sem base definida',
+  },
 ]
 export function getInstrumentType(kind: InstrumentKind): InstrumentType {
-  return catalog.find((item) => item.kind === kind)!
+  return catalog.find((item) => item.kind === catalogInstrumentKind(kind))!
+}
+export function isInstrumentKind(value: unknown): value is InstrumentKind {
+  return (
+    typeof value === 'string' &&
+    catalog.some(
+      (item) => item.kind === catalogInstrumentKind(value as InstrumentKind),
+    )
+  )
 }
 export function updateInstrument(
   instruments: StageInstrument[],

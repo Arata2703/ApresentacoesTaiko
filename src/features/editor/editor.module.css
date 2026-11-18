@@ -181,7 +181,7 @@
 }
 .catalog {
   border-right: 1px solid var(--line);
-  padding: 23px 12px;
+  padding: 23px clamp(4px, calc((100vw - 950px) / 25), 12px);
 }
 .catalogHeading {
   padding: 0 6px;
@@ -204,6 +204,7 @@
 }
 .catalogItem {
   background: transparent;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -213,6 +214,8 @@
   border-radius: 6px;
   font-size: 11px;
   min-height: 35px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .catalogItem:hover {
   border-color: var(--line);
@@ -220,6 +223,7 @@
 }
 .addSign {
   color: var(--ink-muted);
+  flex-shrink: 0;
   margin-left: auto;
   font-size: 15px;
 }
@@ -229,44 +233,16 @@
   width: 43px;
   height: 44px;
   flex-shrink: 0;
-}
-.symbol > span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: #d9b293;
-  border: 1.5px solid #8b6f53;
-  border-radius: 50% / 14%;
-  box-shadow:
-    inset 0 6px 0 #f4dcc0,
-    inset 0 -4px 0 #bc936f;
-}
-.flat > span {
-  height: 24px;
-  margin-top: 10px;
-  background: #f0eee2;
-  border-color: #8f927e;
-  box-shadow:
-    inset 0 6px 0 #fbfaef,
-    inset 0 -3px 0 #d9d8ca;
-  border-radius: 50% / 28%;
+  object-fit: contain;
 }
 .flute > span {
+  display: block;
+  width: 100%;
   height: 9px;
   margin-top: 18px;
   background: repeating-linear-gradient(90deg, #b1aa80 0 8px, #504f38 9px 11px);
-  border-color: #6d6c50;
+  border: 1.5px solid #6d6c50;
   border-radius: 2px;
-  box-shadow: none;
-}
-.hand > span {
-  height: 30px;
-  width: 30px;
-  margin: 8px auto;
-  border-radius: 50%;
-  background: #cbb977;
-  border-color: #918453;
-  box-shadow: inset 0 0 0 5px #e2d49b;
 }
 .largeDrum {
   width: 57px;
@@ -276,27 +252,10 @@
   width: 19px;
   height: 21px;
 }
-.smallSymbol > span {
-  border-width: 1px;
-  box-shadow:
-    inset 0 3px 0 #f4dcc0,
-    inset 0 -2px 0 #bc936f;
-}
-.smallSymbol.flat > span {
-  height: 12px;
-  margin-top: 4px;
-  box-shadow: inset 0 3px 0 #f7f6e9;
-}
 .smallSymbol.flute > span {
+  border-width: 1px;
   height: 5px;
   margin-top: 7px;
-  box-shadow: none;
-}
-.smallSymbol.hand > span {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
-  box-shadow: inset 0 0 0 3px #e2d49b;
 }
 .stageArea {
   min-width: 0;
@@ -693,7 +652,7 @@
   }
   .catalogItems {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .catalogItem {
     font-size: 10px;

@@ -1,8 +1,9 @@
 import type { InstrumentKind } from '../../domain/stage'
 import {
-  assertCompatibleBase,
+  assertMapInstrumentBase,
   instrumentDefinition,
 } from '../../domain/presentation/catalog'
+import { validateIconPng } from '../../domain/presentation/customInstruments'
 import type {
   BaseId,
   MapInstrument,
@@ -69,8 +70,12 @@ function instrument(
   const data = record(value)
   const kind = string(data.kind) as InstrumentKind
   instrumentDefinition(kind)
+  const customInstrumentId =
+    data.customInstrumentId === undefined
+      ? undefined
+      : id(data.customInstrumentId)
   const baseId = data.baseId === null ? null : (string(data.baseId) as BaseId)
-  assertCompatibleBase(kind, baseId)
+  assertMapInstrumentBase(kind, baseId, customInstrumentId !== undefined)
   const point = record(data.position)
   const x = number(point.x),
     y = number(point.y),
@@ -89,6 +94,7 @@ function instrument(
   return {
     id: id(data.id),
     kind,
+    ...(customInstrumentId === undefined ? {} : { customInstrumentId }),
     baseId,
     playerIds: references(data.playerIds),
     position: { x, y },
@@ -170,6 +176,23 @@ export function validateStructure(value: unknown): Presentation {
       return { id: id(person.id), name: name(person.name) }
     }),
     rosterIds: references(data.rosterIds),
+    ...(data.customInstruments === undefined
+      ? {}
+      : {
+          customInstruments: array(data.customInstruments).map((value) => {
+            const item = record(value)
+            const kind = string(item.kind) as InstrumentKind
+            instrumentDefinition(kind)
+            return {
+              id: id(item.id),
+              name: name(item.name),
+              kind,
+              ...(item.png === undefined
+                ? {}
+                : { png: validateIconPng(string(item.png)) }),
+            }
+          }),
+        }),
     maps: array(data.maps).map(map),
     transitions: array(data.transitions).map(transition),
     sequence: array(data.sequence).map(sequenceItem),
