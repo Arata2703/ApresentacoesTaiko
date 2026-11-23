@@ -9,6 +9,7 @@ export type BaseId =
   | 'shime-tachidai'
   | 'nagado-suwaridai'
   | 'nagado-tachi'
+  | 'nagado-naname'
 export interface Person {
   readonly id: string
   readonly name: string

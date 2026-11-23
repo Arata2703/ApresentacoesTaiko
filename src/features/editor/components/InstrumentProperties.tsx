@@ -4,7 +4,7 @@ import type { EditorInstrument, InstrumentTransform } from '../editorProjection'
 import type { StageDimensions } from '../../../domain/presentation/model'
 import type { Person } from '../../../domain/presentation/model'
 import { PlayerAssignments } from '../../people/PlayerAssignments'
-import { bases } from '../../../domain/presentation/catalog'
+import { bases, allBaseDefinitions } from '../../../domain/presentation/catalog'
 import type { BaseId } from '../../../domain/presentation/model'
 
 interface Props {
@@ -47,11 +47,12 @@ export function InstrumentProperties(props: Props) {
               }
             >
               <option value="">Sem base definida</option>
-              {bases
+              {allBaseDefinitions
                 .filter(
                   (base) =>
-                    selected.customInstrumentId !== undefined ||
-                    base.kinds.includes(selectedType.kind),
+                    (bases.includes(base) || base.id === selected.baseId) &&
+                    (selected.customInstrumentId !== undefined ||
+                      base.kinds.includes(selectedType.kind)),
                 )
                 .map((base) => (
                   <option key={base.id} value={base.id}>
