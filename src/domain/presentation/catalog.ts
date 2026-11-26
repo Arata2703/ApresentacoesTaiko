@@ -22,7 +22,6 @@ export const bases: readonly BaseDefinition[] = [
   { id: 'okedo-suwaridai', name: 'Okedo suwaridai', kinds: ['okedo'] },
   { id: 'okedo-naname', name: 'Okedo naname', kinds: ['okedo'] },
   { id: 'okedo-eitetsu', name: 'Okedo Eitetsu', kinds: ['okedo'] },
-  { id: 'okedo-tachi', name: 'Okedo Tachi', kinds: ['okedo'] },
   { id: 'shime-suwaridai', name: 'Shime suwaridai', kinds: ['shime'] },
   { id: 'shime-tachidai', name: 'Shime tachidai', kinds: ['shime'] },
   {
@@ -31,10 +30,16 @@ export const bases: readonly BaseDefinition[] = [
     kinds: ['nagado'],
   },
   {
-    id: 'nagado-tachi',
-    name: 'Nagado tachi',
+    id: 'nagado-naname',
+    name: 'Nagado naname',
     kinds: ['nagado'],
   },
+]
+// Historical assignments stay readable while these bases are absent from new choices.
+export const allBaseDefinitions: readonly BaseDefinition[] = [
+  ...bases,
+  { id: 'okedo-tachi', name: 'Okedo Tachi', kinds: ['okedo'] },
+  { id: 'nagado-tachi', name: 'Nagado tachi', kinds: ['nagado'] },
 ]
 const defaultBases: Record<InstrumentType['kind'], BaseId | null> = {
   okedo: 'okedo-suwaridai',
@@ -69,7 +74,7 @@ export function instrumentDefinition(kind: InstrumentKind) {
 
 export function assertCompatibleBase(kind: InstrumentKind, id: BaseId | null) {
   if (id === null) return
-  const base = bases.find((item) => item.id === id)
+  const base = allBaseDefinitions.find((item) => item.id === id)
   if (!base || !base.kinds.includes(catalogInstrumentKind(kind)))
     throw new Error('Base incompatível com o instrumento.')
 }
@@ -81,7 +86,10 @@ export function assertMapInstrumentBase(
 ) {
   if (!custom) {
     assertCompatibleBase(kind, id)
-  } else if (id !== null && !bases.some((base) => base.id === id)) {
+  } else if (
+    id !== null &&
+    !allBaseDefinitions.some((base) => base.id === id)
+  ) {
     throw new Error('Base desconhecida.')
   }
 }

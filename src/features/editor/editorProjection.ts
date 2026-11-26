@@ -1,5 +1,5 @@
 import type { BaseId, Presentation } from '../../domain/presentation/model'
-import { bases } from '../../domain/presentation/catalog'
+import { allBaseDefinitions } from '../../domain/presentation/catalog'
 import type { StageInstrument } from '../../domain/stage'
 import { getInstrumentType } from '../../domain/stage'
 import { customInstrumentFor } from '../../domain/presentation/customInstruments'
@@ -40,7 +40,7 @@ export function projectMap(presentation: Presentation, mapId: string | null) {
       baseLabel:
         item.baseId === null
           ? 'Sem base definida'
-          : bases.find((base) => base.id === item.baseId)!.name,
+          : allBaseDefinitions.find((base) => base.id === item.baseId)!.name,
     }
   })
   return {
