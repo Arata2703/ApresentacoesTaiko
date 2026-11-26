@@ -14,6 +14,8 @@ interface Props {
   onCommit: (players: readonly PlayerReference[]) => void
   onCancel: () => void
   initialCaret?: number
+  label?: string
+  autoFocus?: boolean
 }
 
 export function StagePlayerEditor({
@@ -22,6 +24,8 @@ export function StagePlayerEditor({
   onCommit,
   onCancel,
   initialCaret,
+  label = 'Tocadores no instrumento',
+  autoFocus = true,
 }: Props) {
   const input = useRef<HTMLInputElement>(null)
   const activeOption = useRef<HTMLLIElement>(null)
@@ -93,10 +97,10 @@ export function StagePlayerEditor({
       <input
         ref={input}
         className={`${styles.nameField} ${styles.editing}`}
-        autoFocus
+        autoFocus={autoFocus}
         id={id}
         role="combobox"
-        aria-label="Tocadores no instrumento"
+        aria-label={label}
         aria-autocomplete="list"
         aria-expanded={showOptions}
         aria-controls={`${id}-options`}

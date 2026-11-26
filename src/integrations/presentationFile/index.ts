@@ -38,9 +38,11 @@ function encode(data: Presentation): string {
   const source = JSON.stringify(
     {
       format: presentationFormat,
-      version: data.customInstruments?.length
-        ? customCatalogVersion
-        : presentationVersion,
+      version: data.maps.some((map) => map.kumis?.length)
+        ? 3
+        : data.customInstruments?.length
+          ? customCatalogVersion
+          : presentationVersion,
       presentation: data,
     },
     null,
@@ -94,7 +96,7 @@ export function importPresentation(source: string): ImportResult {
       envelope.version !== supportedVersion &&
       !(
         envelope.format === presentationFormat &&
-        envelope.version === customCatalogVersion
+        (envelope.version === customCatalogVersion || envelope.version === 3)
       )
     )
       return {

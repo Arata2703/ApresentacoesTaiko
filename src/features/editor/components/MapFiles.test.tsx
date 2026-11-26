@@ -1,3 +1,4 @@
+import { deleteStageSelection } from '../../../test/deleteStageSelection'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -98,9 +99,7 @@ describe('arquivos e primeiro fluxo integrado', () => {
       rotation: 135,
     })
     expect(loaded.presentation.people[0]!.name).toBe('Ana Silva')
-    await user.click(
-      screen.getByRole('button', { name: 'Remover instrumento' }),
-    )
+    await deleteStageSelection()
     upload(source)
     await screen.findByRole('alertdialog')
     expect(

@@ -116,6 +116,19 @@ function map(value: unknown): MusicMap {
     id: id(data.id),
     title: name(data.title),
     stage: { width, depth },
+    ...(data.kumis === undefined
+      ? {}
+      : {
+          kumis: array(data.kumis).map((value) => {
+            const item = record(value)
+            return {
+              id: id(item.id),
+              name: name(item.name, true),
+              instrumentIds: references(item.instrumentIds),
+              playerIds: references(item.playerIds),
+            }
+          }),
+        }),
     instruments: array(data.instruments).map((item) =>
       instrument(item, width, depth),
     ),

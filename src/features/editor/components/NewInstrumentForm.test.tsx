@@ -151,10 +151,9 @@ it('mostra a prévia do SVG, salva o ícone próprio e o recupera ao reabrir', a
   app.unmount()
   render(<App />)
   const item = screen.getByRole('button', { name: /Meu tambor, sem tocador/ })
-  expect(item.querySelector('img')).toHaveAttribute(
-    'src',
-    `data:image/png;base64,${iconPng}`,
-  )
+  expect(
+    item.closest('[data-stage-instrument]')!.querySelector('img'),
+  ).toHaveAttribute('src', `data:image/png;base64,${iconPng}`)
   await user.click(screen.getByRole('button', { name: 'Novo instrumento' }))
   await user.selectOptions(
     screen.getByLabelText('Ícone', { exact: true }),

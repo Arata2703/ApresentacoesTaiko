@@ -28,10 +28,10 @@ function example() {
 }
 
 describe('catálogo do MVP', () => {
-  it('contém os 11 tipos e as 8 bases, sem fingir dimensões reais', () => {
+  it('contém os 11 tipos e as 7 bases, sem fingir dimensões reais', () => {
     expect(instrumentDefinitions).toHaveLength(11)
-    expect(bases).toHaveLength(8)
-    expect(new Set(bases.map((base) => base.id)).size).toBe(8)
+    expect(bases).toHaveLength(7)
+    expect(new Set(bases.map((base) => base.id)).size).toBe(7)
     for (const type of instrumentDefinitions) {
       expect(type.dimensions).toBeNull()
       expect(instrumentDefinition(type.kind)).toBe(type)

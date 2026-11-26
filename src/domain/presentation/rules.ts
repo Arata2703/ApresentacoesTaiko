@@ -23,6 +23,7 @@ export function assertNewId(presentation: Presentation, id: string) {
     ...presentation.maps.flatMap((map) => [
       map.id,
       ...map.instruments.map((item) => item.id),
+      ...(map.kumis ?? []).map((item) => item.id),
     ]),
     ...presentation.transitions.map((item) => item.id),
     ...presentation.materials.map((item) => item.id),

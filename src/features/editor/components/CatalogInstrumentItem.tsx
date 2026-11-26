@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import type { InstrumentKind } from '../../../domain/stage'
 import { InstrumentSymbol } from './InstrumentSymbol'
 import styles from '../editor.module.css'
@@ -8,6 +14,7 @@ interface Props {
   abbreviation?: string
   kind: InstrumentKind
   png?: string
+  symbol?: ReactNode
   onAdd: () => void
   actions?: { onEdit: () => void; onRemove: () => void }
 }
@@ -19,6 +26,7 @@ export function CatalogInstrumentItem({
   png,
   onAdd,
   actions,
+  symbol,
 }: Props) {
   const row = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
@@ -157,7 +165,7 @@ export function CatalogInstrumentItem({
         onPointerLeave={stopHold}
       >
         <span ref={icon} className={styles.catalogSymbol}>
-          <InstrumentSymbol kind={kind} png={png} small />
+          {symbol ?? <InstrumentSymbol kind={kind} png={png} small />}
         </span>
         <span className={styles.catalogLabel}>
           <span

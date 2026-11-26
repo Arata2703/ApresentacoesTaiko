@@ -1,3 +1,4 @@
+import { deleteStageSelection } from '../../test/deleteStageSelection'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
@@ -110,9 +111,7 @@ describe('fluxos da primeira tela', () => {
     expect(
       screen.getByRole('checkbox', { name: 'Ana · pessoa 1' }),
     ).toBeChecked()
-    await user.click(
-      screen.getByRole('button', { name: 'Remover instrumento' }),
-    )
+    await deleteStageSelection()
     expect(
       screen.queryByRole('button', { name: /Okedo, tocador Ana/ }),
     ).not.toBeInTheDocument()
@@ -121,9 +120,7 @@ describe('fluxos da primeira tela', () => {
     ).not.toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent('Okedo removido.')
     await user.click(screen.getByRole('button', { name: /Shime, sem tocador/ }))
-    await user.click(
-      screen.getByRole('button', { name: 'Remover instrumento' }),
-    )
+    await deleteStageSelection()
     expect(
       screen.getByRole('heading', { name: 'O palco é seu.' }),
     ).toBeVisible()
