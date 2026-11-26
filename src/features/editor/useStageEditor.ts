@@ -223,8 +223,11 @@ export function useStageEditor() {
         return additions.get(name)!.id
       })
       setState((s) => {
-        const map = s.presentation.maps.find((item) =>
-          item.instruments.some((instrument) => instrument.id === instrumentId),
+        const map = s.presentation.maps.find(
+          (item) =>
+            item.instruments.some(
+              (instrument) => instrument.id === instrumentId,
+            ) || item.kumis?.some((k) => k.id === instrumentId),
         )
         if (!map) return s
         let p = s.presentation
@@ -232,7 +235,13 @@ export function useStageEditor() {
           p = addPerson(p, person.id, person.name)
         return {
           ...s,
-          presentation: assignInstrumentPlayers(p, map.id, instrumentId, ids),
+          presentation: assignInstrumentPlayers(
+            p,
+            map.id,
+            map.kumis?.find((k) => k.id === instrumentId)?.instrumentIds[0] ??
+              instrumentId,
+            ids,
+          ),
         }
       })
     },
@@ -257,6 +266,7 @@ export function useStageEditor() {
     selected,
     selectedId: state.selectedId,
     message,
+    announce: setMessage,
     title: state.titleDraft,
     song: state.songDraft,
     selectInstrument,

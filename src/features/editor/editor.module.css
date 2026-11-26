@@ -361,6 +361,7 @@
   margin: 32px 10px 10px;
 }
 .stageInstrument {
+  pointer-events: none;
   touch-action: none;
   user-select: none;
   cursor: grab;
@@ -372,10 +373,10 @@
   align-items: center;
   flex-direction: column;
   width: 74px;
-  min-height: 68px;
-  gap: 8px;
-  padding: 8px 2px 4px;
-  border: 1px solid transparent;
+  height: 54px;
+  justify-content: center;
+  padding: 0;
+  border: 0;
   background: transparent;
   border-radius: 5px;
 }
@@ -404,7 +405,10 @@
   display: block;
 }
 .instrumentLabel {
+  pointer-events: auto;
   flex-shrink: 0;
+  position: absolute;
+  top: calc(100% + 4px);
 }
 .properties {
   padding: 25px 20px;
@@ -728,6 +732,9 @@
 }
 
 .instrumentButton {
+  position: absolute;
+  pointer-events: auto;
+  z-index: 1;
   display: grid;
   place-items: center;
   width: 100%;
@@ -738,7 +745,7 @@
 .instrumentButton:focus-visible {
   outline: none;
 }
-.instrumentButton:focus-visible .rotating {
+.instrumentButton:focus-visible + .rotating {
   filter: drop-shadow(0 0 3px #547ac5);
 }
 .dimensionNote {
@@ -773,11 +780,17 @@
 .stageInstrument:focus-within {
   z-index: 6;
 }
+.stageInstrument > div {
+  position: absolute;
+  top: calc(100% + 4px);
+  pointer-events: auto;
+}
 
 .catalogRow {
   display: flex;
   align-items: center;
   position: relative;
+  touch-action: none;
   min-width: 0;
   gap: 3px;
 }

@@ -1,3 +1,4 @@
+import { deleteStageSelection } from '../../../test/deleteStageSelection'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
@@ -22,9 +23,7 @@ describe('sequência de músicas na interface', () => {
     await userEvent.click(
       screen.getByRole('button', { name: /Okedo, sem tocador/ }),
     )
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Remover instrumento' }),
-    )
+    await deleteStageSelection()
     await userEvent.click(
       screen.getByRole('button', {
         name: 'Abrir mapa Primeira música',

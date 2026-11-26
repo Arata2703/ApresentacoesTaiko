@@ -1,10 +1,8 @@
+import { StageWorkspace } from './components/StageWorkspace'
 import { PresentationHeader } from './components/PresentationHeader'
 import { PresentationSidebar } from './components/PresentationSidebar'
 import { MapHeading } from './components/MapHeading'
 import { MapFiles } from './components/MapFiles'
-import { InstrumentCatalog } from './components/InstrumentCatalog'
-import { StageMap } from './components/StageMap'
-import { InstrumentProperties } from './components/InstrumentProperties'
 import { EditorFooter } from './components/EditorFooter'
 import { useStageEditor } from './useStageEditor'
 import styles from './editor.module.css'
@@ -22,6 +20,7 @@ import type { PlayerReference } from '../people/playerDraft'
 
 export function EditorPage() {
   const editor = useStageEditor()
+  const [showNames, setShowNames] = useState(true)
   const [view, setView] = useState<'slides' | 'people' | 'materials' | 'order'>(
     'slides',
   )
@@ -168,48 +167,25 @@ export function EditorPage() {
                 stage={editor.page.stage}
                 onApply={editor.resizeStage}
               />
-              <div className={styles.editor}>
-                <InstrumentCatalog
-                  key={editor.presentation.id}
-                  onAdd={editor.addInstrument}
-                  custom={editor.presentation.customInstruments ?? []}
-                  onCreate={editor.registerInstrument}
-                  presentation={editor.presentation}
-                  onEdit={editor.editInstrument}
-                  onRemove={editor.removeCatalogInstrument}
-                />
-                <StageMap
-                  people={editor.presentation.people}
-                  onCommitPlayers={(instrumentId, players) => {
-                    const names = [
-                      ...new Set(
-                        players.flatMap((player) =>
-                          'name' in player ? [player.name] : [],
-                        ),
+              <StageWorkspace
+                key={editor.presentation.id + editor.activeMapId}
+                editor={editor}
+                showNames={showNames}
+                onToggleNames={() => setShowNames((current) => !current)}
+                onManage={() => setView('people')}
+                onCommitPlayers={(instrumentId, players) => {
+                  const names = [
+                    ...new Set(
+                      players.flatMap((player) =>
+                        'name' in player ? [player.name] : [],
                       ),
-                    ]
-                    if (names.length)
-                      setPendingPlayers({ instrumentId, players, names })
-                    else editor.commitPlayers(instrumentId, players)
-                  }}
-                  stage={editor.page.stage}
-                  instruments={editor.instruments}
-                  selectedId={editor.selectedId}
-                  onSelect={editor.selectInstrument}
-                  onAdd={editor.addInstrument}
-                  onMove={editor.moveInstrument}
-                />
-                <InstrumentProperties
-                  onBaseChange={editor.changeBase}
-                  people={editor.presentation.people}
-                  onAssign={editor.assignPlayers}
-                  onManage={() => setView('people')}
-                  stage={editor.page.stage}
-                  selected={editor.selected}
-                  onChange={editor.changeSelected}
-                  onRemove={editor.removeSelected}
-                />
-              </div>
+                    ),
+                  ]
+                  if (names.length)
+                    setPendingPlayers({ instrumentId, players, names })
+                  else editor.commitPlayers(instrumentId, players)
+                }}
+              />
             </>
           ) : (
             <section>

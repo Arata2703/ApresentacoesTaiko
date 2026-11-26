@@ -8,6 +8,8 @@ import { bases, allBaseDefinitions } from '../../../domain/presentation/catalog'
 import type { BaseId } from '../../../domain/presentation/model'
 
 interface Props {
+  embedded?: boolean
+  hidePlayers?: boolean
   people: readonly Person[]
   onAssign: (ids: readonly string[]) => void
   onManage: () => void
@@ -21,21 +23,24 @@ export function InstrumentProperties(props: Props) {
   const { selected, onChange, onRemove, stage, people, onAssign, onManage } =
     props
   const selectedType = selected && getInstrumentType(selected.kind)
+  const Tag = props.embedded ? 'div' : 'aside'
   return (
-    <aside
-      className={styles.properties}
+    <Tag
+      className={props.embedded ? undefined : styles.properties}
       aria-label="Propriedades do instrumento"
     >
       {selected && selectedType ? (
         <>
           <h2 id="properties-title">{selected.name}</h2>
           <p className={styles.propertyCaption}>Instrumento selecionado</p>
-          <PlayerAssignments
-            people={people}
-            selectedIds={selected.playerIds}
-            onAssign={onAssign}
-            onManage={onManage}
-          />
+          {!props.hidePlayers && (
+            <PlayerAssignments
+              people={people}
+              selectedIds={selected.playerIds}
+              onAssign={onAssign}
+              onManage={onManage}
+            />
+          )}
           <label className={styles.field}>
             Base
             <select
@@ -107,9 +112,11 @@ export function InstrumentProperties(props: Props) {
               }
             />
           </label>
-          <button className={styles.removeButton} onClick={onRemove}>
-            Remover instrumento
-          </button>
+          {!props.embedded && (
+            <button className={styles.removeButton} onClick={onRemove}>
+              Remover instrumento
+            </button>
+          )}
         </>
       ) : (
         <>
@@ -122,6 +129,6 @@ export function InstrumentProperties(props: Props) {
           </div>
         </>
       )}
-    </aside>
+    </Tag>
   )
 }
