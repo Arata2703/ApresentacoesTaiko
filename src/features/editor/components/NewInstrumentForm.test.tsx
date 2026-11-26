@@ -30,6 +30,10 @@ it('cadastra pelo topo da lista, reutiliza ícone e permite escolher a base depo
   )
   await user.clear(within(catalog).getByLabelText('Nome'))
   await user.type(within(catalog).getByLabelText('Nome'), 'Tambor da escola')
+  await user.type(
+    within(catalog).getByLabelText('Abreviação (opcional)'),
+    'Escola',
+  )
   await user.selectOptions(
     within(catalog).getByLabelText('Ícone', { exact: true }),
     'shime',

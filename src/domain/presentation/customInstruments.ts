@@ -21,21 +21,77 @@ export function addCustomInstrument(
   instrument: CustomInstrument,
 ): Presentation {
   assertNewId(presentation, instrument.id)
-  if (!isInstrumentKind(instrument.kind)) throw new Error('Ícone desconhecido.')
-  const name = named(instrument.name)
-  const png =
-    instrument.png === undefined ? undefined : validateIconPng(instrument.png)
   return {
     ...presentation,
     customInstruments: [
       ...(presentation.customInstruments ?? []),
-      {
-        id: instrument.id,
-        name,
-        kind: instrument.kind,
-        ...(png === undefined ? {} : { png }),
-      },
+      validatedInstrument(instrument),
     ],
+  }
+}
+
+export function normalizeInstrumentAbbreviation(
+  value?: string,
+): string | undefined {
+  const abbreviation = value?.trim()
+  return abbreviation ? named(abbreviation) : undefined
+}
+
+function validatedInstrument(instrument: CustomInstrument): CustomInstrument {
+  const abbreviation = normalizeInstrumentAbbreviation(instrument.abbreviation)
+  if (!isInstrumentKind(instrument.kind)) throw new Error('Ícone desconhecido.')
+  return {
+    id: instrument.id,
+    name: named(instrument.name),
+    ...(abbreviation === undefined ? {} : { abbreviation }),
+    kind: instrument.kind,
+    ...(instrument.png === undefined
+      ? {}
+      : { png: validateIconPng(instrument.png) }),
+  }
+}
+
+export function updateCustomInstrument(
+  presentation: Presentation,
+  id: string,
+  input: Omit<CustomInstrument, 'id'>,
+): Presentation {
+  byId(presentation.customInstruments ?? [], id)
+  const instrument = validatedInstrument({ ...input, id })
+  return {
+    ...presentation,
+    customInstruments: presentation.customInstruments!.map((item) =>
+      item.id === id ? instrument : item,
+    ),
+    maps: presentation.maps.map((map) => ({
+      ...map,
+      instruments: map.instruments.map((item) =>
+        item.customInstrumentId === id
+          ? { ...item, kind: instrument.kind }
+          : item,
+      ),
+    })),
+  }
+}
+
+export function customInstrumentUsage(presentation: Presentation, id: string) {
+  byId(presentation.customInstruments ?? [], id)
+  return presentation.maps.filter((map) =>
+    map.instruments.some((item) => item.customInstrumentId === id),
+  )
+}
+
+export function removeCustomInstrument(
+  presentation: Presentation,
+  id: string,
+): Presentation {
+  const maps = customInstrumentUsage(presentation, id)
+  if (maps.length) throw new Error('O instrumento ainda está em uso nos mapas.')
+  return {
+    ...presentation,
+    customInstruments: presentation.customInstruments!.filter(
+      (item) => item.id !== id,
+    ),
   }
 }
 
