@@ -41,9 +41,29 @@ export function MapPreview({
                 <span style={{ transform: `rotate(${item.rotation}deg)` }}>
                   <InstrumentSymbol kind={item.kind} png={item.png} small />
                 </span>
-                <span>{item.player || item.name}</span>
+                {!map.kumis.some((k) => k.instrumentIds.includes(item.id)) && (
+                  <span>{item.player || item.name}</span>
+                )}
               </div>
             ))}
+            {map.kumis.map((k) => {
+              const items = map.instruments.filter((i) =>
+                k.instrumentIds.includes(i.id),
+              )
+              return (
+                <div
+                  key={k.id}
+                  className={styles.instrument}
+                  style={{
+                    left: `${((Math.min(...items.map((i) => i.x)) + Math.max(...items.map((i) => i.x))) / 2 / map.stage.width) * 100}%`,
+                    top: `${(Math.max(...items.map((i) => i.y)) / map.stage.depth) * 100}%`,
+                    paddingTop: 24,
+                  }}
+                >
+                  <span>{items[0]!.player}</span>
+                </div>
+              )
+            })}
             {!map.instruments.length && (
               <p className={styles.empty}>Mapa sem instrumentos</p>
             )}

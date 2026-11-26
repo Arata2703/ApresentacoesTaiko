@@ -121,6 +121,7 @@ export function drawStage(
   }
   for (const item of map.instruments) {
     const cx = x + item.position.x * scale
+    if (map.kumis?.some((k) => k.instrumentIds.includes(item.id))) continue
     const cy = y + height - item.position.y * scale
     const players = item.playerIds
       .map((id) => names.get(id))
@@ -142,6 +143,37 @@ export function drawStage(
       Math.min(y + height - 17, cy - r - size - 2),
     )
     drawLabel(page, fonts, label, left, baseline, span, size, true)
+  }
+  for (const kumi of map.kumis ?? []) {
+    const items = map.instruments.filter((item) =>
+      kumi.instrumentIds.includes(item.id),
+    )
+    const cx =
+      x +
+      ((Math.min(...items.map((i) => i.position.x)) +
+        Math.max(...items.map((i) => i.position.x))) /
+        2) *
+        scale
+    const cy =
+      y + height - Math.max(...items.map((i) => i.position.y)) * scale - r
+    const labels = [kumi.playerIds.map((id) => names.get(id)).join('/')].filter(
+      Boolean,
+    )
+    labels.forEach((label, index) => {
+      const size = compact ? 8 : 10,
+        span = Math.min(width, compact ? 120 : 220),
+        labelWidth = Math.min(span, pdfTextWidth(fonts[1], label, size))
+      drawLabel(
+        page,
+        fonts,
+        label,
+        Math.max(x, Math.min(x + width - labelWidth, cx - labelWidth / 2)),
+        Math.max(y + 12, cy - (size + 2) * (index + 1)),
+        span,
+        size,
+        true,
+      )
+    })
   }
   drawLabel(
     page,

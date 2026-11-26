@@ -66,7 +66,17 @@ export function mapActions(
       const id = crypto.randomUUID()
       const ids = source.instruments.map(() => crypto.randomUUID())
       update((s) =>
-        activate(s, duplicateMap(s.presentation, source.id, id, ids), id),
+        activate(
+          s,
+          duplicateMap(
+            s.presentation,
+            source.id,
+            id,
+            ids,
+            (source.kumis ?? []).map(() => crypto.randomUUID()),
+          ),
+          id,
+        ),
       )
     },
     removeMusic: () => {

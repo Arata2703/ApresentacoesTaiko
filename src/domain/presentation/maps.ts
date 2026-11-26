@@ -6,6 +6,7 @@ import type {
   MapInstrument,
   MusicMap,
   Presentation,
+  Position,
   StageDimensions,
 } from './model'
 import {
@@ -18,6 +19,7 @@ import {
   rotation,
 } from './rules'
 import { reconcileSequence } from './sequence'
+import { changeKumi, kumiFor, pruneKumis } from './kumi'
 
 function replaceMap(p: Presentation, map: MusicMap): Presentation {
   return { ...p, maps: p.maps.map((item) => (item.id === map.id ? map : item)) }
@@ -83,9 +85,31 @@ export function resizeStage(
     const dx = (nextStage.width - map.stage.width) / 2
     const dy = (nextStage.depth - map.stage.depth) / 2
     let needsReposition = false
+    const groupedPositions = new Map<string, Position>()
+    for (const kumi of map.kumis ?? []) {
+      const members = kumi.instrumentIds.map((id) => byId(map.instruments, id))
+      const xs = members.map((item) => item.position.x + dx),
+        ys = members.map((item) => item.position.y + dy)
+      const minX = Math.min(...xs),
+        maxX = Math.max(...xs),
+        minY = Math.min(...ys),
+        maxY = Math.max(...ys)
+      if (maxX - minX > nextStage.width || maxY - minY > nextStage.depth)
+        throw new Error(
+          'Um Kumi não cabe nas novas medidas. Edite sua formação antes de reduzir o palco.',
+        )
+      const shiftX = Math.max(-minX, Math.min(0, nextStage.width - maxX)),
+        shiftY = Math.max(-minY, Math.min(0, nextStage.depth - maxY))
+      members.forEach((item, index) =>
+        groupedPositions.set(item.id, {
+          x: xs[index]! + shiftX,
+          y: ys[index]! + shiftY,
+        }),
+      )
+    }
     const instruments = map.instruments.map((item) => {
       const point = { x: item.position.x + dx, y: item.position.y + dy }
-      const fitted = position(point, nextStage)
+      const fitted = groupedPositions.get(item.id) ?? position(point, nextStage)
       if (point.x !== fitted.x || point.y !== fitted.y) needsReposition = true
       return { ...item, position: fitted }
     })
@@ -182,6 +206,8 @@ export function assignInstrumentPlayers(
   const map = byId(p.maps, mapId)
   byId(map.instruments, id)
   const playerIds = peopleReferences(p, ids)
+  const kumi = kumiFor(map, id)
+  if (kumi) return changeKumi(p, mapId, kumi.id, { playerIds })
   return replaceMap(p, {
     ...map,
     instruments: map.instruments.map((item) =>
@@ -197,8 +223,11 @@ export function removeMapInstrument(
 ): Presentation {
   const map = byId(p.maps, mapId)
   byId(map.instruments, id)
-  return replaceMap(p, {
-    ...map,
-    instruments: map.instruments.filter((item) => item.id !== id),
-  })
+  return replaceMap(
+    p,
+    pruneKumis({
+      ...map,
+      instruments: map.instruments.filter((item) => item.id !== id),
+    }),
+  )
 }

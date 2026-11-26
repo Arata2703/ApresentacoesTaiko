@@ -48,6 +48,7 @@ export function projectMap(presentation: Presentation, mapId: string | null) {
     song: map.title,
     stage: map.stage,
     instruments,
+    kumis: map.kumis ?? [],
   }
 }
 

@@ -77,6 +77,14 @@ export function removePresentationPerson(
     rosterIds: p.rosterIds.filter((personId) => personId !== id),
     maps: p.maps.map((map) => ({
       ...map,
+      ...(map.kumis
+        ? {
+            kumis: map.kumis.map((item) => ({
+              ...item,
+              playerIds: item.playerIds.filter((personId) => personId !== id),
+            })),
+          }
+        : {}),
       instruments: map.instruments.map((item) => ({
         ...item,
         playerIds: item.playerIds.filter((personId) => personId !== id),

@@ -43,6 +43,13 @@ export interface MusicMap {
   readonly title: string
   readonly stage: StageDimensions
   readonly instruments: readonly MapInstrument[]
+  readonly kumis?: readonly Kumi[]
+}
+export interface Kumi {
+  readonly id: string
+  readonly name: string
+  readonly instrumentIds: readonly string[]
+  readonly playerIds: readonly string[]
 }
 export interface TextTransition {
   readonly id: string
